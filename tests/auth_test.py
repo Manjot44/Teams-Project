@@ -41,11 +41,13 @@ def test_authreg_email():
         assert src.auth.auth_register_v1("", "thisIsPass13./", "Jerry", "Lin")                  # empty email
 
 def test_authreg_password():
+    clearv1()
     with pytest.raises(InputError):
         assert src.auth.auth_register_v1("abc@gmail.com", "1>;[g", "Jerry", "Lin")              # 5 letter password
         assert src.auth.auth_register_v1("abc@gmail.com", "", "Jerry", "Lin")                   # empty password
 
 def test_authreg_names():
+    clearv1()
     with pytest.raises(ImportError):
         assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "")        # 
         assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "", "Lin")          # empty names
