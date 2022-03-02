@@ -54,3 +54,23 @@ def test_authreg_names():
         "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg8", "Lin")                           #
         assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./",                     #
         "Jerry", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg8")                         # long names
+
+
+
+def test_authlog_valid(test_authreg_valid):
+    assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "123456")
+    assert src.auth.auth_login_v1(".@..Ml", "a>?:1#")
+
+def test_authlog_missing(test_authreg_valid):
+    with pytest.raises(InputError):
+        assert src.auth.auth_login_v1("aBc12._%+-@aBc123.-.Co", "123456")                       # missing email
+        assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "1234576")                     # missing password
+
+def test_authlog_mixed(test_authreg_valid):
+    with pytest.raises(InputError):
+        assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "a>?:1#")                      # 
+        assert src.auth.auth_login_v1(".@..Ml", "123456")                                       # different accounts password
+
+def test_authlog_none():
+    with pytest.raises(InputError):
+        assert src.auth.auth_login_v1("anything@gmail.com", "password1$^")                      # no accounts stored
