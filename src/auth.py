@@ -25,6 +25,7 @@ def auth_register_v1(email, password, name_first, name_last):
     alpha_nfirst = ''.join(filter(str.isalnum, name_first))
     alpha_nlast = ''.join(filter(str.isalnum, name_last))
     alpha_nfirst += alpha_nlast
+    alpha_nfirst = alpha_nfirst.lower()
     handle = alpha_nfirst[:20]
 
     store = data_store.get()
