@@ -3,6 +3,7 @@ import pytest
 from src.other import clear_v1
 from src.error import InputError
 
+@pytest.fixture
 def test_authreg_valid():
     clear_v1()
     new_id = []
@@ -46,7 +47,7 @@ def test_authreg_password():
         assert src.auth.auth_register_v1("abc@gmail.com", "", "Jerry", "Lin")                   # empty password
 
 def test_authreg_names():
-    with pytest.raises(ImportError):
+    with pytest.raises(InputError):
         assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "")        # 
         assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "", "Lin")          # empty names
         
