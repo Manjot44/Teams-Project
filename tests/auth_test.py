@@ -53,6 +53,6 @@ def test_authreg_names():
         assert auth_register_v1("abc@gmail.com", "thisIsPass13./", "", "Lin")          # empty names
         
         assert auth_register_v1("abc@gmail.com", "thisIsPass13./",                     #
-        "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg8", "Lin")                           #
+        "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg8", "Lin")                  #
         assert auth_register_v1("abc@gmail.com", "thisIsPass13./",                     #
-        "Jerry", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg8")                         # long names
+        "Jerry", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg8")                # long names
