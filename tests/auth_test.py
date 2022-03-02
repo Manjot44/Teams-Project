@@ -9,16 +9,16 @@ def test_authreg_valid():
     new_id = []
     
     returned = src.auth.auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")
-    assert returned is int not in new_id
+    assert isinstance(returned, int) and returned not in new_id
     new_id.append(returned)
 
     returned = src.auth.auth_register_v1(".@..Ml", "a>?:1#", 
     "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg")
-    assert returned is int not in new_id
+    assert isinstance(returned, int) and returned not in new_id
     new_id.append(returned)
 
     returned = src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")
-    assert returned is int not in new_id
+    assert isinstance(returned, int) and returned not in new_id
 
 def test_authreg_email():
     clear_v1()
@@ -42,11 +42,13 @@ def test_authreg_email():
         assert src.auth.auth_register_v1("", "thisIsPass13./", "Jerry", "Lin")                  # empty email
 
 def test_authreg_password():
+    clear_v1()
     with pytest.raises(InputError):
         assert src.auth.auth_register_v1("abc@gmail.com", "1>;[g", "Jerry", "Lin")              # 5 letter password
         assert src.auth.auth_register_v1("abc@gmail.com", "", "Jerry", "Lin")                   # empty password
 
 def test_authreg_names():
+    clear_v1()
     with pytest.raises(InputError):
         assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "")        # 
         assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "", "Lin")          # empty names
