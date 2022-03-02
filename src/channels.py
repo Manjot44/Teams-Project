@@ -1,3 +1,4 @@
+from data_store import data_store
 def channels_list_v1(auth_user_id):
     return {
         'channels': [
