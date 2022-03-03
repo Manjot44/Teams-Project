@@ -20,6 +20,8 @@ def test_authreg_valid():
     returned = src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     assert isinstance(returned, int) and returned not in new_id
 
+    return new_id
+
 def test_authreg_email():
     clear_v1()
     with pytest.raises(InputError):
@@ -61,8 +63,8 @@ def test_authreg_names():
 
 
 def test_authlog_valid(test_authreg_valid):
-    assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "123456")
-    assert src.auth.auth_login_v1(".@..Ml", "a>?:1#")
+    assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "123456") == test_authreg_valid[0]
+    assert src.auth.auth_login_v1(".@..Ml", "a>?:1#") == test_authreg_valid[1]
 
 def test_authlog_missing(test_authreg_valid):
     with pytest.raises(InputError):
