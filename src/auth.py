@@ -57,7 +57,7 @@ def auth_register_v1(email, password, name_first, name_last):
         "email": email,
         "password": password,
         "handle": handle,
-        "id": id
+        "id": id,
     }
     store["users"].append(new_user)
 
