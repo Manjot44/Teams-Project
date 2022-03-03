@@ -3,6 +3,17 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     }
 
 def channel_details_v1(auth_user_id, channel_id):
+    details = {}
+    store = data_store.get()
+    stored_channel_list = store['channels']
+    stored_user_list = store['user']
+
+    for channel in stored_channel_list:
+        listall['channels'].append(channel)
+    
+    return listall
+
+    '''
     return {
         'name': 'Hayden',
         'owner_members': [
@@ -24,6 +35,7 @@ def channel_details_v1(auth_user_id, channel_id):
             }
         ],
     }
+    '''
 
 def channel_messages_v1(auth_user_id, channel_id, start):
     return {

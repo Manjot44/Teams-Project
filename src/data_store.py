@@ -27,6 +27,35 @@ Example usage:
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'users': [],
+    'channels': [
+        {
+            'channel_id': 0,
+            'name': 'sanjam_channel',
+            'members' : {
+                'owner_members': [0],
+                'all_members': [0, 1, 2],
+            },
+            'ispublic': True,
+        },
+        {
+            'channel_id': 2,
+            'name': 'jerry_channel',
+            'members' : {
+                'owner_members': [0],
+                'all_members': [0, 1, 2],
+            },
+            'ispublic': False,
+        }
+    ],
+    'users_alt_details': [
+        {
+            'u_id': None,
+            'email': None,
+            'name_first': None,
+            'name_last': None,
+            'handle_str': None,
+        }
+    ]
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
