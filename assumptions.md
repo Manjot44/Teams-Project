@@ -1,0 +1,1 @@
+We have assumed that only strings are able to be inputted into the auth_register_v1 and auth_login_v1 functions.
