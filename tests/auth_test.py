@@ -3,24 +3,7 @@ import pytest
 from src.other import clear_v1
 from src.error import InputError
 
-@pytest.fixture
-def test_authreg_valid_fixture():
-    clear_v1()
-    new_id = []
-    
-    returned = src.auth.auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")
-    new_id.append(returned)
-
-    returned = src.auth.auth_register_v1(".@..Ml", "a>?:1#", 
-    "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg")
-    new_id.append(returned)
-
-    returned = src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")
-    new_id.append(returned)
-
-    return new_id
-
-def test_authreg_valid(test_authreg_valid_fixture):
+def test_authreg_valid():
     clear_v1()
     new_id = []
     
@@ -132,31 +115,31 @@ def test_authreg_names_long2():
 
 
 
-def test_authlog_valid(test_authreg_valid_fixture):
-    assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "123456") == test_authreg_valid_fixture[0]
-    assert src.auth.auth_login_v1(".@..Ml", "a>?:1#") == test_authreg_valid_fixture[1]
+def test_authlog_valid(register_three_users):
+    assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "123456") == register_three_users[0]
+    assert src.auth.auth_login_v1(".@..Ml", "a>?:1#") == register_three_users[1]
 
-def test_authlog_missing1(test_authreg_valid_fixture):
+def test_authlog_missing1(register_three_users):
     with pytest.raises(InputError):
         src.auth.auth_login_v1("aBc12._%+-@aBc123.-.Co", "123456")                       # missing email
 
-def test_authlog_missing2(test_authreg_valid_fixture):
+def test_authlog_missing2(register_three_users):
     with pytest.raises(InputError):
         src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "1234576")                     # missing password
 
-def test_authlog_empty1(test_authreg_valid_fixture):
+def test_authlog_empty1(register_three_users):
     with pytest.raises(InputError):
         src.auth.auth_login_v1("", "123456")                                             # empty email
         
-def test_authlog_empty2(test_authreg_valid_fixture):
+def test_authlog_empty2(register_three_users):
     with pytest.raises(InputError):
         src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "")                            # empty password
 
-def test_authlog_mixed1(test_authreg_valid_fixture):
+def test_authlog_mixed1(register_three_users):
     with pytest.raises(InputError):
         src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "a>?:1#")                      # different accounts password
 
-def test_authlog_mixed2(test_authreg_valid_fixture):
+def test_authlog_mixed2(register_three_users):
     with pytest.raises(InputError):
         src.auth.auth_login_v1(".@..Ml", "123456")                                       # different accounts password
 
