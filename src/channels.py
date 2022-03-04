@@ -6,14 +6,24 @@ else:
     from src.data_store import data_store
 
 def channels_list_v1(auth_user_id):
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
-    }
+    #Getting Data from data storage file
+    store = data_store.get()
+
+    #Creating empty list for the channels the user is part of
+    channels = []
+    no_channels = len(store["channels"])
+    i = 0
+
+    #Looping through all channels and adding the channels that the user is part of to "channels"
+    while i != no_channels:
+        j = 0
+        no_members = len(store["channels"][i]["members"])
+        while j != no_members:
+            if auth_user_id == store["channels"][i]["members"][j]:
+                channels.append(store["channels"][i])
+            j += 1
+        i += 1
+    return channels
 
 def channels_listall_v1(auth_user_id):
     return {
@@ -37,8 +47,8 @@ def channels_create_v1(auth_user_id, name, is_public):
     #Getting Data from data storage file
     store = data_store.get()
 
-    #Creates list of all channels if it does not already exist
-    if "channels" not in store:
+    #Creates the initial channel if channels list is empty
+    if len(store["channels"]) == 0:
         nc = {      
         }
         nc["channel_id"] = 1
@@ -72,10 +82,5 @@ def channels_create_v1(auth_user_id, name, is_public):
     #Saving to datastore
     data_store.set(store)
 
-    #Testing
-    print(current_channel)
     return channel_id
 
-
-if __name__ == '__main__':
-    channels_create_v1("abcdefgh", "test-channel-1", False)

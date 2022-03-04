@@ -27,6 +27,7 @@ Example usage:
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'users': [],
+    'channels': [],
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
@@ -43,7 +44,6 @@ class Datastore:
             raise TypeError('store must be of type dictionary')
         self.__store = store
 
-print('Loading Datastore...')
 
 global data_store
 data_store = Datastore()
