@@ -58,9 +58,6 @@ def test_valid_no_messages():
     assert ch_messages["end"] == -1   
 
 
-    # assert channel_messages_v1(auth_user_id, channel_id, 0)
-    # valid_start = True
-
 
 
 
