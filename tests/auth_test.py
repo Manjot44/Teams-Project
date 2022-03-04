@@ -4,7 +4,23 @@ from src.other import clear_v1
 from src.error import InputError
 
 @pytest.fixture
-def test_authreg_valid():
+def test_authreg_valid_fixture():
+    clear_v1()
+    new_id = []
+    
+    returned = src.auth.auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")
+    new_id.append(returned)
+
+    returned = src.auth.auth_register_v1(".@..Ml", "a>?:1#", 
+    "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg")
+    new_id.append(returned)
+
+    returned = src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")
+    new_id.append(returned)
+
+    return new_id
+
+def test_authreg_valid(test_authreg_valid_fixture):
     clear_v1()
     new_id = []
     
@@ -20,62 +36,131 @@ def test_authreg_valid():
     returned = src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     assert isinstance(returned, int) and returned not in new_id
 
-    return new_id
-
-def test_authreg_email():
+def test_authreg_email_miss1():
     clear_v1()
     with pytest.raises(InputError):
-        assert src.auth.auth_register_v1("abcgmail.com", "thisIsPass13./", "Jerry", "Lin")      # missing the @
-        assert src.auth.auth_register_v1("abc@gmailcom", "thisIsPass13./", "Jerry", "Lin")      # missing the .
+        src.auth.auth_register_v1("abcgmail.com", "thisIsPass13./", "Jerry", "Lin")      # missing the @
 
-        assert src.auth.auth_register_v1("abc@gmail.M", "thisIsPass13./", "Jerry", "Lin")       # not >one characters to end
+def test_authreg_email_miss2():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@gmailcom", "thisIsPass13./", "Jerry", "Lin")      # missing the .
+
+def test_authreg_email_end():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@gmail.M", "thisIsPass13./", "Jerry", "Lin")       # not >1 characters to end
+
+def test_authreg_email_repeat():
+    clear_v1()
+    with pytest.raises(InputError):  
+        src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")     #
+        src.auth.auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")
+        src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")     # repeated email
+
+def test_authreg_email_inv1():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc%^@gmail.com", "thisIsPass13./", "Jerry", "Lin")   # invalid character in first section
+
+def test_authreg_email_inv2():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@gmail.+.com", "thisIsPass13./", "Jerry", "Lin")   # invalid character in second section
+
+def test_authreg_email_inv3():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@gmail.co2", "thisIsPass13./", "Jerry", "Lin")     # invalid character in third section
+
+def test_authreg_email_inv4():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@gmail.co.*", "thisIsPass13./", "Jerry", "Lin")    # invalid character in third section
+
+def test_authreg_email_empty1():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("@gmail.com", "thisIsPass13./", "Jerry", "Lin")        # empty first section
+
+def test_authreg_email_empty2():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@.com", "thisIsPass13./", "Jerry", "Lin")          # empty second section
+
+def test_authreg_email_empty3():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@gmail.", "thisIsPass13./", "Jerry", "Lin")        # empty third section
+
+def test_authreg_email_empty4():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("", "thisIsPass13./", "Jerry", "Lin")                  # empty email
+
+def test_authreg_password_less():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@gmail.com", "1>;[g", "Jerry", "Lin")              # 5 letter password
+
+def test_authreg_password_empty():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@gmail.com", "", "Jerry", "Lin")                   # empty password
+
+def test_authreg_names_empty1():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "")        # empty first name
+
+def test_authreg_names_empty2():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "", "Lin")          # empty last name
+
+def test_authreg_names_long1():
+    clear_v1()
+    with pytest.raises(InputError):
+        src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./",                     #
+        "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg8", "Lin")                    # long first name
         
-        assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")     #
-        assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")     # repeated email
-
-        assert src.auth.auth_register_v1("abc%^@gmail.com", "thisIsPass13./", "Jerry", "Lin")   # invalid character in first section
-        assert src.auth.auth_register_v1("abc@gmail.+.com", "thisIsPass13./", "Jerry", "Lin")   # invalid character in second section
-        assert src.auth.auth_register_v1("abc@gmail.co2", "thisIsPass13./", "Jerry", "Lin")     # invalid character in third section
-        assert src.auth.auth_register_v1("abc@gmail.co.*", "thisIsPass13./", "Jerry", "Lin")    # invalid character in third section
-
-        assert src.auth.auth_register_v1("@gmail.com", "thisIsPass13./", "Jerry", "Lin")        # empty first section
-        assert src.auth.auth_register_v1("abc@.com", "thisIsPass13./", "Jerry", "Lin")          # empty second section
-        assert src.auth.auth_register_v1("abc@gmail.", "thisIsPass13./", "Jerry", "Lin")        # empty third section
-        assert src.auth.auth_register_v1("", "thisIsPass13./", "Jerry", "Lin")                  # empty email
-
-def test_authreg_password():
+def test_authreg_names_long2():
     clear_v1()
     with pytest.raises(InputError):
-        assert src.auth.auth_register_v1("abc@gmail.com", "1>;[g", "Jerry", "Lin")              # 5 letter password
-        assert src.auth.auth_register_v1("abc@gmail.com", "", "Jerry", "Lin")                   # empty password
+        src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./",                     #
+        "Jerry", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg8")                  # long last name
 
-def test_authreg_names():
-    clear_v1()
+
+
+def test_authlog_valid(test_authreg_valid_fixture):
+    assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "123456") == test_authreg_valid_fixture[0]
+    assert src.auth.auth_login_v1(".@..Ml", "a>?:1#") == test_authreg_valid_fixture[1]
+
+def test_authlog_missing1(test_authreg_valid_fixture):
     with pytest.raises(InputError):
-        assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "")        # 
-        assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "", "Lin")          # empty names
+        src.auth.auth_login_v1("aBc12._%+-@aBc123.-.Co", "123456")                       # missing email
+
+def test_authlog_missing2(test_authreg_valid_fixture):
+    with pytest.raises(InputError):
+        src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "1234576")                     # missing password
+
+def test_authlog_empty1(test_authreg_valid_fixture):
+    with pytest.raises(InputError):
+        src.auth.auth_login_v1("", "123456")                                             # empty email
         
-        assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./",                     #
-        "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg8", "Lin")                           #
-        assert src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./",                     #
-        "Jerry", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg8")                         # long names
-
-
-
-def test_authlog_valid(test_authreg_valid):
-    assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "123456") == test_authreg_valid[0]
-    assert src.auth.auth_login_v1(".@..Ml", "a>?:1#") == test_authreg_valid[1]
-
-def test_authlog_missing(test_authreg_valid):
+def test_authlog_empty2(test_authreg_valid_fixture):
     with pytest.raises(InputError):
-        assert src.auth.auth_login_v1("aBc12._%+-@aBc123.-.Co", "123456")                       # missing email
-        assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "1234576")                     # missing password
+        src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "")                            # empty password
 
-def test_authlog_mixed(test_authreg_valid):
+def test_authlog_mixed1(test_authreg_valid_fixture):
     with pytest.raises(InputError):
-        assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "a>?:1#")                      # 
-        assert src.auth.auth_login_v1(".@..Ml", "123456")                                       # different accounts password
+        src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "a>?:1#")                      # different accounts password
+
+def test_authlog_mixed2(test_authreg_valid_fixture):
+    with pytest.raises(InputError):
+        src.auth.auth_login_v1(".@..Ml", "123456")                                       # different accounts password
 
 def test_authlog_none():
+    clear_v1()
     with pytest.raises(InputError):
-        assert src.auth.auth_login_v1("anything@gmail.com", "password1$^")                      # no accounts stored
+        src.auth.auth_login_v1("anything@gmail.com", "password1$^")                      # no accounts stored
