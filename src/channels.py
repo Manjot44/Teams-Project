@@ -1,6 +1,7 @@
 if __name__ == '__main__':
     from error import InputError, AccessError
     from data_store import data_store
+
 else:
     from src.error import InputError, AccessError
     from src.data_store import data_store
@@ -24,7 +25,11 @@ def channels_list_v1(auth_user_id):
     for idx1, channel in enumerate(store["channels"]):
         for member in store["channels"][idx1]["members"]:
             if auth_user_id == member:
-                channels_list.append(channel)
+                fix_chan = {
+                    "channel_id": store["channels"][idx1]["channel_id"],
+                    "name": store["channels"][idx1]["name"],
+                }
+                channels_list.append(fix_chan)
 
     return channels_list
 
