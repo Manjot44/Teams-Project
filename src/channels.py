@@ -72,6 +72,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     current_channel["members"] = [auth_user_id]
     current_channel["name"] = name
     current_channel["ispublic"] = is_public
+    current_channel["messages"] = []
 
     #Saving to datastore
     data_store.set(store)
