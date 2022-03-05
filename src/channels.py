@@ -1,4 +1,4 @@
-from data_store import data_store
+from src import data_store
 
 
 def channels_list_v1(auth_user_id):
@@ -12,12 +12,26 @@ def channels_list_v1(auth_user_id):
     }
 
 def channels_listall_v1(auth_user_id):
+    # dictionary that is to be returned by function
     listall = {
         'channels': []
     }
-    store = data_store.get()
-    stored_channel_list = store['channels']
-    for channel in stored_channel_list:
+
+    # validate auth user id
+    saved_data = data_store.get()
+    valid_user = False
+    for user in saved_data['users']['u_id']:
+        if auth_user_id == user:
+            valid_user = True
+    if valid_user == False:
+        raise error.AccessError()
+          
+
+    # getting current channel data from src/data_store 
+    saved_channels = saved_data['channels']
+
+    # copying channels to 'listall' dict from saved channel data
+    for channel in saved_channels:
         listall['channels'].append(channel)
     
     return listall
