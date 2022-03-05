@@ -20,7 +20,7 @@ def channels_list_v1(auth_user_id):
     #Creating empty list for the channels the user is part of
     channels_list = []
 
-    #Looping through all channels and adding the channels that the user is part of to "channels"
+    #Looping through all channels and adding the channels that the user is part of to "channels_list"
     for idx1, channel in enumerate(store["channels"]):
         for member in store["channels"][idx1]["members"]:
             if auth_user_id == member:
@@ -53,34 +53,14 @@ def channels_create_v1(auth_user_id, name, is_public):
     if valid_user == False:
         raise AccessError("User ID must be registered")
 
-    #Assigning variable to check if this is the first channel created
-    initialchannel = False
+    #Creates and adds the new channel to the channels list
+    channel_id = len(store["channels"]) + 1
+    nc = {}
+    nc["channel_id"] = channel_id
+    store["channels"].append(nc)
 
-    #Creates the initial channel if channels list is empty
-    if len(store["channels"]) == 0:
-        nc = {      
-        }
-        nc["channel_id"] = 1
-        store["channels"] = [nc]
-        initialchannel = True
-    
-    #Creating new channel ID and adding to the channels list
-    channel_id = 1
-    i = 0
-    while True:
-        if initialchannel == True:
-            break
-        if i == len(store["channels"]):
-            nnc = {
-            }
-            nnc["channel_id"] = channel_id
-            store["channels"].append(nnc)
-            break
-        channel_id += 1
-        i += 1
-    
     #Assigning variable to newly created channel
-    current_channel = store["channels"][i]
+    current_channel = store["channels"][channel_id - 1]
 
     #Assigning user inputs
     current_channel["channel_id"] = channel_id
