@@ -1,29 +1,32 @@
 if __name__ == '__main__':
-    from error import InputError
+    from error import InputError, AccessError
     from data_store import data_store
 else:
-    from src.error import InputError
+    from src.error import InputError, AccessError
     from src.data_store import data_store
 
 def channels_list_v1(auth_user_id):
     #Getting Data from data storage file
     store = data_store.get()
 
+    #Assessing for Access Error
+    valid_user = False
+    for user in store["users"]:
+        if user["u_id"] == auth_user_id:
+            valid_user = True
+    if valid_user == False:
+        raise AccessError("User ID must be registered")
+
     #Creating empty list for the channels the user is part of
-    channels = []
-    no_channels = len(store["channels"])
-    i = 0
+    channels_list = []
 
     #Looping through all channels and adding the channels that the user is part of to "channels"
-    while i != no_channels:
-        j = 0
-        no_members = len(store["channels"][i]["members"])
-        while j != no_members:
-            if auth_user_id == store["channels"][i]["members"][j]:
-                channels.append(store["channels"][i])
-            j += 1
-        i += 1
-    return channels
+    for idx1, channel in enumerate(store["channels"]):
+        for member in store["channels"][idx1]["members"]:
+            if auth_user_id == member:
+                channels_list.append(channel)
+
+    return channels_list
 
 def channels_listall_v1(auth_user_id):
     return {
@@ -36,16 +39,22 @@ def channels_listall_v1(auth_user_id):
     }
 
 def channels_create_v1(auth_user_id, name, is_public):
+    #Getting Data from data storage file
+    store = data_store.get()
+
     #Assessing for exception
     namelen = len(name)
     if namelen < 1 or namelen > 20:
         raise InputError(f"Name must be between 1 and 20 characters long")
-    
+    valid_user = False
+    for user in store["users"]:
+        if user["u_id"] == auth_user_id:
+            valid_user = True
+    if valid_user == False:
+        raise AccessError("User ID must be registered")
+
     #Assigning variable to check if this is the first channel created
     initialchannel = False
-
-    #Getting Data from data storage file
-    store = data_store.get()
 
     #Creates the initial channel if channels list is empty
     if len(store["channels"]) == 0:
