@@ -170,7 +170,7 @@ def channel_join_v1(auth_user_id, channel_id):
         if auth_user["u_id"] == auth_user_id:
             has_auth_user = 1
     if has_auth_user == 0:
-        raise InputError('Error: User does not have a valid ID')
+        raise AccessError('Error: User does not have a valid ID')
 
     # Raise InputError if channel_id does not refer to valid channel
     # Loop through existing channels to see if any of them have the same ID as 'channel_id'
