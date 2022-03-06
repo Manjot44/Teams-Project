@@ -57,23 +57,6 @@ def channels_listall_v1(auth_user_id):
     
     return listall
 
-    '''
-    return 
-    {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel 1',
-                'members' = [],
-                'ispublic' = True,
-        	},
-            {
-                'channel_id': 2,
-        		'name': 'My Channel 2',
-            },
-        ],
-    }
-    '''
 
 
 def channels_create_v1(auth_user_id, name, is_public):
