@@ -31,33 +31,39 @@ def channel_details_v1(auth_user_id, channel_id):
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
-    # return {
-    #     'messages': [
-    #         {
-    #             'message_id': 1,
-    #             'u_id': 1,
-    #             'message': 'Hello world',
-    #             'time_sent': 1582426789,
-    #         }
-    #     ],
-    #     'start': 0,
-    #     'end': 50,
-    
-    # return {
-    #     'messages': [
-    #         {
-    #             'message_id': 1,
-    #             'u_id': 1,
-    #             'message': 'Hello world',
-    #             'time_created': 1582426789,
-    #         }
-    #     ],
-    #     'start': 0,
-    #     'end': 50,
-    # }
 
     store = data_store.get()
-    # start = int(start)
+
+    is_user_valid = False
+    for user in store['users']:
+        if auth_user_id == user['u_id']:
+            is_user_valid = True
+            break
+
+    if is_user_valid == False:
+        raise AccessError(f"invalid user")
+
+    channel_id_valid = False
+    store_channel = 0
+    for idx, valid_id in enumerate(store['channels']):
+        
+        if channel_id == valid_id['channel_id']:        
+            channel_id_valid = True
+            store_channel = idx
+            break
+
+    if channel_id_valid == False: 
+        raise InputError(f"Invalid channel id")  
+
+    valid_member = False
+
+    for member in store['channels'][channel_id - 1]['all_members']:
+        if auth_user_id == member:
+            valid_member = True
+            break
+
+    if valid_member == False:
+        raise AccessError(f"member is not part of the channel")
 
     messagesreturn = {
         'messages': [],
@@ -65,73 +71,18 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end': start + 50
     }
     
-    # 1. Access the channel
-    # 2. Test if channel_id is valid
-    # 3. Assign all the messages is the channel to 'messages'
-    # 4. Tests if start value is valid (must be less than the amount of messages)
-    # 5. If 'start + 50' is larger than len(messages) ---> end = -1
-    # 6. Run through all the messages and ensure there a no messages (iteration 1 requirement)
-    # Notice: Also have to make sure the user is a member of the channel
+    messages = store['channels'][store_channel]['messages']
 
-    channel_id_valid = False
-    valid_member = False
+    if start > len(messages):
+        raise InputError(f"start must be smaller than total amount of messages")
 
-    for valid_id in enumerate(store['channels']):
-        
-        if channel_id == store['channels'][valid_id]['channel_id']:        
-            channel_id_valid = True
-            
-        if auth_user_id == store['channels'][channel_id - 1]['members'][0]:
-            valid_member = True
-            messages = store['channels']['messages']
+    if start + 50 > len(messages):
+        messagesreturn['end'] = -1
+        messagesreturn['messages'] = messages
+    else:
+        messagesreturn['messages'] = messages[:50]
 
-            if start > len(messages):
-                raise(InputError)
-
-            if start + 50 > len(messages):
-                messagesreturn['end'] = -1
-
-        for message_amount in store['channels']['messages']:
-            if message_amount < len(messages):
-                messagesreturn['messages'].append(messages)
-            else:
-                return messagesreturn        
-
-    if channel_id_valid == False: 
-        raise InputError("Invalid channel id")        
-    if valid_member == False:
-             raise(AccessError)
-        
-    # for data in store['channel']:
-        
-    #     messages = c['messages']
-
-    #     if start > len(messages):
-    #         raise InputError("start is larger than messages")
-    
-    # return {
-    #     'messages': [
-    #         {
-    #             'message_id': 1,
-    #             'u_id': 1,
-    #             'message': 'Hello world',
-    #             'time_created': 1582426789,
-    #         }
-    #     ],
-    #     'start': 0,
-    #     'end': 50,
-    # }
-
-    # channel_id = 1
-    # if channel_id != 10:
-    #     raise InputError("channel_id is invalid")
-
-    # auth_user_id = 1
-    # if auth_user_id != 10:
-    #     raise AccessError("invalid user id")
-
-    # if start > len(messagesreturn["messages"]):
-    #     raise InputError("start should not be greater than the amount of messages"
+    return messagesreturn        
 
 def channel_join_v1(auth_user_id, channel_id):
     return {
