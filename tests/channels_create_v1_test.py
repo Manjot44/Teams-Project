@@ -42,4 +42,5 @@ def test_edge():
     user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
     with pytest.raises(InputError):
         channels_create_v1(user_id, "", True)["channel_id"]
+    with pytest.raises(InputError):
         channels_create_v1(user_id, "abcdefghijklmnopqrst0", True)["channel_id"]
