@@ -19,7 +19,7 @@ def test_if_person_is_added():
 
     for user in details["all_members"]:
         if user["u_id"] == auth_user2:
-            user_joined == True
+            user_joined = True
             break
 
     assert user_joined == True

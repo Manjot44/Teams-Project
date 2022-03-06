@@ -20,7 +20,7 @@ def test_valid_user1():
 
     for user in details["all_members"]:
         if user["u_id"] == auth_user2:
-            user_joined == True
+            user_joined = True
             break
 
     assert user_joined == True
@@ -40,7 +40,7 @@ def test_valid_user_private():
 
     for user in details["all_members"]:
         if user["u_id"] == auth_user2:
-            user_joined == True
+            user_joined = True
             break
 
     assert user_joined == True
