@@ -53,12 +53,14 @@ def auth_register_v1(email, password, name_first, name_last):
     handle = alpha_nfirst[:20]
 
     store = data_store.get()
-    same_handle = 0
+    same_handle = -1
     for user in store["users"]:
         if user["handle_str"] == handle:
             same_handle += 1
         
-    handle += str(same_handle)
+    if same_handle != -1:
+        handle += str(same_handle)
+    
     id = len(store["users"])
 
     new_user = {
