@@ -61,7 +61,7 @@ def test_invalid_userid2():
 
     channel1 = channels_create_v1(auth_user1, "Channel1", False)["channel_id"]
     with pytest.raises(AccessError):
-        channel_invite_v1(auth_user1 + 1, channel1, auth_user1) # Should InputError here, thus not adding 'auth_user2'
+        channel_invite_v1(auth_user1 + 1, channel1, auth_user1) # Should AccessError here, thus not adding 'auth_user1'
 
 # Test where auth_user tries to add someone to the channel who is already in the channel
 def test_channel_is_member():
