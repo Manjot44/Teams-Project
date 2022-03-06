@@ -94,3 +94,13 @@ def test_invalid_member():
     channel1 = channels_create_v1(auth_user1, "Channel1", True)["channel_id"]
     with pytest.raises(AccessError):
         channel_invite_v1(auth_user3, channel1, auth_user2) # auth_user3 who is not in channel1 tries to invite auth_user2. Should AccessError
+
+# Test if an invalid channel_id is put in 
+def test_invalid_channel_id():    
+    clear_v1()
+    auth_user1 = auth_register_v1("Iqtidar@gmail.com", "amazingpassword1", "Iqtidar", "Rahman")["auth_user_id"]
+    auth_user2 = auth_register_v1("Manjot@gmail.com", "amazingpassword2", "Manjot", "Singh")["auth_user_id"]
+
+    channel1 = channels_create_v1(auth_user1, "Channel1", True)["channel_id"]
+    with pytest.raises(InputError):
+        channel_invite_v1(auth_user1, channel1 + 1, auth_user2)
