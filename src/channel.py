@@ -34,7 +34,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     # Checks if auth_user is in the channel of channel_id
     in_channel = 0
-    check_user = store["channels"][channel_id - 1]["members"]["all_members"]
+    check_user = store["channels"][channel_id - 1]["all_members"]
     for check in check_user:
         if check == auth_user_id:
             in_channel = 1
@@ -43,7 +43,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         raise AccessError('Error: user that is not in a specific channel cannot add other users to that channel')
 
     # Checks if u_id is in the channel 
-    users = store["channels"][channel_id - 1]["members"]["all_members"]
+    users = store["channels"][channel_id - 1]["all_members"]
     for user in users:
         if user == u_id:
             raise InputError(f"Error: user is already member of the channel")
@@ -182,11 +182,11 @@ def channel_join_v1(auth_user_id, channel_id):
         raise InputError('Error: Channel ID does not refer to a valid channel')
     
     # AccessError if the channel user is trying to join is private
-    if store["channels"][channel_id - 1]["ispublic"] == False:
+    if store["channels"][channel_id - 1]["is_public"] == False:
         raise AccessError('Error: Cannot join private channel without being invited')
 
     # Checks if authorised user is already part of the channel by looping through the channel users
-    users = store["channels"][channel_id - 1]["members"]["all_members"]
+    users = store["channels"][channel_id - 1]["all_members"]
     for user in users:
         if user == auth_user_id:
             raise InputError('Error: User is already member of the channel')
