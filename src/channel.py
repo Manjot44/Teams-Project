@@ -1,7 +1,10 @@
-from src.error import AccessError, InputError
 from src.data_store import data_store
-from src.auth import auth_register_v1
-from src.channels import channels_create_v1
+from src import auth, channel, channels, error, other
+
+# from src.error import AccessError, InputError
+# from src.data_store import data_store
+# from src.auth import auth_register_v1
+# from src.channels import channels_create_v1
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
@@ -41,7 +44,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
             break
 
     if is_user_valid == False:
-        raise AccessError(f"invalid user")
+        raise error.AccessError(f"invalid user")
 
     channel_id_valid = False
     store_channel = 0
@@ -53,7 +56,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
             break
 
     if channel_id_valid == False: 
-        raise InputError(f"Invalid channel id")  
+        raise error.InputError(f"Invalid channel id")  
 
     valid_member = False
 
@@ -63,7 +66,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
             break
 
     if valid_member == False:
-        raise AccessError(f"member is not part of the channel")
+        raise error.AccessError(f"member is not part of the channel")
 
     messagesreturn = {
         'messages': [],
@@ -74,7 +77,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     messages = store['channels'][store_channel]['messages']
 
     if start > len(messages):
-        raise InputError(f"start must be smaller than total amount of messages")
+        raise error.InputError(f"start must be smaller than total amount of messages")
 
     if start + 50 > len(messages):
         messagesreturn['end'] = -1
