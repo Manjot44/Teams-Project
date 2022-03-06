@@ -54,8 +54,3 @@ def test_details_user_of_created_channel():
         assert members['name_last'] == 'singh'
         assert members['handle_str'] == handle
 
-
-'''
-Test for:
-
-'''
