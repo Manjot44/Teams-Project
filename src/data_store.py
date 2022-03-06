@@ -43,8 +43,24 @@ initial_object = {
         {
             'channel_id': 0,
             'name': default_channel,
-            'owner_members': [0],
-            'all_members': [0],
+            'owner_members': [
+            {
+                'u_id': 1,
+                'email': 'example@gmail.com',
+                'name_first': 'Hayden',
+                'name_last': 'Jacobs',
+                'handle_str': 'haydenjacobs',
+            }
+            ],
+            'all_members': [
+            {
+                'u_id': 1,
+                'email': 'example@gmail.com',
+                'name_first': 'Hayden',
+                'name_last': 'Jacobs',
+                'handle_str': 'haydenjacobs',
+            }
+            ]
             'is_public': True,
         }
         '''
