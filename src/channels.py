@@ -33,14 +33,48 @@ def channels_list_v1(auth_user_id):
     return fixstore
 
 def channels_listall_v1(auth_user_id):
-    return {
+    # dictionary that is to be returned by function
+    listall = {
+        'channels': []
+    }
+
+    # validate auth user id
+    saved_data = data_store.get()
+    valid_user = False
+    for user in saved_data['users']:
+        if auth_user_id == user['u_id']:
+            valid_user = True
+    if valid_user == False:
+        raise AccessError()
+          
+
+    # getting current channel data from src/data_store 
+    saved_channels = saved_data['channels']
+
+    # copying channels to 'listall' dict from saved channel data
+    for channel in saved_channels:
+        listall['channels'].append(channel)
+    
+    return listall
+
+    '''
+    return 
+    {
         'channels': [
         	{
         		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
+        		'name': 'My Channel 1',
+                'members' = [],
+                'ispublic' = True,
+        	},
+            {
+                'channel_id': 2,
+        		'name': 'My Channel 2',
+            },
         ],
     }
+    '''
+
 
 def channels_create_v1(auth_user_id, name, is_public):
     #Getting Data from data storage file

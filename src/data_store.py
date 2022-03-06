@@ -26,8 +26,31 @@ Example usage:
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'users': [],
-    'channels': [],
+    'users': [
+        '''
+        {
+            'u_id': 0,
+            'email': 'sanjam@gmail.com',
+            'name_first': 'sanjam',
+            'name_last': 'singh',
+            'handle_str': 'sanjamsingh',
+            'password': 'jerrylin123'
+        }
+        '''
+    ],
+    'channels': [
+        '''
+        {
+            'channel_id': 0,
+            'name': default_channel,
+            'members' : {
+                'owner_members': [0],
+                'all_members': [0],
+            },
+            'ispublic': True,
+        }
+        '''
+    ],
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
