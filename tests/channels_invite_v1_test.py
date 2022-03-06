@@ -45,8 +45,8 @@ def test_valid_user_private():
 
     assert user_joined == True
 
-# User that is invited does not have a valid ID - Public Channel
-def test_invalid_userid():
+# User that is invited does not have a valid ID
+def test_invalid_userid1():
     clear_v1()
     auth_user1 = auth_register_v1("Iqtidar@gmail.com", "amazingpassword1", "Iqtidar", "Rahman")["auth_user_id"]
 
@@ -54,14 +54,14 @@ def test_invalid_userid():
     with pytest.raises(InputError):
         channel_invite_v1(auth_user1, channel1, auth_user1 + 1) # Should InputError here, thus not adding 'auth_user2'
 
-# User that is invited does not have a valid ID - Private Channel
-def test_invalid_userid():
+# User that is inviting does not have a valid ID
+def test_invalid_userid2():
     clear_v1()
     auth_user1 = auth_register_v1("Iqtidar@gmail.com", "amazingpassword1", "Iqtidar", "Rahman")["auth_user_id"]
 
     channel1 = channels_create_v1(auth_user1, "Channel1", False)["channel_id"]
-    with pytest.raises(InputError):
-        channel_invite_v1(auth_user1, channel1, auth_user1 + 1) # Should InputError here, thus not adding 'auth_user2'
+    with pytest.raises(AccessError):
+        channel_invite_v1(auth_user1 + 1, channel1, auth_user1) # Should InputError here, thus not adding 'auth_user2'
 
 # Test where auth_user tries to add someone to the channel who is already in the channel
 def test_channel_is_member():
