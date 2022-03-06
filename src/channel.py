@@ -1,5 +1,5 @@
 from src.data_store import data_store
-
+from src import auth, channel, channels, error, other
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
@@ -16,26 +16,27 @@ def channel_details_v1(auth_user_id, channel_id):
     # validate auth user id
     saved_data = data_store.get()
     valid_user = False
-    for user in saved_data['users']['u_id']:
-        if auth_user_id == user:
+    for user in saved_data['users']:
+        if auth_user_id == user['u_id']:
             valid_user = True
     if valid_user == False:
         raise error.AccessError()   # error as user id is not valid
 
     # validate channel id
     valid_channel = False
-    for channel in saved_data['channels']['channel_id']:
-        if channel_id == channel:
+    for channel in saved_data['channels']:
+        if channel_id == channel['channel_id']:
             selected_channel = channel
             valid_channel = True
     if valid_channel == False:
-        raise error.AccessError()   # error as channel id is not valid
+        raise error.InputError()   # error as channel id is not valid
 
     # validate user is member of channel
     is_member = False
     for members in saved_data['channels'][channel_id - 1]['members']['all_members']:
         if auth_user_id == members:
             is_member = True
+            break
     if is_member != True:
         raise error.AccessError()   # error as user is valid but not a member of channel
 
@@ -98,7 +99,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
                 'message_id': 1,
                 'u_id': 1,
                 'message': 'Hello world',
-                'time_created': 1582426789,
+                'time_sent': 1582426789,
             }
         ],
         'start': 0,
