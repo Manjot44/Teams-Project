@@ -9,13 +9,13 @@ def register_three_users():
     new_id = []
     
     returned = src.auth.auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")
-    new_id.append(returned)
+    new_id.append(returned['auth_user_id'] )
 
     returned = src.auth.auth_register_v1(".@..Ml", "a>?:1#", 
     "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg")
-    new_id.append(returned)
+    new_id.append(returned['auth_user_id'] )
 
     returned = src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")
-    new_id.append(returned)
+    new_id.append(returned['auth_user_id'] )
 
     return new_id

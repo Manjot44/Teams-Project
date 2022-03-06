@@ -25,13 +25,12 @@ def channels_list_v1(auth_user_id):
     for idx1, channel in enumerate(store["channels"]):
         for member in store["channels"][idx1]["members"]:
             if auth_user_id == member:
-                fix_chan = {
-                    "channel_id": store["channels"][idx1]["channel_id"],
-                    "name": store["channels"][idx1]["name"],
-                }
-                channels_list.append(fix_chan)
+                channels_list.append(store["channels"][idx1])
 
-    return channels_list
+    fixstore = {
+        "channels": channels_list
+    }
+    return fixstore
 
 def channels_listall_v1(auth_user_id):
     return {
@@ -77,5 +76,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     #Saving to datastore
     data_store.set(store)
 
-    return channel_id
+    return {
+        'channel_id': channel_id,
+    }
 

@@ -22,7 +22,9 @@ def auth_login_v1(email, password):
     
     id = store["users"][nth_user]["u_id"]
 
-    return id 
+    return {
+        "auth_user_id": id,
+    }
 
 def auth_register_v1(email, password, name_first, name_last):
     store = data_store.get()
@@ -71,4 +73,6 @@ def auth_register_v1(email, password, name_first, name_last):
 
     data_store.set(store)
 
-    return id
+    return {
+        "auth_user_id": id,
+    }
