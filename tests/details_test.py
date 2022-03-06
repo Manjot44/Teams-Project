@@ -1,5 +1,9 @@
 import pytest
 from src import auth, channel, channels, error, other
+# from src.auth import auth_register_v1
+# from src.channel import channel_details_v1
+# from src.channels import channels_create_v1
+# from src.other import clear_v1
 
 def test_details_invalid_auth_user_id():
     other.clear_v1()
