@@ -60,7 +60,7 @@ def test_invalid_userid2():
     auth_user1 = auth_register_v1("Iqtidar@gmail.com", "amazingpassword1", "Iqtidar", "Rahman")["auth_user_id"]
 
     channel1 = channels_create_v1(auth_user1, "Channel1", False)["channel_id"]
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         channel_invite_v1(auth_user1 + 1, channel1, auth_user1) # Should InputError here, thus not adding 'auth_user2'
 
 # Test where auth_user tries to add someone to the channel who is already in the channel
