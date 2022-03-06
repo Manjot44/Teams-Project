@@ -8,16 +8,16 @@ def test_authreg_valid():
     new_id = []
     
     returned = src.auth.auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")
-    assert isinstance(returned, int) and returned not in new_id
-    new_id.append(returned)
+    assert isinstance(returned['auth_user_id'], int) and returned['auth_user_id'] not in new_id
+    new_id.append(returned['auth_user_id'] )
 
     returned = src.auth.auth_register_v1(".@..Ml", "a>?:1#", 
     "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg")
-    assert isinstance(returned, int) and returned not in new_id
-    new_id.append(returned)
+    assert isinstance(returned['auth_user_id'] , int) and returned['auth_user_id']  not in new_id
+    new_id.append(returned['auth_user_id'])
 
     returned = src.auth.auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")
-    assert isinstance(returned, int) and returned not in new_id
+    assert isinstance(returned['auth_user_id'] , int) and returned['auth_user_id']  not in new_id
 
 def test_authreg_email_miss1():
     clear_v1()
@@ -116,8 +116,8 @@ def test_authreg_names_long2():
 
 
 def test_authlog_valid(register_three_users):
-    assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "123456") == register_three_users[0]
-    assert src.auth.auth_login_v1(".@..Ml", "a>?:1#") == register_three_users[1]
+    assert src.auth.auth_login_v1("aBc123._%+-@aBc123.-.Co", "123456")['auth_user_id'] == register_three_users[0]
+    assert src.auth.auth_login_v1(".@..Ml", "a>?:1#")['auth_user_id'] == register_three_users[1]
 
 def test_authlog_missing1(register_three_users):
     with pytest.raises(InputError):
