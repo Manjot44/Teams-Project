@@ -31,17 +31,3 @@ def test_listall_two_public_channel():
         assert ch['channel_id'] == ids
         assert ch['name'] == names
 
-
-'''
-What to test:
-Listing no channels
-Listing 1 public channel
-Listing 3 public channels
-Listing 1 private channel
-Listing 2 private channels
-Listing a mixture of public and private channels
-Listing with invalid id??
-
-Other:
-Use a fixture; for clear_v1(), auth.auth_register (?)
-'''
