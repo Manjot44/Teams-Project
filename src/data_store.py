@@ -43,11 +43,9 @@ initial_object = {
         {
             'channel_id': 0,
             'name': default_channel,
-            'members' : {
-                'owner_members': [0],
-                'all_members': [0],
-            },
-            'ispublic': True,
+            'owner_members': [0],
+            'all_members': [0],
+            'is_public': True,
         }
         '''
     ],

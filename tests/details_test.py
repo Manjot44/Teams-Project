@@ -38,6 +38,8 @@ def test_details_user_of_created_channel():
     details = channel.channel_details_v1(user_id, channel_id)
     assert details['name'] == 'sanjam'
 
+    assert details['is_public'] == True
+
     for members in details['owner_members']:
         assert members['u_id'] == user_id
         assert members['email'] == 'sanjamsingh@gmail.com'

@@ -9,6 +9,7 @@ def channel_details_v1(auth_user_id, channel_id):
     # dictionary that is to be returned with function
     details = {
         'name': None,
+        'is_public': None,
         'owner_members': [],
         'all_members': [],
     }
@@ -33,7 +34,7 @@ def channel_details_v1(auth_user_id, channel_id):
 
     # validate user is member of channel
     is_member = False
-    for members in saved_data['channels'][channel_id - 1]['members']['all_members']:
+    for members in saved_data['channels'][channel_id - 1]['all_members']:
         if auth_user_id == members:
             is_member = True
             break
@@ -43,8 +44,12 @@ def channel_details_v1(auth_user_id, channel_id):
     # configuring 'name' key
     details['name'] = saved_data['users'][auth_user_id]['name_first']
     
+    # configuring 'is_public' key
+    public = saved_data['channels'][channel_id - 1]['is_public']
+    details['is_public'] = public
+
     # configuring 'owner_members' key
-    saved_owners = saved_data['channels'][channel_id - 1]['members']['owner_members']
+    saved_owners = saved_data['channels'][channel_id - 1]['owner_members']
     saved_users = saved_data['users']
     for owner_ids in saved_owners:
         details['owner_members'].append({
@@ -56,7 +61,7 @@ def channel_details_v1(auth_user_id, channel_id):
         })
 
     # configuring 'all_members' key
-    saved_members = saved_data['channels'][channel_id - 1]['members']['all_members']
+    saved_members = saved_data['channels'][channel_id - 1]['all_members']
     for member_ids in saved_members:
         details['all_members'].append({
             'u_id': saved_users[member_ids]['u_id'],
