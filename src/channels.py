@@ -23,7 +23,7 @@ def channels_list_v1(auth_user_id):
 
     #Looping through all channels and adding the channels that the user is part of to "channels_list"
     for idx1, channel in enumerate(store["channels"]):
-        for member in store["channels"][idx1]["members"]:
+        for member in store["channels"][idx1]["members"]["all_members"]:
             if auth_user_id == member:
                 channels_list.append(store["channels"][idx1])
 
@@ -68,7 +68,10 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     #Assigning user inputs
     current_channel["channel_id"] = channel_id
-    current_channel["members"] = [auth_user_id]
+    current_channel["members"] = {
+        "owner_members": [auth_user_id],
+        "all_members": [auth_user_id],
+    }
     current_channel["name"] = name
     current_channel["ispublic"] = is_public
     current_channel["messages"] = []
