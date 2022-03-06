@@ -1,4 +1,3 @@
-from turtle import clear
 import src.auth
 import src.channels
 import src.channel
