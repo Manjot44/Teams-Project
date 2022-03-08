@@ -1,0 +1,38 @@
+(these are also located in the project wiki)
+\\Meeting 1 Minutes//
+1/03/22 10pm
+
+Attendees: All group members
+The agenda of this meeting is to establish a general understanding of the assignment within the group, and then to delegate functions between members. We also established a buddy system for merge request reviews.
+
+Manjot- auth_login_v1 and auth_register_v1
+Ashwin- channels_create_v1 and channels_list_v1
+Iqtidar- channels_listall_v1 and channel_details_v1
+Jerry- channel_join_v1 and channel_invite_v1
+Sanjam- channel_messages_v1 and clear_v1
+
+Our buddy system: Jerry will review Ashwin, Ashwin will review Manjot, Manjot will review Iqtidar, Iqtidar will review Sanjam and Sanjam will review Jerry
+We expect everyone to have finished their testing files by 3/03/22
+Our next meeting will be on 4/03/22
+
+\\Meeting 2 Minutes//
+4/03/22 10pm
+
+Attendees: All group members
+
+The agenda of this meeting was as a quick catch-up of everyone's progress. It allowed us to quickly check weather or not we were operating on the same assumptions, and gave group members to ask any questions about the code. We also used this time to coordinate merge requests and when we planned on sending them. Lastly, we discussed the creation of a new testing file, which would contain some common tests which group members could import into the function specific test files to streamline the code.
+
+The goal we set for the next meeting was that we wanted all group members to have completed the implementation and testing for their files so that everyone has passing pipelines.
+Our next meeting will be on 7/03/22
+
+\\Meeting 3 Minutes//
+5/03/22 10pm
+
+Attendees: All group members
+
+The purpose of this meeting was to ensure everyone's code was up to scratch and was working well with everyone else. We looked at each other's tests to make sure there were no edge cases being missed, and when we reached the final deliverable we ensured that the master branch met the outlined specification.
+
+Our next meeting time will be to review the feedback received and to look over iteration 2
+
+
+
