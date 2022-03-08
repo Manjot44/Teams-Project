@@ -3,7 +3,7 @@
 1/03/22 10pm
 
 Attendees: All group members
-The agenda of this meeting is to establish a general understanding of the assignment within the group, and then to delegate functions between members. We also established a buddy system for merge request reviews.
+The agenda of this meeting is to establish a general understanding of the assignment within the group, and then to delegate functions between members. 
 
 Manjot- auth_login_v1 and auth_register_v1
 Ashwin- channels_create_v1 and channels_list_v1
@@ -11,7 +11,6 @@ Iqtidar- channels_listall_v1 and channel_details_v1
 Jerry- channel_join_v1 and channel_invite_v1
 Sanjam- channel_messages_v1 and clear_v1
 
-Our buddy system: Jerry will review Ashwin, Ashwin will review Manjot, Manjot will review Iqtidar, Iqtidar will review Sanjam and Sanjam will review Jerry
 We expect everyone to have finished their testing files by 3/03/22
 Our next meeting will be on 4/03/22
 
