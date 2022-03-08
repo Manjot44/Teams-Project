@@ -27,43 +27,47 @@ Example usage:
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'users': [
-        '''
         {
-            'u_id': 0,
-            'email': 'sanjam@gmail.com',
-            'name_first': 'sanjam',
-            'name_last': 'singh',
-            'handle_str': 'sanjamsingh',
-            'password': 'jerrylin123'
+            'u_id': None,
+            'email': None,
+            'name_first': None,
+            'name_last': None,
+            'handle_str': None,
+            'password': None,
         }
-        '''
     ],
     'channels': [
-        '''
         {
-            'channel_id': 0,
-            'name': default_channel,
+            'channel_id': None,
+            'name': None,
             'owner_members': [
-            {
-                'u_id': 1,
-                'email': 'example@gmail.com',
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-                'handle_str': 'haydenjacobs',
-            }
+                {
+                    'u_id': None,
+                    'email': None,
+                    'name_first': None,
+                    'name_last': None,
+                    'handle_str': None,
+                }
             ],
             'all_members': [
-            {
-                'u_id': 1,
-                'email': 'example@gmail.com',
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-                'handle_str': 'haydenjacobs',
-            }
+                {
+                    'u_id': None,
+                    'email': None,
+                    'name_first': None,
+                    'name_last': None,
+                    'handle_str': None,
+                }
+            ],
+            'is_public': None,
+            'messages': [
+                {
+                    'message_id': None,
+                    'u_id': None,
+                    'message': None,
+                    'time_sent': None,
+                },
             ]
-            'is_public': True,
-        }
-        '''
+        }  
     ],
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE

@@ -12,4 +12,4 @@ def test_clear_v1():
     clear_v1()
 
     with pytest.raises(AccessError):
-        channel1 = channels_create_v1(user, "foo", True)['channel_id']
+        channels_create_v1(user, "foo", True)['channel_id']
