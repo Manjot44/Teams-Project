@@ -13,7 +13,7 @@ def test_valid_user():
     #Even though a user has been added, since the user_id input is different it should be an error
     user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
     with pytest.raises(AccessError):
-        channels_create_v1("userone", "new_channel1", True)["channel_id"]
+        channels_create_v1(user_id + 1, "new_channel1", True)["channel_id"]
 
 #Testing for correct channel_id if one channel is created
 def test_normal_single():

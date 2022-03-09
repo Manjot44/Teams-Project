@@ -78,7 +78,7 @@ def test_channel_is_member():
 def test_invite_oneself():
     clear_v1()
     auth_user1 = auth_register_v1("Iqtidar@gmail.com", "amazingpassword1", "Iqtidar", "Rahman")["auth_user_id"]
-    auth_user2 = auth_register_v1("Manjot@gmail.com", "amazingpassword2", "Manjot", "Singh")["auth_user_id"]
+    auth_register_v1("Manjot@gmail.com", "amazingpassword2", "Manjot", "Singh")["auth_user_id"]
 
     channel1 = channels_create_v1(auth_user1, "Channel1", True)["channel_id"]
     with pytest.raises(InputError):

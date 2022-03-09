@@ -1,12 +1,50 @@
-if __name__ == '__main__':
-    from error import InputError, AccessError
-    from data_store import data_store
-
-else:
-    from src.error import InputError, AccessError
-    from src.data_store import data_store
+from src.error import InputError, AccessError
+from src.data_store import data_store
 
 def channels_list_v1(auth_user_id):
+    '''Provide a list of all channels (and their associated details) that the authorised user is part of.
+
+    Arguments:
+        auth_user_id (int) - user authentication id number
+
+    Exceptions:
+        AccessError - Occurs when:
+            auth_user_id passed in is not valid
+
+    Return Value:
+        Returns {
+            'channel_id': channel_id (int),
+            'name': channel_name (str),
+            'owner_members': [
+                {
+                    'u_id': id (int),
+                    'email': email (str),
+                    'name_first': name_first (str),
+                    'name_last': name_last (str),
+                    'handle_str': handle (str),
+                }
+            ],
+            'all_members': [
+                {
+                    'u_id': id (int),
+                    'email': email (str),
+                    'name_first': name_first (str),
+                    'name_last': name_last (str),
+                    'handle_str': handle (str),
+                }
+            ],
+            'is_public': public (bool),
+            'messages': [
+                {
+                    'message_id': message_id (int),
+                    'u_id': u_id (int),
+                    'message': message (str),
+                    'time_sent': time (int),
+                },
+            ]
+        }
+    '''
+    
     #Getting Data from data storage file
     store = data_store.get()
 
@@ -22,10 +60,10 @@ def channels_list_v1(auth_user_id):
     channels_list = []
 
     #Looping through all channels and adding the channels that the user is part of to "channels_list"
-    for idx1, channel in enumerate(store["channels"]):
-        for member in store["channels"][idx1]["all_members"]:
-            if auth_user_id == member:
-                channels_list.append(store["channels"][idx1])
+    for channel in store["channels"]:
+        for member in channel["all_members"]:
+            if auth_user_id == member["u_id"]:
+                channels_list.append(channel)
 
     fixstore = {
         "channels": channels_list
@@ -33,6 +71,49 @@ def channels_list_v1(auth_user_id):
     return fixstore
 
 def channels_listall_v1(auth_user_id):
+    '''Provide a list of all channels, including private channels, (and their associated details)
+
+    Arguments:
+        auth_user_id (int) - user authentication id number
+
+    Exceptions:
+        AccessError - Occurs when:
+            auth_user_id passed in is not valid
+
+    Return Value:
+        Returns {
+            'channel_id': channel_id (int),
+            'name': channel_name (str),
+            'owner_members': [
+                {
+                    'u_id': id (int),
+                    'email': email (str),
+                    'name_first': name_first (str),
+                    'name_last': name_last (str),
+                    'handle_str': handle (str),
+                }
+            ],
+            'all_members': [
+                {
+                    'u_id': id (int),
+                    'email': email (str),
+                    'name_first': name_first (str),
+                    'name_last': name_last (str),
+                    'handle_str': handle (str),
+                }
+            ],
+            'is_public': public (bool),
+            'messages': [
+                {
+                    'message_id': message_id (int),
+                    'u_id': u_id (int),
+                    'message': message (str),
+                    'time_sent': time (int),
+                },
+            ]
+        }
+    '''
+    
     # dictionary that is to be returned by function
     listall = {
         'channels': []
@@ -46,20 +127,33 @@ def channels_listall_v1(auth_user_id):
             valid_user = True
     if valid_user == False:
         raise AccessError()
-          
-
-    # getting current channel data from src/data_store 
-    saved_channels = saved_data['channels']
 
     # copying channels to 'listall' dict from saved channel data
-    for channel in saved_channels:
-        listall['channels'].append(channel)
+    listall['channels'] = saved_data['channels']
     
     return listall
 
 
 
 def channels_create_v1(auth_user_id, name, is_public):
+    '''Creates a new channel with the given name that is either a public or private channel. 
+    The user who created it automatically joins the channel.
+
+    Arguments:
+        auth_user_id (int) - user authentication id number
+
+    Exceptions:
+        InputError - Occurs when:
+            length of name is less than 1 or more than 20 characters
+        AccessError - Occurs when:
+            auth_user_id passed in is not valid
+
+    Return Value:
+        Returns {
+            'channel_id': channel_id,
+        }
+    '''
+
     #Getting Data from data storage file
     store = data_store.get()
 
@@ -68,9 +162,11 @@ def channels_create_v1(auth_user_id, name, is_public):
     if namelen < 1 or namelen > 20:
         raise InputError(f"Name must be between 1 and 20 characters long")
     valid_user = False
-    for user in store["users"]:
+    which_user = 0
+    for idx, user in enumerate(store["users"]):
         if user["u_id"] == auth_user_id:
             valid_user = True
+            which_user = idx
     if valid_user == False:
         raise AccessError("User ID must be registered")
 
@@ -85,11 +181,20 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     #Assigning user inputs
     current_channel["channel_id"] = channel_id
-    current_channel["owner_members"] = [auth_user_id]
-    current_channel["all_members"] = [auth_user_id]
     current_channel["name"] = name
     current_channel["is_public"] = is_public
     current_channel["messages"] = []
+
+    add_user = {
+        'u_id': store['users'][which_user]['u_id'],
+        'email': store['users'][which_user]['email'],
+        'name_first': store['users'][which_user]['name_first'],
+        'name_last': store['users'][which_user]['name_last'],
+        'handle_str': store['users'][which_user]['handle_str'],
+    }
+
+    current_channel["all_members"] = [add_user]
+    current_channel["owner_members"] = [add_user]
 
     #Saving to datastore
     data_store.set(store)
