@@ -1,13 +1,10 @@
-from urllib import response
 import src.auth
 import src.channels
 import src.channel
 import pytest 
-from src.other import clear_v1
-from src.error import InputError
 import requests
 
-BASE_ADDRESS = '127.0.0.1'
+BASE_ADDRESS = 'http://127.0.0.1'
 BASE_PORT = 8080
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
@@ -20,7 +17,7 @@ def test_authreg_valid(register_three_users):
     assert register_three_users[1] != register_three_users[2]
 
 def test_email_missing_element(user_init):
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1")
     user_init['email'] = "abcgmail.com"
     response = requests.post(f"{BASE_URL}/auth/register/v2", json = user_init)
     assert response.status_code == 400
@@ -34,13 +31,13 @@ def test_email_missing_element(user_init):
     assert response.status_code == 400     
 
 def test_email_repeat(user_init):
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1")
     requests.post(f"{BASE_URL}/auth/register/v2", json = user_init) 
     response = requests.post(f"{BASE_URL}/auth/register/v2", json = user_init)
     assert response.status_code == 400 
 
 def test_email_invalid_char(user_init):
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1")
     user_init['email'] = "abc%^@gmail.com"
     response = requests.post(f"{BASE_URL}/auth/register/v2", json = user_init)
     assert response.status_code == 400
@@ -58,7 +55,7 @@ def test_email_invalid_char(user_init):
     assert response.status_code == 400 
 
 def test_email_empty_section(user_init):
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1")
     user_init['email'] = "@gmail.com"
     response = requests.post(f"{BASE_URL}/auth/register/v2", json = user_init)
     assert response.status_code == 400
@@ -76,7 +73,7 @@ def test_email_empty_section(user_init):
     assert response.status_code == 400                
 
 def test_password_invalid(user_init):
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1")
     user_init['password'] = "1>;[g"
     response = requests.post(f"{BASE_URL}/auth/register/v2", json = user_init)
     assert response.status_code == 400
@@ -86,7 +83,7 @@ def test_password_invalid(user_init):
     assert response.status_code == 400     
             
 def test_names_empty(user_init):
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1")
     user_init['name_last'] = ""
     response = requests.post(f"{BASE_URL}/auth/register/v2", json = user_init)
     assert response.status_code == 400
@@ -96,7 +93,7 @@ def test_names_empty(user_init):
     assert response.status_code == 400
 
 def test_names_long(user_init):
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1")
     user_init['name_last'] = "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg8"
     response = requests.post(f"{BASE_URL}/auth/register/v2", json = user_init)
     assert response.status_code == 400
@@ -108,47 +105,47 @@ def test_names_long(user_init):
 
 
 
-def test_handle_normal():
-    clear_v1()
-    user_id = src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "Jerry", "Lin")["auth_user_id"]
-    channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
-    generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
+# def test_handle_normal():
+#     clear_v1()
+#     user_id = src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "Jerry", "Lin")["auth_user_id"]
+#     channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
+#     generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
 
-    expected_handle = "jerrylin"
-    assert generated_handle == expected_handle
+#     expected_handle = "jerrylin"
+#     assert generated_handle == expected_handle
 
-def test_border_handle_long():
-    clear_v1()
-    user_id = src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "Iamthegreatest", "JerryL")["auth_user_id"]
-    channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
-    generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
+# def test_border_handle_long():
+#     clear_v1()
+#     user_id = src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "Iamthegreatest", "JerryL")["auth_user_id"]
+#     channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
+#     generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
 
-    expected_handle = "iamthegreatestjerryl"
-    assert generated_handle == expected_handle
+#     expected_handle = "iamthegreatestjerryl"
+#     assert generated_handle == expected_handle
 
-    clear_v1()
-    user_id = src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "Iamthegreatest", "JerryLi")["auth_user_id"]
-    channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
-    generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
+#     clear_v1()
+#     user_id = src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "Iamthegreatest", "JerryLi")["auth_user_id"]
+#     channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
+#     generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
 
-    assert generated_handle == expected_handle
+#     assert generated_handle == expected_handle
 
-def test_handle_repeat():
-    clear_v1()
-    src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "Jerry", "Lin")
-    user_id = src.auth.auth_register_v1("jerry@gmail.com", "123456", "Jerry", "Lin")["auth_user_id"]
-    channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
-    generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
+# def test_handle_repeat():
+#     clear_v1()
+#     src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "Jerry", "Lin")
+#     user_id = src.auth.auth_register_v1("jerry@gmail.com", "123456", "Jerry", "Lin")["auth_user_id"]
+#     channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
+#     generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
 
-    expected_handle = "jerrylin0"
-    assert generated_handle == expected_handle
+#     expected_handle = "jerrylin0"
+#     assert generated_handle == expected_handle
 
-def test_long_handle_repeat():
-    clear_v1()
-    src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "Iamthegreatest", "JerryLi")
-    user_id = src.auth.auth_register_v1("jerry@gmail.com", "123456", "Iamthegreatest", "JerryLi")["auth_user_id"]
-    channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
-    generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
+# def test_long_handle_repeat():
+#     clear_v1()
+#     src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "Iamthegreatest", "JerryLi")
+#     user_id = src.auth.auth_register_v1("jerry@gmail.com", "123456", "Iamthegreatest", "JerryLi")["auth_user_id"]
+#     channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
+#     generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
 
-    expected_handle = "iamthegreatestjerryl0"
-    assert generated_handle == expected_handle
+#     expected_handle = "iamthegreatestjerryl0"
+#     assert generated_handle == expected_handle

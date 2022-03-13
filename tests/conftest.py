@@ -1,17 +1,14 @@
 from re import A
 import pytest
-import src.auth
-from src.other import clear_v1
-from src.error import InputError
 import requests
 
-BASE_ADDRESS = '127.0.0.1'
+BASE_ADDRESS = 'http://127.0.0.1'
 BASE_PORT = 8080
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
 @pytest.fixture
 def register_three_users():
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1")
     new_id = []
     
     user = {

@@ -4,7 +4,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config
+from src import config, auth, other
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -38,6 +38,30 @@ def echo():
     return dumps({
         'data': data
     })
+
+@APP.route("/auth/register/v2", methods=['POST'])
+def handle_auth_register():
+    request_data = request.get_json()
+    email = str(request_data.get("email", None))
+    password = str(request_data.get("password", None))
+    name_first = str(request_data.get("name_first", None))
+    name_last = str(request_data.get("name_last", None))
+
+    return dumps(auth.auth_register_v1(email, password, name_first, name_last))
+
+@APP.route("/auth/login/v2", methods=['POST'])
+def handle_auth_login():
+    request_data = request.get_json()
+    email = str(request_data.get("email", None))
+    password = str(request_data.get("password", None))
+
+    return dumps(auth.auth_login_v1(email, password))
+
+@APP.route("/clear/v1", methods=['DELETE'])
+def handle_clear():
+    other.clear_v1()
+    return dumps({})
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

@@ -1,10 +1,7 @@
-import src.auth
 import pytest
-from src.other import clear_v1
-from src.error import InputError
 import requests
 
-BASE_ADDRESS = '127.0.0.1'
+BASE_ADDRESS = 'http://127.0.0.1'
 BASE_PORT = 8080
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
@@ -57,6 +54,6 @@ def test_mixed_password(register_three_users, user_init):
     assert response.status_code == 400                                                            
 
 def test_no_registered_user(user_init):
-    clear_v1()
+    requests.delete(f"{BASE_URL}/clear/v1")
     response = requests.post(f"{BASE_URL}/auth/login/v2", json = user_init)
     assert response.status_code == 400 
