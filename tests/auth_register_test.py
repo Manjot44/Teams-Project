@@ -7,7 +7,7 @@ from src.error import InputError
 
 def test_authreg_valid(register_three_users):
     for id in register_three_users:
-        assert id is int
+        assert isinstance(id, int)
     
     assert register_three_users[0] != register_three_users[1]
     assert register_three_users[0] != register_three_users[2] 
