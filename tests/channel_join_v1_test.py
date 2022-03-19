@@ -55,7 +55,7 @@ def test_channel_private():
         channel_join_v1(auth_user2, channel1) 
 
 # user tries to join invalid channel
-def test_invld_chnnl():
+def test_invalid_channel():
     clear_v1()
     auth_user1 = auth_register_v1("Iqtidar@gmail.com", "amazingpassword1", "Iqtidar", "Rahman")["auth_user_id"]
     auth_user2 = auth_register_v1("Manjot@gmail.com", "amazingpassword2", "Manjot", "Singh")["auth_user_id"]
@@ -70,3 +70,22 @@ def test_invalid_user():
     channel1 = channels_create_v1(auth_user1, "channel1", True)["channel_id"]
     with pytest.raises(AccessError):
         channel_join_v1(auth_user1 + 1, channel1)
+
+# Global owner tries to join a private channel - Iqtidar is the global owner
+def test_global_owner():
+    clear_v1()
+    auth_user1 = auth_register_v1("Iqtidar@gmail.com", "amazingpassword1", "Iqtidar", "Rahman")["auth_user_id"]
+    auth_user2 = auth_register_v1("Manjot@gmail.com", "amazingpassword2", "Manjot", "Singh")["auth_user_id"]
+    channel1 = channels_create_v1(auth_user2, "channel1", False)["channel_id"]
+    channel_join_v1(auth_user1, channel1)
+
+    details = channel_details_v1(auth_user2, channel1)
+
+    user_joined = False 
+
+    for user in details["all_members"]:
+        if user["u_id"] == auth_user1:
+            user_joined = True
+            break
+
+    assert user_joined == True
