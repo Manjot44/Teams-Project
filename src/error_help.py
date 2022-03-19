@@ -8,7 +8,7 @@ def check_valid_id(auth_user_id, data):
     has_auth_user = False
     which_auth = 0
     for idx, auth_user in enumerate(data["users"]):
-        if auth_user["u_id"] == auth_user_id:
+        if auth_user["u_id"] == auth_user_id and auth_user_id != None:
             has_auth_user = True
             which_auth = idx
     if has_auth_user == False:
@@ -26,11 +26,11 @@ def validate_channel(data, channel_id):
         raise error.InputError()   # error as channel id is not valid
 
 def check_channel_priv(data, channel_id, which_auth):
-    if data["channels"][channel_id - 1]["is_public"] == False and data['users'][which_auth]['perm_id'] == 2: 
+    if data["channels"][channel_id]["is_public"] == False and data['users'][which_auth]['perm_id'] == 2: 
         raise AccessError('Error: Cannot join private channel without being invited')
 
 def check_channel_user(data, auth_user_id, channel_id):
-    users = data["channels"][channel_id - 1]["all_members"]
+    users = data["channels"][channel_id]["all_members"]
     for user in users:
-        if user['u_id'] == auth_user_id:
+        if user['u_id'] == auth_user_id and auth_user_id != None:
             raise InputError(f"Error: User is already member of the channel")
