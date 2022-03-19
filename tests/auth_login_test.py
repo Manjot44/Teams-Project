@@ -11,14 +11,14 @@ def test_authlog_valid(register_three_users, user_init):
     response = requests.post(f"{BASE_URL}/auth/login/v2", json = user_init)
     assert response.status_code == 200
     response_data = response.json()
-    assert response_data['auth_user_id'] == register_three_users[0]
+    assert response_data['auth_user_id'] == register_three_users["id"][0]
 
     user_init['email'] = ".@..Ml"
     user_init['password'] = "a>?:1#"
     response = requests.post(f"{BASE_URL}/auth/login/v2", json = user_init)
     assert response.status_code == 200
     response_data = response.json()
-    assert response_data['auth_user_id'] == register_three_users[1]
+    assert response_data['auth_user_id'] == register_three_users["id"][1]
 
 def test_incorrect_details(register_three_users, user_init):
     user_init['email'] = "aBc12._%+-@aBc123.-.Co"

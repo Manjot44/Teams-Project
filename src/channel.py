@@ -35,10 +35,12 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     which_auth = 0
     for idx, user in enumerate(store["users"]):
         if user["u_id"] == auth_user_id:
-            has_auth_user = True
+            if auth_user_id != None:
+                has_auth_user = True
         if user["u_id"] == u_id:
-            has_u_id = True
-            which_auth = idx
+            if auth_user_id != None:    
+                has_u_id = True
+                which_auth = idx
     
     if has_auth_user == False:
         raise AccessError(f"Error: auth_user does not have a valid ID")
@@ -50,7 +52,8 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     channel_valid = False
     for channel in store["channels"]:
         if channel["channel_id"] == channel_id:
-            channel_valid = True
+            if channel_id != None:
+                channel_valid = True
     if channel_valid == False:
         raise InputError(f"Error: Channel ID does not refer to a valid channel")
 
@@ -131,13 +134,16 @@ def channel_details_v1(auth_user_id, channel_id):
         'owner_members': [],
         'all_members': [],
     }
+
+    saved_data = data_store.get()
+    
     #                           AUTHENTICATION
     # validate auth user id
-    saved_data = data_store.get()
     valid_user = False
     for user in saved_data['users']:
         if auth_user_id == user['u_id']:
-            valid_user = True
+            if auth_user_id != None:
+                valid_user = True
     if valid_user == False:
         raise error.AccessError()   # error as user id is not valid
 
@@ -145,13 +151,14 @@ def channel_details_v1(auth_user_id, channel_id):
     valid_channel = False
     for channel in saved_data['channels']:
         if channel_id == channel['channel_id']:
-            valid_channel = True
+            if channel_id != None:
+                valid_channel = True
     if valid_channel == False:
         raise error.InputError()   # error as channel id is not valid
 
     # validate user is member of channel
     is_member = False
-    for members in saved_data['channels'][channel_id - 1]['all_members']:
+    for members in saved_data['channels'][channel_id]['all_members']:
         if auth_user_id == members['u_id']:
             is_member = True
             break
@@ -215,7 +222,8 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     is_user_valid = False
     for user in store['users']:
         if auth_user_id == user['u_id']:
-            is_user_valid = True
+            if auth_user_id != None:
+                is_user_valid = True
             break
 
     if is_user_valid == False:
@@ -225,9 +233,10 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     store_channel = 0
     for idx, valid_id in enumerate(store['channels']): 
         if channel_id == valid_id['channel_id']:        
-            channel_id_valid = True
-            store_channel = idx
-            break
+            if channel_id != None:
+                channel_id_valid = True
+                store_channel = idx
+                break
 
     if channel_id_valid == False: 
         raise error.InputError(f"Invalid channel id")  
