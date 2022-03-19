@@ -1,10 +1,14 @@
-import re
-from webbrowser import get
+from base64 import encode
 from src.data_store import data_store
 from src.error import InputError
+import hashlib
+import re
+import jwt
+
+SECRET = 'jroilin'
 
 def auth_login_v1(email, password):
-    '''Given a registered user's email and password, returns their `auth_user_id` value.
+    '''Given a registered user's email and password, returns their 'auth_user_id' value and a new 'token'.
 
     Arguments:
         email (str) - inputted email,
@@ -16,9 +20,7 @@ def auth_login_v1(email, password):
             password is not correct
 
     Return Value:
-        Returns {
-            "auth_user_id": id (int),
-        }
+        (dict): returns a dictionary with the auth_user_id and the unique token for the current session
     '''
 
     store = data_store.get()
@@ -27,17 +29,23 @@ def auth_login_v1(email, password):
     for user in store["users"]:
         if user["email"] == email:
             valid_email = True
-            if user["password"] != password:
+            if user["password"] != hashlib.sha256(password.encode()).hexdigest():
                 raise InputError(f"Error: password is incorrect")
             else:
                 id = user["u_id"]
+                session_id = len(user["valid_tokens"])
+                encoded_jwt = jwt.encode({'handle_str': user["handle_str"], "session_id": session_id}, SECRET, algorithm='HS256')
+                user["valid_tokens"].append(encoded_jwt)
             break
 
     if valid_email == False:
         raise InputError(f"Error: email does not belong to a user")
     
+    data_store.set(store)
+
     return {
         "auth_user_id": id,
+        "token": encoded_jwt,
     }
 
 
@@ -53,7 +61,7 @@ def generate_handle(name_first, name_last):
         N/A
     
     Return Value:
-        Returns handle (str)
+        (str): returns the unique handle
     '''
 
     store = data_store.get()
@@ -68,16 +76,18 @@ def generate_handle(name_first, name_last):
     for user in store["users"]:
         if user["handle_str"] == handle:
             same_handle += 1
-        
-    if same_handle != -1:
-        handle += str(same_handle)
+            if same_handle == 0:
+                handle += str(same_handle)
+            else:
+                handle = handle[:-1] + str(same_handle)
     
     return handle
-    
+
 
 
 def auth_register_v1(email, password, name_first, name_last):
-    '''Given a user's first and last name, email address, and password, create a new account for them and return a new `auth_user_id`.
+    '''Given a user's first and last name, email address, and password, create a new account for them and
+    return a new 'auth_user_id' and 'token'.
 
     Arguments:
         email (str) - inputted email,
@@ -94,9 +104,7 @@ def auth_register_v1(email, password, name_first, name_last):
             length of name_last is not between 1 and 50 characters inclusive
 
     Return Value:
-        Returns {
-            "auth_user_id": id (int),
-        }
+        (dict): returns a dictionary with the auth_user_id and the unique token for the current session 
     '''
     
     store = data_store.get()
@@ -120,14 +128,20 @@ def auth_register_v1(email, password, name_first, name_last):
 
     handle = generate_handle(name_first, name_last)
     id = len(store["users"])
+    perm_id = 2
+    if id == 1:
+        perm_id = 1
+    encoded_jwt = jwt.encode({'handle_str': handle, "session_id": 0}, SECRET, algorithm='HS256')
 
     new_user = {
         "email": email,
-        "password": password,
+        "password": hashlib.sha256(password.encode()).hexdigest(),
         "name_first": name_first,
         "name_last": name_last,
         "handle_str": handle,
         "u_id": id,
+        "perm_id": perm_id,
+        "valid_tokens": [encoded_jwt],
     }
 
     store["users"].append(new_user)
@@ -135,4 +149,5 @@ def auth_register_v1(email, password, name_first, name_last):
 
     return {
         "auth_user_id": id,
+        "token": encoded_jwt,
     }

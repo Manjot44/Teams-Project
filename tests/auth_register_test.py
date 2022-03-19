@@ -149,3 +149,14 @@ def test_names_long(user_init):
 
 #     expected_handle = "iamthegreatestjerryl0"
 #     assert generated_handle == expected_handle
+
+# def test_handle_double_repeat():
+#     clear_v1()
+#     src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "abc", "def")
+#     src.auth.auth_register_v1("jerryl@gmail.com", "123456", "abc", "def0")
+#     user_id = src.auth.auth_register_v1("jerry@gmail.com", "123456", "abc", "def")
+#     channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
+#     generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
+
+#     expected_handle = "abcdef1"
+#     assert generated_handle == expected_handle
