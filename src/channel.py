@@ -4,6 +4,45 @@ from src.data_store import data_store
 from src.channels import channels_create_v1
 from src.error import InputError, AccessError
 
+''' 
+Helper Functions
+
+'''
+def check_valid_id(auth_user_id, data):
+    has_auth_user = False
+    which_auth = 0
+    for idx, auth_user in enumerate(data["users"]):
+        if auth_user["u_id"] == auth_user_id:
+            has_auth_user = True
+            which_auth = idx
+    if has_auth_user == False:
+        raise AccessError(f"Error: User does not have a valid ID")
+
+    return which_auth
+
+def validate_channel(data, channel_id):
+    valid_channel = False
+    for channel in data['channels']:
+        if channel_id == channel['channel_id']:
+            if channel_id != None:
+                valid_channel = True
+    if valid_channel == False:
+        raise error.InputError()   # error as channel id is not valid
+
+def check_channel_priv(data, channel_id, which_auth):
+    if data["channels"][channel_id - 1]["is_public"] == False and data['users'][which_auth]['perm_id'] == 2: 
+        raise AccessError('Error: Cannot join private channel without being invited')
+
+def check_channel_user(data, auth_user_id, channel_id):
+    users = data["channels"][channel_id - 1]["all_members"]
+    for user in users:
+        if user['u_id'] == auth_user_id:
+            raise InputError(f"Error: User is already member of the channel")
+
+'''
+Main Functions for Seams 
+
+'''
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''Invites a user with ID u_id to join a channel with ID channel_id. 
     Once invited, the user is added to the channel immediately. 
@@ -47,15 +86,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     if has_u_id == False:
         raise InputError(f"Error: User does not have a valid ID")
 
-    # Raise InputError if channel_id does not refer to valid channel
-    # Loop through existing channels to see if any of them have the same ID as 'channel_id'
-    channel_valid = False
-    for channel in store["channels"]:
-        if channel["channel_id"] == channel_id:
-            if channel_id != None:
-                channel_valid = True
-    if channel_valid == False:
-        raise InputError(f"Error: Channel ID does not refer to a valid channel")
+    validate_channel(store, channel_id)
 
     # Checks if auth_user is in the channel of channel_id
     in_channel = False
@@ -67,13 +98,8 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     if in_channel == False:
         raise AccessError(f"Error: user that is not in a specific channel cannot add other users to that channel")
 
-    # Checks if u_id is in the channel 
-    users = store["channels"][channel_id - 1]["all_members"]
-    for user in users:
-        if user['u_id'] == u_id:
-            raise InputError(f"Error: user is already member of the channel")
+    check_channel_user(store, u_id, channel_id)
 
-    
     # Once the above functions run and confirm that the auth_user is in channel and that u_id valid, u_id will be added to channel 
     add_user_info = {
         'u_id': store['users'][which_auth]['u_id'],
@@ -82,7 +108,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         'name_last': store['users'][which_auth]['name_last'],
         'handle_str': store['users'][which_auth]['handle_str'],
     }
-    
+    users = store["channels"][channel_id - 1]["all_members"]
     users.append(add_user_info)
     data_store.set(store)
     return {
@@ -136,25 +162,8 @@ def channel_details_v1(auth_user_id, channel_id):
     }
 
     saved_data = data_store.get()
-    
-    #                           AUTHENTICATION
-    # validate auth user id
-    valid_user = False
-    for user in saved_data['users']:
-        if auth_user_id == user['u_id']:
-            if auth_user_id != None:
-                valid_user = True
-    if valid_user == False:
-        raise error.AccessError()   # error as user id is not valid
-
-    # validate channel id
-    valid_channel = False
-    for channel in saved_data['channels']:
-        if channel_id == channel['channel_id']:
-            if channel_id != None:
-                valid_channel = True
-    if valid_channel == False:
-        raise error.InputError()   # error as channel id is not valid
+    check_valid_id(auth_user_id, saved_data)
+    validate_channel(saved_data, channel_id)
 
     # validate user is member of channel
     is_member = False
@@ -163,7 +172,7 @@ def channel_details_v1(auth_user_id, channel_id):
             is_member = True
             break
     if is_member != True:
-        raise error.AccessError()   # error as user is valid but not a member of channel
+        raise error.AccessError(f"Error: User is not a member of this channel, hence they cannot view channel details") 
 
     # configuring 'name' key
     details['name'] = saved_data['channels'][channel_id - 1]['name']
@@ -218,16 +227,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     '''
 
     store = data_store.get()
-
-    is_user_valid = False
-    for user in store['users']:
-        if auth_user_id == user['u_id']:
-            if auth_user_id != None:
-                is_user_valid = True
-            break
-
-    if is_user_valid == False:
-        raise error.AccessError(f"invalid user")
+    check_valid_id(auth_user_id, store)
 
     channel_id_valid = False
     store_channel = 0
@@ -237,7 +237,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
                 channel_id_valid = True
                 store_channel = idx
                 break
-
     if channel_id_valid == False: 
         raise error.InputError(f"Invalid channel id")  
 
@@ -292,33 +291,10 @@ def channel_join_v1(auth_user_id, channel_id):
     store = data_store.get()
 
     # Checks if the auth_user_id is valid
-    has_auth_user = False
-    which_auth = 0
-    for idx, auth_user in enumerate(store["users"]):
-        if auth_user["u_id"] == auth_user_id:
-            has_auth_user = True
-            which_auth = idx
-    if has_auth_user == False:
-        raise AccessError(f"Error: User does not have a valid ID")
-
-    # Raise InputError if channel_id does not refer to valid channel
-    # Loop through existing channels to see if any of them have the same ID as 'channel_id'
-    channel_valid = False
-    for channel in store["channels"]:
-        if channel["channel_id"] == channel_id:
-            channel_valid = True
-    if channel_valid == False:
-        raise InputError(f"Error: Channel ID does not refer to a valid channel")
-    
-    # AccessError if the channel user is trying to join is private
-    if store["channels"][channel_id - 1]["is_public"] == False:
-        raise AccessError('Error: Cannot join private channel without being invited')
-
-    # Checks if authorised user is already part of the channel by looping through the channel users
-    users = store["channels"][channel_id - 1]["all_members"]
-    for user in users:
-        if user['u_id'] == auth_user_id:
-            raise InputError(f"Error: User is already member of the channel")
+    which_auth = check_valid_id(auth_user_id, store)
+    validate_channel(store, channel_id)
+    check_channel_priv(store, channel_id, which_auth)
+    check_channel_user(store, auth_user_id, channel_id)
     
     # Once confirmed that user is not in channel, user will be added
     add_user_info = {
@@ -328,9 +304,8 @@ def channel_join_v1(auth_user_id, channel_id):
         'name_last': store['users'][which_auth]['name_last'],
         'handle_str': store['users'][which_auth]['handle_str'],
     }
+    users = store["channels"][channel_id - 1]["all_members"]
     users.append(add_user_info)
-
     data_store.set(store)
-
     return {
     }
