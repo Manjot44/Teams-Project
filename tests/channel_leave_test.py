@@ -10,7 +10,7 @@ BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 # testing for messages being persistent may also be added
 
 def test_valid_leave(register_three_users):
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token:": "stringofuser0", "name": "channel_name", "is_public": True})
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token:": register_three_users["token"][0], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
     channel_id = response_data["channel_id"]

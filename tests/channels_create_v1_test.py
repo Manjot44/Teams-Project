@@ -19,22 +19,22 @@ def test_valid_user():
 def test_normal_single():
     clear_v1()
     user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    assert channels_create_v1(user_id, "new_channel", True)["channel_id"] == 1
+    assert channels_create_v1(user_id, "new_channel", True)["channel_id"] == 0
 
 #Testing for correct channel_id if multiple channels are created
 def test_normal_multiple():
     clear_v1()
     user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    assert channels_create_v1(user_id, "new_channel1", True)["channel_id"] == 1
-    assert channels_create_v1(user_id, "new_channel2", False)["channel_id"] == 2
-    assert channels_create_v1(user_id, "new_channel3", True)["channel_id"] == 3
+    assert channels_create_v1(user_id, "new_channel1", True)["channel_id"] == 0
+    assert channels_create_v1(user_id, "new_channel2", False)["channel_id"] == 1
+    assert channels_create_v1(user_id, "new_channel3", True)["channel_id"] == 2
 
 #Tests border cases for the exception
 def test_border():
     clear_v1()
     user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    assert channels_create_v1(user_id, "a", True)["channel_id"] == 1
-    assert channels_create_v1(user_id, "abcdefghijklmnopqrst", True)["channel_id"] == 2
+    assert channels_create_v1(user_id, "a", True)["channel_id"] == 0
+    assert channels_create_v1(user_id, "abcdefghijklmnopqrst", True)["channel_id"] == 1
 
 #Tests for exception
 def test_edge():
