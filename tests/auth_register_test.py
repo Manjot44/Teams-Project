@@ -9,12 +9,12 @@ BASE_PORT = 8080
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
 def test_authreg_valid(register_three_users):
-    for id in register_three_users:
+    for id in register_three_users["id"]:
         assert isinstance(id, int)
     
-    assert register_three_users[0] != register_three_users[1]
-    assert register_three_users[0] != register_three_users[2] 
-    assert register_three_users[1] != register_three_users[2]
+    assert register_three_users["id"][0] != register_three_users["id"][1]
+    assert register_three_users["id"][0] != register_three_users["id"][2] 
+    assert register_three_users["id"][1] != register_three_users["id"][2]
 
 def test_email_missing_element(user_init):
     requests.delete(f"{BASE_URL}/clear/v1")

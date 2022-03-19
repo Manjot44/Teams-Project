@@ -47,12 +47,13 @@ def channels_list_v1(auth_user_id):
     
     #Getting Data from data storage file
     store = data_store.get()
-
+    
     #Assessing for Access Error
     valid_user = False
     for user in store["users"]:
         if user["u_id"] == auth_user_id:
-            valid_user = True
+            if auth_user_id != None:
+                valid_user = True
     if valid_user == False:
         raise AccessError("User ID must be registered")
 
@@ -119,12 +120,14 @@ def channels_listall_v1(auth_user_id):
         'channels': []
     }
 
-    # validate auth user id
     saved_data = data_store.get()
+
+    # validate auth user id
     valid_user = False
     for user in saved_data['users']:
         if auth_user_id == user['u_id']:
-            valid_user = True
+            if auth_user_id != None:
+                valid_user = True
     if valid_user == False:
         raise AccessError()
 
@@ -165,19 +168,22 @@ def channels_create_v1(auth_user_id, name, is_public):
     which_user = 0
     for idx, user in enumerate(store["users"]):
         if user["u_id"] == auth_user_id:
-            valid_user = True
-            which_user = idx
+            if auth_user_id != None:
+                valid_user = True
+                which_user = idx
     if valid_user == False:
         raise AccessError("User ID must be registered")
 
     #Creates and adds the new channel to the channels list
-    channel_id = len(store["channels"]) + 1
+    if store["channels"][0]["channel_id"] == None:
+        store["channels"] = []
+    channel_id = len(store["channels"])
     nc = {}
     nc["channel_id"] = channel_id
     store["channels"].append(nc)
 
     #Assigning variable to newly created channel
-    current_channel = store["channels"][channel_id - 1]
+    current_channel = store["channels"][channel_id]
 
     #Assigning user inputs
     current_channel["channel_id"] = channel_id

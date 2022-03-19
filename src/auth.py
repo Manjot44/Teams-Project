@@ -25,6 +25,9 @@ def auth_login_v1(email, password):
 
     store = data_store.get()
     
+    if store["users"][0]["u_id"] == None:
+            store["users"] = []
+    
     valid_email = False
     for user in store["users"]:
         if user["email"] == email:
@@ -127,9 +130,11 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError(f"Error: last name must be between 1 and 50 characters long inclusive")
 
     handle = generate_handle(name_first, name_last)
+    if store["users"][0]["u_id"] == None:
+            store["users"] = []
     id = len(store["users"])
     perm_id = 2
-    if id == 1:
+    if id == 0:
         perm_id = 1
     encoded_jwt = jwt.encode({'handle_str': handle, "session_id": 0}, SECRET, algorithm='HS256')
 
