@@ -4,6 +4,22 @@ from src.data_store import data_store
 from src.channels import channels_create_v1
 from src.error import InputError, AccessError
 
+
+def check_valid_token(token, data):
+    valid_token = False
+    which_auth = 0
+    for idx, user in enumerate(data["users"]):
+        for active_token in user["valid_tokens"]:
+            if active_token == token:
+                valid_token = True
+                which_auth = idx
+    if valid_token == False:
+        raise AccessError(f"Error: User does not have a valid token")
+    
+    return which_auth
+
+
+# remove this after all iteration 1 functions have used jwt implementation
 def check_valid_id(auth_user_id, data):
     has_auth_user = False
     which_auth = 0

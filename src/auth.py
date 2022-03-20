@@ -1,4 +1,3 @@
-from base64 import encode
 from src.data_store import data_store
 from src.error import InputError
 import hashlib
@@ -25,12 +24,10 @@ def auth_login_v1(email, password):
 
     store = data_store.get()
     
-    if store["users"][0]["u_id"] == None:
-            store["users"] = []
     
     valid_email = False
     for user in store["users"]:
-        if user["email"] == email:
+        if user["email"] == email and email != None:
             valid_email = True
             if user["password"] != hashlib.sha256(password.encode()).hexdigest():
                 raise InputError(f"Error: password is incorrect")
