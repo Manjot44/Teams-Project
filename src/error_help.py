@@ -12,7 +12,7 @@ def check_valid_id(auth_user_id, data):
             has_auth_user = True
             which_auth = idx
     if has_auth_user == False:
-        raise AccessError(f"Error: User does not have a valid ID")
+        raise AccessError(f"Error: {auth_user_id} does not have a valid ID")
 
     return which_auth
 
@@ -23,7 +23,7 @@ def validate_channel(data, channel_id):
             if channel_id != None:
                 valid_channel = True
     if valid_channel == False:
-        raise error.InputError()   # error as channel id is not valid
+        raise error.InputError(f"Error: {channel_id} not valid")   
 
 def check_channel_priv(data, channel_id, which_auth):
     if data["channels"][channel_id]["is_public"] == False and data['users'][which_auth]['perm_id'] == 2: 
@@ -33,4 +33,14 @@ def check_channel_user(data, auth_user_id, channel_id):
     users = data["channels"][channel_id]["all_members"]
     for user in users:
         if user['u_id'] == auth_user_id and auth_user_id != None:
-            raise InputError(f"Error: User is already member of the channel")
+            raise InputError(f"Error: {auth_user_id} is already member of the channel")
+
+def user_not_in_channel(data, auth_user_id, channel_id):
+    in_channel = False
+    check_user = data["channels"][channel_id]["all_members"]
+    for check in check_user:
+        if check['u_id'] == auth_user_id and auth_user_id != None:
+            in_channel = True
+            break
+    if in_channel == False:
+        raise AccessError(f"Error: {auth_user_id} not in specific channel")
