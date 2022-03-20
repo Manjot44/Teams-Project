@@ -57,7 +57,7 @@ def handle_auth_login():
 
     return dumps(auth.auth_login_v1(email, password))
 
-@APP.route("channel/leave/v1", methods=['POST'])
+@APP.route("/channel/leave/v1", methods=['POST'])
 def handle_channel_leave():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
