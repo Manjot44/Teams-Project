@@ -26,5 +26,11 @@ def test_valid_logout(register_three_users, user_init):
     response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token:": register_three_users["token"][0], "name": "channel_name", "is_public": True})
     assert response.status_code == 403
 
-def test_invalid_token_regitistered():
-    
+def test_invalid_token_registered(register_three_users):
+    response = requests.post(f"{BASE_URL}/auth/logout/v1", json = {"token": None})
+    assert response.status_code == 403
+
+def test_invalid_token_unregistered():
+    requests.delete(f"{BASE_URL}/clear/v1")
+    response = requests.post(f"{BASE_URL}/auth/logout/v1", json = {"token": None})
+    assert response.status_code == 403
