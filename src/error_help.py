@@ -19,18 +19,15 @@ def check_valid_token(token, data):
     return which_auth
 
 
-# remove this after all iteration 1 functions have used jwt implementation
 def check_valid_id(auth_user_id, data):
     has_auth_user = False
-    which_auth = 0
-    for idx, auth_user in enumerate(data["users"]):
+    for auth_user in data["users"]:
         if auth_user["u_id"] == auth_user_id and auth_user_id != None:
             has_auth_user = True
-            which_auth = idx
     if has_auth_user == False:
         raise AccessError(f"Error: {auth_user_id} does not have a valid ID")
 
-    return which_auth
+    return auth_user_id
 
 def validate_channel(data, channel_id):
     valid_channel = False
