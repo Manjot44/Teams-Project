@@ -3,6 +3,7 @@ from src.error import InputError
 import hashlib
 import re
 import jwt
+import src.error_help
 
 SECRET = 'jroilin'
 
@@ -153,3 +154,13 @@ def auth_register_v1(email, password, name_first, name_last):
         "auth_user_id": id,
         "token": encoded_jwt,
     }
+
+
+
+def auth_logout_v1(token):
+    store = data_store.get()
+    
+    auth_user_id = src.error_help.check_valid_token
+
+
+    data_store.set(store)
