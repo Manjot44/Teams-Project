@@ -21,7 +21,6 @@ def check_valid_token(token, data):
 
 def check_valid_id(auth_user_id, data):
     has_auth_user = False
-    which_auth = 0
     for auth_user in data["users"]:
         if auth_user["u_id"] == auth_user_id and auth_user_id != None:
             has_auth_user = True
