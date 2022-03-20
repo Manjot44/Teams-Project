@@ -57,5 +57,6 @@ def invalid_token_registered(register_three_users):
     assert response.status_code == 403
 
 def invalid_token_unregistered():
+    requests.delete(f"{BASE_URL}/clear/v1")
     response = requests.post(f"{BASE_URL}/channel/leave/v1", json = {"token:": None, "channel_id": 0})
     assert response.status_code == 403
