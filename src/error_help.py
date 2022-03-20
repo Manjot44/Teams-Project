@@ -1,9 +1,5 @@
 from src.data_store import data_store
-from src import auth, channel, channels, error, other
-from src.data_store import data_store
-from src.channels import channels_create_v1
 from src.error import InputError, AccessError
-
 
 def check_valid_token(token, data):
     valid_token = False
@@ -17,7 +13,6 @@ def check_valid_token(token, data):
         raise AccessError(f"Error: User does not have a valid token")
     
     return which_auth
-
 
 def check_valid_id(auth_user_id, data):
     has_auth_user = False
@@ -36,7 +31,7 @@ def validate_channel(data, channel_id):
             if channel_id != None:
                 valid_channel = True
     if valid_channel == False:
-        raise error.InputError(f"Error: {channel_id} not valid")   
+        raise InputError(f"Error: {channel_id} not valid")   
 
 def check_channel_priv(data, channel_id, which_auth):
     if data["channels"][channel_id]["is_public"] == False and data['users'][which_auth]['perm_id'] == 2: 

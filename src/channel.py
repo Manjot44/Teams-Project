@@ -1,7 +1,4 @@
 from src.data_store import data_store
-from src import auth, channel, channels, error, other
-from src.data_store import data_store
-from src.channels import channels_create_v1
 from src.error import InputError, AccessError
 from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel
 
@@ -181,7 +178,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     messages = store['channels'][channel_id]['messages']
 
     if start > len(messages):
-        raise error.InputError(f"start must be smaller than total amount of messages")
+        raise InputError(f"start must be smaller than total amount of messages")
 
     if start + 50 > len(messages):
         messagesreturn['end'] = -1
