@@ -4,7 +4,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, other
+from src import config, auth, channel_expansion, other
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -56,6 +56,14 @@ def handle_auth_login():
     password = str(request_data.get("password", None))
 
     return dumps(auth.auth_login_v1(email, password))
+
+@APP.route("channel/leave/v1", methods=['POST'])
+def handle_channel_leave():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    channel_id = int(request_data.get("channel_id", None))
+
+    return dumps(channel_expansion.channel_leave_v1(token, channel_id))
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def handle_clear():
