@@ -72,6 +72,15 @@ def handle_channel_leave():
 
     return dumps(channel_expansion.channel_leave_v1(token, channel_id))
 
+@APP.route("/channel/addowner/v1", methods=['POST'])
+def handle_channel_addowner():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    channel_id = int(request_data.get("channel_id", None))
+    u_id = int(request_data.get("u_id", None))
+
+    return dumps(channel_expansion.channel_addowner_v1(token, channel_id, u_id))
+
 @APP.route("/clear/v1", methods=['DELETE'])
 def handle_clear():
     other.clear_v1()
