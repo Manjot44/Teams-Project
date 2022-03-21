@@ -14,7 +14,7 @@ def test_valid_leave(register_three_users):
     response_data = response.json()
     channel_id = response_data["channel_id"]
 
-    response = requests.post(f"{BASE_URL}/channel/invite/v2", json = {"token:": register_three_users["token"][0], "channel_id": channel_id, "u_id": register_three_users[1]})
+    response = requests.post(f"{BASE_URL}/channel/invite/v2", json = {"token:": register_three_users["token"][0], "channel_id": channel_id, "u_id": register_three_users["id"][1]})
     assert response.status_code == 200
 
     response = requests.post(f"{BASE_URL}/channel/leave/v1", json = {"token:": register_three_users["token"][0], "channel_id": channel_id})
@@ -27,9 +27,9 @@ def test_valid_leave(register_three_users):
     all_members = response_data["all_members"]
     
     for member in owner_members:
-        assert member["u_id"] != register_three_users[0]
+        assert member["u_id"] != register_three_users["id"][0]
     for member in all_members:
-        assert member["u_id"] != register_three_users[0]
+        assert member["u_id"] != register_three_users["id"][0]
 
 def test_invalid_channel_id(register_three_users):
     response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token:": register_three_users["token"][0], "name": "channel_name", "is_public": True})
