@@ -20,7 +20,7 @@ def test_valid_leave(register_three_users):
     response = requests.post(f"{BASE_URL}/channel/leave/v1", json = {"token:": register_three_users["token"][0], "channel_id": channel_id})
     assert response.status_code == 200
 
-    response = requests.post(f"{BASE_URL}/channel/details/v2", json = {"token:": register_three_users["token"][1], "name": "channel_name", "is_public": True})
+    response = requests.post(f"{BASE_URL}/channel/details/v2", json = {"token:": register_three_users["token"][1], "channel_id": channel_id})
     assert response.status_code == 200
     response_data = response.json()
     owner_members = response_data["owner_members"]
