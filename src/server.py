@@ -4,7 +4,8 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, other
+from src import config, auth, other, channel, channels
+
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -56,6 +57,18 @@ def handle_auth_login():
     password = str(request_data.get("password", None))
 
     return dumps(auth.auth_login_v1(email, password))
+
+@APP.route("/channels/listall/v2", methods=['GET'])
+def listall():
+    user = auth.auth_register_v1('email@email.com', 'password', 'name_first', 'name_last')
+
+    return dumps(channels.channels_listall_v1(user['auth_user_id']))
+
+@APP.route("/channel/details/v2", methods=['GET'])
+def handle_channel_details():
+    request_data = request.get_json
+    return dumps(channel.channel_details_v1(auth_user_id))
+
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def handle_clear():
