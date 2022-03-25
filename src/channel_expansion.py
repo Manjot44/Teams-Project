@@ -38,7 +38,7 @@ def channel_leave_v1(token, channel_id):
     }
 
 def channel_addowner_v1(token, channel_id, u_id):
-    '''Given a channel with ID channel_id that the authorised user is a member of, remove them as a member of the channel
+    '''Make user with user id u_id an owner of the channel
 
     Arguments:
         token (str) - jwt passed in,
@@ -90,3 +90,57 @@ def channel_addowner_v1(token, channel_id, u_id):
 
     return {
     }
+
+def channel_removeowner_v1(token, channel_id, u_id):
+    '''Remove user with user id u_id as an owner of the channel
+
+    Arguments:
+        token (str) - jwt passed in,
+        channel_id (str) - channel identification number,
+        u_id (int) - user authentication id number
+
+    Exceptions:
+        InputError  - Occurs when:
+            channel_id does not refer to a valid channel,
+            u_id does not refer to a valid user,
+            u_id refers to a user who is not an owner of the channel,
+            u_id refers to a user who is currently the only owner of the channel
+        AccessError - Occurs when:
+            token passed in is not valid,
+            channel_id is valid and the authorised user does not have owner permissions in the channel
+
+    Return Value:
+        (dict): returns an empty dictionary
+    '''
+    store = data_store.get()
+
+    auth_user_id = src.error_help.check_valid_token(token, store)
+    src.error_help.validate_channel(store, channel_id)
+    src.error_help.check_valid_id(u_id, store)
+
+    is_auth_owner = False
+    is_uid_owner = False
+    for idx, owner in enumerate(store["channels"][channel_id]["owner_members"]):
+        if owner["u_id"] == auth_user_id:
+            is_auth_owner = True
+        if owner["u_id"] == u_id:
+            is_uid_owner = True
+            which_owner = idx
+
+    
+    if is_uid_owner == False:
+        raise InputError(f"Error: u_id refers to a user who is not an owner of the channel")
+
+    if len(store["channels"][channel_id]["owner_members"]) == 1:
+        raise InputError(f"u_id refers to a user who is currently the only owner of the channel")
+
+    if is_auth_owner == False:
+        if store["users"][auth_user_id]["perm_id"] == 2:
+            raise AccessError(f"Error: channel_id is valid and the authorised user does not have owner permissions in the channel")
+    
+    store["channels"][channel_id]["owner_members"].pop(which_owner)
+
+    data_store.set(store)
+
+    return {
+    }    
