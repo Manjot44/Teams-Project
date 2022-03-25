@@ -9,7 +9,10 @@ BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 @pytest.fixture
 def register_three_users():
     requests.delete(f"{BASE_URL}/clear/v1")
-    new_id = []
+    user_info = {
+        "id": [],
+        "token": []
+    }
     
     user = {
         "email": "aBc123._%+-@aBc123.-.Co",
@@ -21,7 +24,8 @@ def register_three_users():
     response = requests.post(f"{BASE_URL}/auth/register/v2", json = user)
     assert response.status_code == 200
     response_data = response.json()
-    new_id.append(response_data['auth_user_id'])
+    user_info["id"].append(response_data["auth_user_id"])
+    user_info["token"].append(response_data["token"])
 
     
     user['email'] = ".@..Ml"
@@ -32,7 +36,8 @@ def register_three_users():
     response = requests.post(f"{BASE_URL}/auth/register/v2", json = user)
     assert response.status_code == 200
     response_data = response.json()
-    new_id.append(response_data['auth_user_id'] )
+    user_info["id"].append(response_data["auth_user_id"])
+    user_info["token"].append(response_data["token"])
 
 
     user['email'] = "abc@gmail.com"
@@ -43,9 +48,10 @@ def register_three_users():
     response = requests.post(f"{BASE_URL}/auth/register/v2", json = user)
     assert response.status_code == 200
     response_data = response.json()
-    new_id.append(response_data['auth_user_id'] )
+    user_info["id"].append(response_data["auth_user_id"])
+    user_info["token"].append(response_data["token"])
 
-    return new_id
+    return user_info
 
 @pytest.fixture
 def user_init():

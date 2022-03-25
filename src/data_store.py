@@ -34,6 +34,8 @@ initial_object = {
             'name_last': None,
             'handle_str': None,
             'password': None,
+            'perm_id': None,
+            'valid_tokens': []
         }
     ],
     'channels': [

@@ -1,5 +1,6 @@
 from src.error import InputError, AccessError
 from src.data_store import data_store
+from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel
 
 def channels_list_v1(auth_user_id):
     '''Provide a list of all channels (and their associated details) that the authorised user is part of.
@@ -47,15 +48,10 @@ def channels_list_v1(auth_user_id):
     
     #Getting Data from data storage file
     store = data_store.get()
-
+    
     #Assessing for Access Error
-    valid_user = False
-    for user in store["users"]:
-        if user["u_id"] == auth_user_id:
-            valid_user = True
-    if valid_user == False:
-        raise AccessError("User ID must be registered")
-
+    check_valid_id(auth_user_id, store)
+    
     #Creating empty list for the channels the user is part of
     channels_list = []
 
@@ -119,14 +115,10 @@ def channels_listall_v1(auth_user_id):
         'channels': []
     }
 
-    # validate auth user id
     saved_data = data_store.get()
-    valid_user = False
-    for user in saved_data['users']:
-        if auth_user_id == user['u_id']:
-            valid_user = True
-    if valid_user == False:
-        raise AccessError()
+
+    # validate auth user id
+    check_valid_id(auth_user_id, saved_data)
 
     # copying channels to 'listall' dict from saved channel data
     listall['channels'] = saved_data['channels']
@@ -161,23 +153,19 @@ def channels_create_v1(auth_user_id, name, is_public):
     namelen = len(name)
     if namelen < 1 or namelen > 20:
         raise InputError(f"Name must be between 1 and 20 characters long")
-    valid_user = False
-    which_user = 0
-    for idx, user in enumerate(store["users"]):
-        if user["u_id"] == auth_user_id:
-            valid_user = True
-            which_user = idx
-    if valid_user == False:
-        raise AccessError("User ID must be registered")
+    
+    which_user = check_valid_id(auth_user_id, store)
 
     #Creates and adds the new channel to the channels list
-    channel_id = len(store["channels"]) + 1
+    if store["channels"][0]["channel_id"] == None:
+        store["channels"] = []
+    channel_id = len(store["channels"])
     nc = {}
     nc["channel_id"] = channel_id
     store["channels"].append(nc)
 
     #Assigning variable to newly created channel
-    current_channel = store["channels"][channel_id - 1]
+    current_channel = store["channels"][channel_id]
 
     #Assigning user inputs
     current_channel["channel_id"] = channel_id

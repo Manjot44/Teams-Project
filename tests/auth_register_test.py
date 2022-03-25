@@ -9,12 +9,12 @@ BASE_PORT = 8080
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
 def test_authreg_valid(register_three_users):
-    for id in register_three_users:
+    for id in register_three_users["id"]:
         assert isinstance(id, int)
     
-    assert register_three_users[0] != register_three_users[1]
-    assert register_three_users[0] != register_three_users[2] 
-    assert register_three_users[1] != register_three_users[2]
+    assert register_three_users["id"][0] != register_three_users["id"][1]
+    assert register_three_users["id"][0] != register_three_users["id"][2] 
+    assert register_three_users["id"][1] != register_three_users["id"][2]
 
 def test_email_missing_element(user_init):
     requests.delete(f"{BASE_URL}/clear/v1")
@@ -148,4 +148,15 @@ def test_names_long(user_init):
 #     generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
 
 #     expected_handle = "iamthegreatestjerryl0"
+#     assert generated_handle == expected_handle
+
+# def test_handle_double_repeat():
+#     clear_v1()
+#     src.auth.auth_register_v1("jerrylin@gmail.com", "123456", "abc", "def")
+#     src.auth.auth_register_v1("jerryl@gmail.com", "123456", "abc", "def0")
+#     user_id = src.auth.auth_register_v1("jerry@gmail.com", "123456", "abc", "def")
+#     channel_id = src.channels.channels_create_v1(user_id, "new channel", True)["channel_id"]
+#     generated_handle = src.channel.channel_details_v1(user_id, channel_id)["all_members"][0]["handle_str"]
+
+#     expected_handle = "abcdef1"
 #     assert generated_handle == expected_handle
