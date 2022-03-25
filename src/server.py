@@ -62,6 +62,15 @@ def handle_clear():
     other.clear_v1()
     return dumps({})
 
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def handle_userpermission_change():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    u_id = int(request_data.get("u_id", None))
+    permission_id = int(request_data.get("permission_id", None))
+
+    return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
