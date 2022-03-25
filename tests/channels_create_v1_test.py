@@ -1,46 +1,76 @@
-import pytest
-from src.channels import channels_create_v1
-from src.error import AccessError, InputError
-from src.other import clear_v1
-from src.auth import auth_register_v1
+import requests
 
-#Testing for valid user ID
-def test_valid_user():
-    clear_v1()
-    #No user has been added to the user list, so this should be an error
-    with pytest.raises(AccessError):
-        channels_create_v1("userone", "new_channel1", True)["channel_id"]
-    #Even though a user has been added, since the user_id input is different it should be an error
-    user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    with pytest.raises(AccessError):
-        channels_create_v1(user_id + 1, "new_channel1", True)["channel_id"]
+BASE_ADDRESS = 'http://127.0.0.1'
+BASE_PORT = 8080
+BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
-#Testing for correct channel_id if one channel is created
-def test_normal_single():
-    clear_v1()
-    user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    assert channels_create_v1(user_id, "new_channel", True)["channel_id"] == 0
 
-#Testing for correct channel_id if multiple channels are created
-def test_normal_multiple():
-    clear_v1()
-    user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    assert channels_create_v1(user_id, "new_channel1", True)["channel_id"] == 0
-    assert channels_create_v1(user_id, "new_channel2", False)["channel_id"] == 1
-    assert channels_create_v1(user_id, "new_channel3", True)["channel_id"] == 2
+def test_long_name(register_three_users):
+    requests.delete(f"{BASE_URL}/clear/v1")
+    token1 = register_three_users["token"][0]
+    input = {
+        "token": token1,
+        "name": "12345678klmopqrstuvwx",
+        "is_public": False
+    }
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json=input)
+    assert response.status_code == 400
 
-#Tests border cases for the exception
-def test_border():
-    clear_v1()
-    user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    assert channels_create_v1(user_id, "a", True)["channel_id"] == 0
-    assert channels_create_v1(user_id, "abcdefghijklmnopqrst", True)["channel_id"] == 1
 
-#Tests for exception
-def test_edge():
-    clear_v1()
-    user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    with pytest.raises(InputError):
-        channels_create_v1(user_id, "", True)["channel_id"]
-    with pytest.raises(InputError):
-        channels_create_v1(user_id, "abcdefghijklmnopqrst0", True)["channel_id"]
+def test_short_name(register_three_users):
+    requests.delete(f"{BASE_URL}/clear/v1")
+    token1 = register_three_users["token"][0]
+    input = {
+        "token": token1,
+        "name": "",
+        "is_public": False
+    }
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json=input)
+    assert response.status_code == 400
+
+
+def test_normal_dualchannel(user_init):
+    requests.delete(f"{BASE_URL}/clear/v1")
+    user = {
+        "email": "aBc123._%+-@aBc123.-.Co",
+        "password": "123456",
+        "name_first": "A",
+        "name_last": "A"
+    }
+    auth_response1 = requests.post(f"{BASE_URL}/auth/register/v2", json=user)
+    token1 = auth_response1.json()["token"]
+    input1 = {
+        "token": token1,
+        "name": "channel1",
+        "is_public": False
+    }
+    response1 = requests.post(f"{BASE_URL}/channels/create/v2", json=input1)
+    assert response1.status_code == 200
+    response_data1 = response1.json()
+    assert response_data1["channel_id"] == 0
+    auth_response2 = requests.post(
+        f"{BASE_URL}/auth/register/v2", json=user_init)
+    token2 = auth_response2.json()["token"]
+    input2 = {
+        "token": token2,
+        "name": "channel2",
+        "is_public": True
+    }
+    response2 = requests.post(f"{BASE_URL}/channels/create/v2", json=input2)
+    assert response2.status_code == 200
+    response_data2 = response2.json()
+    assert response_data2["channel_id"] == 1
+
+
+def test_invalid_token(user_init):
+    requests.delete(f"{BASE_URL}/clear/v1")
+    auth_response = requests.post(
+        f"{BASE_URL}/auth/register/v2", json=user_init)
+    token = auth_response.json()["token"]
+    input = {
+        "token": "invalidtoken",
+        "name": "channel1",
+        "is_public": True
+    }
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json=input)
+    assert response.status_code == 403
