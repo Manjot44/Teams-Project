@@ -4,7 +4,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, other, channel, channels
+from src import config, auth, other, channel, channel, data_store
 
 
 def quit_gracefully(*args):
@@ -60,15 +60,26 @@ def handle_auth_login():
 
 @APP.route("/channels/listall/v2", methods=['GET'])
 def channel_listall():
-    token = request.args.get('token')
-    
-    return dumps(channels.channels_listall_v1(user['auth_user_id']))
+    token = request.args.get('token') # line might be dodge; alt: req = request.get_json() first
+    data = data_store.get()
+
+    u_id = check_valid_token(token, data) # see if instead of data data_store.get() just works
+            # potential errors; have to see if u_id returned is valid 
+
+    return dumps(channels.channels_listall_v1(u_id))
 
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details():
-    request_data = request.get_json
-    return dumps(channel.channel_details_v1(auth_user_id))
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id') # receive args from the req
 
+    data = data_store.get()
+    u_id = check_valid_token(token, data) # retrieve u_id from token if valid
+        # see if instead of data data_store.get() just works
+        # potential errors; have to see if u_id returned is valid 
+    
+    return dumps(channel.channel_details_v1(u_id))
+    
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def handle_clear():
@@ -80,4 +91,4 @@ def handle_clear():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    APP.run(port=config.port, debug = True) # Do not edit this port
