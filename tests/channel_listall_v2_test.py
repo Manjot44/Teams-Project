@@ -3,14 +3,14 @@ import requests
 from src import auth, channel, channels, error, data_store, other
 
 BASE_ADDRESS = 'http://127.0.0.1'
-BASE_PORT = 8080
+BASE_PORT = 8181
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
 def test_listall_invalid_user():
     requests.delete(f"{BASE_URL}/clear/v1")
     token = None
     response = requests.get(f"{BASE_URL}/channels/listall/v2&token={token}")
-    assert response.status_code == 200
+    assert response.status_code == 400 # check if it is the right code; 403?
     
 def test_listall_valid_user_no_channel():
     # CLEAR
@@ -21,7 +21,7 @@ def test_listall_valid_user_no_channel():
     token = response_data['token']
     # START LISTALL TESTING
         # Test if request is received
-    response = requests.get(f"{BASE_URL}/channels/listall/v2&token={token}")
+    response = requests.get(f"{BASE_URL}/channels/listall/v2?token={token}")
     assert response.status_code == 200
         # Test data returned
     response_data = response.json()
@@ -43,13 +43,13 @@ def test_listall_valid_user_1_public_channel():
     })
     channel = response.json()
     # TEST LISTALL FOR CHANNEL
-    response = requests.get(f"{BASE_URL}/channels/listall/v2&{token}")
+    response = requests.get(f"{BASE_URL}/channels/listall/v2?token={token}")
     assert response.status_code == 200
     # TEST DATA RETURNED
     channel = response.json()
     assert channel['channels'][0]['channel_id'] == channel['channel_id']
     assert channel['channels'][0]['name'] == 'channel_name'
-    assert channel['channels'][0]['owner_members'][0]['u_id'] == u_id
+    #assert channel['channels'][0]['owner_members'][0]['u_id'] == u_id
     
 
 def test_listall_valid_user_3_public_channel():
