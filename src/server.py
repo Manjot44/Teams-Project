@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config, auth, other
+import src.admin
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -70,7 +71,6 @@ def handle_userpermission_change():
     permission_id = int(request_data.get("permission_id", None))
 
     return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
-
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
