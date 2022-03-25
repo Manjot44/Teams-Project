@@ -59,13 +59,13 @@ def handle_auth_login():
     return dumps(auth.auth_login_v1(email, password))
 
 @APP.route("/channels/listall/v2", methods=['GET'])
-def listall():
-    user = auth.auth_register_v1('email@email.com', 'password', 'name_first', 'name_last')
-
+def channel_listall():
+    token = request.args.get('token')
+    
     return dumps(channels.channels_listall_v1(user['auth_user_id']))
 
 @APP.route("/channel/details/v2", methods=['GET'])
-def handle_channel_details():
+def channel_details():
     request_data = request.get_json
     return dumps(channel.channel_details_v1(auth_user_id))
 
