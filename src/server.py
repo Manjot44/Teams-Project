@@ -4,8 +4,9 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, other, channel, channel, data_store
-
+from src import config, auth, other, channel, channels
+from src.data_store import data_store
+from src.error_help import check_valid_token
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -78,7 +79,7 @@ def channel_details():
         # see if instead of data data_store.get() just works
         # potential errors; have to see if u_id returned is valid 
     
-    return dumps(channel.channel_details_v1(u_id))
+    return dumps(channel.channel_details_v1(u_id, channel_id))
     
 
 @APP.route("/clear/v1", methods=['DELETE'])
