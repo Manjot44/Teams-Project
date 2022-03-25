@@ -4,7 +4,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, channel_expansion, other
+from src import config, auth, channel_expansion, messages, other
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -89,6 +89,15 @@ def handle_channel_removeowner():
     u_id = int(request_data.get("u_id", None))
 
     return dumps(channel_expansion.channel_removeowner_v1(token, channel_id, u_id))
+
+@APP.route("message/send/v1", methods=['POST'])
+def handle_message_send():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    channel_id = int(request_data.get("channel_id", None))
+    message = str(request_data.get("message", None))
+
+    return dumps(messages.message_send_v1(token, channel_id, message))
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def handle_clear():
