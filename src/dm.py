@@ -117,3 +117,51 @@ def dm_list_v1(u_id):
                 })
 
     return dm_list
+
+
+def dm_remove_v1(u_id, dm_id):
+    '''Remove an existing DM, so all members are no longer in the DM. 
+    This can only be done by the original creator of the DM.
+
+    Arguments:
+        u_id (int) - user authentication int
+        dm_id (ints) - dm identification number
+
+    Exceptions:
+        InputError - Occurs when:
+            - dm_id does not refer to a valid DM
+        AccessError - Occurs when:
+            - token is not valid
+            - dm_id is valid and the authorised user is not the original DM creator
+            - dm_id is valid and the authorised user is no longer in the DM
+
+    Return Value:
+        Returns {}
+    '''
+
+# Getting Data from data storage file
+    store = data_store.get()
+
+    valid_dm_id = False
+    for dm in store["dms"]:
+        if dm["dm_id"] == dm_id:
+            valid_dm_id = True
+    if valid_dm_id == False:
+        raise InputError(f"dm_id is not valid")
+
+    dm_member = False
+    for user in store["dms"][dm_id + 1]["all_members"]:
+        if user["u_id"] == u_id:
+            dm_member = True
+    if dm_member == False:
+        raise AccessError(f"You are not part of this dm")
+
+    if u_id != store["dms"][dm_id + 1]["owner_members"][0]["u_id"]:
+        raise AccessError(f"Only the original creator can remove a dm")
+
+    del store["dms"][dm_id + 1]
+
+    # Saving to datastore
+    data_store.set(store)
+
+    return
