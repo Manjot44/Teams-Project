@@ -139,7 +139,7 @@ def dm_remove_v1(u_id, dm_id):
         Returns {}
     '''
 
-# Getting Data from data storage file
+    # Getting Data from data storage file
     store = data_store.get()
 
     valid_dm_id = False
@@ -165,3 +165,55 @@ def dm_remove_v1(u_id, dm_id):
     data_store.set(store)
 
     return
+
+
+def dm_details_v1(u_id, dm_id):
+    '''Given a DM with ID dm_id that the authorised user is a member of, 
+    provide basic details about the DM.
+
+    Arguments:
+        u_id (int) - user authentication int
+        dm_id (ints) - dm identification number
+
+    Exceptions:
+        InputError - Occurs when:
+            - dm_id does not refer to a valid DM
+        AccessError - Occurs when:
+            - dm_id is valid and the authorised user is not a member of the DM
+
+    Return Value:
+        Returns {
+            'name': name
+            'members': [
+                {
+                    'u_id': None,
+                    'email': None,
+                    'name_first': None,
+                    'name_last': None,
+                    'handle_str': None,
+                }
+            ]
+        }
+    '''
+
+    # Getting Data from data storage file
+    store = data_store.get()
+
+    valid_dm_id = False
+    for dm in store["dms"]:
+        if dm["dm_id"] == dm_id:
+            valid_dm_id = True
+    if valid_dm_id == False:
+        raise InputError(f"dm_id is not valid")
+
+    dm_member = False
+    for user in store["dms"][dm_id + 1]["all_members"]:
+        if user["u_id"] == u_id:
+            dm_member = True
+    if dm_member == False:
+        raise AccessError(f"You are not part of this dm")
+
+    return {
+        "name": store["dms"][dm_id + 1]["name"],
+        "members": store["dms"][dm_id + 1]["all_members"]
+    }
