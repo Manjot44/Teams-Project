@@ -14,7 +14,7 @@ def test_valid_logout(register_three_users, user_init):
     response = requests.post(f"{BASE_URL}/auth/login/v2", json = user_init)
     assert response.status_code == 200
     response_data = response.json()
-    response_data['auth_user_id'] == register_three_users["id"][0]
+    assert response_data['auth_user_id'] == register_three_users["id"][0]
     second_token = response_data["token"]
     
     response = requests.post(f"{BASE_URL}/auth/logout/v1", json = {"token": register_three_users["token"][0]})
