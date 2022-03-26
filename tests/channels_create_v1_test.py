@@ -1,7 +1,7 @@
 import requests
 
 BASE_ADDRESS = 'http://127.0.0.1'
-BASE_PORT = 10000
+BASE_PORT = 8080
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
 
