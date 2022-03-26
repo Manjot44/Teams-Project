@@ -4,7 +4,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, dm
+from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, dm, channel
 import src.admin
 
 
@@ -159,6 +159,29 @@ def dm_create():
     u_ids = list(request_data.get("u_ids", []))
 
     return dumps(dm.dm_create_v1(token, u_ids))
+
+@APP.route("/channel/invite/v2", methods=['POST'])
+def handle_channel_invite():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    channel_id = int(request_data.get("channel_id", None))
+    u_id = int(request_data.get("u_id", None))
+    store = data_store.data_store.get()
+
+    auth_user_id = error_help.check_valid_token(token, store)
+
+    return dumps(channel.channel_invite_v1(auth_user_id, channel_id, u_id))
+
+@APP.route("/channel/join/v2", methods=['POST'])
+def handle_channel_join():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    channel_id = int(request_data.get("channel_id", None))
+    store = data_store.data_store.get()
+
+    auth_user_id = error_help.check_valid_token(token, store)
+
+    return dumps(channel.channel_join_v1(auth_user_id, channel_id))
 
 
 # NO NEED TO MODIFY BELOW THIS POINT
