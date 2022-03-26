@@ -4,11 +4,14 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, channel_expansion, messages, other
+from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store
+import src.admin
+
 
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
+
 
 def defaultHandler(err):
     response = err.get_response()
@@ -21,15 +24,18 @@ def defaultHandler(err):
     response.content_type = 'application/json'
     return response
 
+
 APP = Flask(__name__)
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
 
-#### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
+# NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 # Example
+
+
 @APP.route("/echo", methods=['GET'])
 def echo():
     data = request.args.get('data')
@@ -38,6 +44,7 @@ def echo():
     return dumps({
         'data': data
     })
+
 
 @APP.route("/auth/register/v2", methods=['POST'])
 def handle_auth_register():
@@ -48,6 +55,7 @@ def handle_auth_register():
     name_last = str(request_data.get("name_last", None))
 
     return dumps(auth.auth_register_v1(email, password, name_first, name_last))
+
 
 @APP.route("/auth/login/v2", methods=['POST'])
 def handle_auth_login():
@@ -64,32 +72,6 @@ def handle_auth_logout():
 
     return dumps(auth.auth_logout_v1(token))
 
-@APP.route("/channel/leave/v1", methods=['POST'])
-def handle_channel_leave():
-    request_data = request.get_json()
-    token = str(request_data.get("token", None))
-    channel_id = int(request_data.get("channel_id", None))
-
-    return dumps(channel_expansion.channel_leave_v1(token, channel_id))
-
-@APP.route("/channel/addowner/v1", methods=['POST'])
-def handle_channel_addowner():
-    request_data = request.get_json()
-    token = str(request_data.get("token", None))
-    channel_id = int(request_data.get("channel_id", None))
-    u_id = int(request_data.get("u_id", None))
-
-    return dumps(channel_expansion.channel_addowner_v1(token, channel_id, u_id))
-
-@APP.route("/channel/removeowner/v1", methods=["POST"])
-def handle_channel_removeowner():
-    request_data = request.get_json()
-    token = str(request_data.get("token", None))
-    channel_id = int(request_data.get("channel_id", None))
-    u_id = int(request_data.get("u_id", None))
-
-    return dumps(channel_expansion.channel_removeowner_v1(token, channel_id, u_id))
-
 @APP.route("message/send/v1", methods=['POST'])
 def handle_message_send():
     request_data = request.get_json()
@@ -99,14 +81,33 @@ def handle_message_send():
 
     return dumps(messages.message_send_v1(token, channel_id, message))
 
+@APP.route("/channels/create/v2", methods=['POST'])
+def handle_channels_create():
+    request_data = request.get_json()
+    store = data_store.data_store.get()
+    auth_user_id = store["users"][error_help.check_valid_token(
+        request_data.get("token", None), store)]["u_id"]
+    name = str(request_data.get("name", None))
+    is_public = bool(request_data.get("is_public"))
+
+    return dumps(channels.channels_create_v1(auth_user_id, name, is_public))
+
 @APP.route("/clear/v1", methods=['DELETE'])
 def handle_clear():
     other.clear_v1()
     return dumps({})
 
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def handle_userpermission_change():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    u_id = int(request_data.get("u_id", None))
+    permission_id = int(request_data.get("permission_id", None))
 
-#### NO NEED TO MODIFY BELOW THIS POINT
+    return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
+
+# NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
+    APP.run(port=config.port)  # Do not edit this port

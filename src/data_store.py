@@ -49,7 +49,6 @@ initial_object = {
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
-                    'perm_id': None,
                 }
             ],
             'all_members': [
@@ -59,7 +58,6 @@ initial_object = {
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
-                    'perm_id': None,
                 }
             ],
             'is_public': None,
