@@ -1,48 +1,64 @@
-from src.channels import channels_list_v1, channels_create_v1
-from src.other import clear_v1
-from src.error import AccessError
-from src.auth import auth_register_v1
-import pytest
+import requests
 
-#Testing for valid user ID
-def test_valid_user():
-    clear_v1()
-    #Even though a user has been added, since the user_id input is different it should be an error
-    user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    channels_create_v1(user_id, "new_channel1", True)
-    with pytest.raises(AccessError):
-        channels_list_v1(user_id + 1)
+BASE_ADDRESS = 'http://127.0.0.1'
+BASE_PORT = 8080
+BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
-#Testing that name and channel_id are correct for one channel 
-def test1obj():
-    clear_v1()
-    user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    channels_create_v1(user_id, "channel1", True)
-    assert channels_list_v1(user_id)["channels"][0]["channel_id"] == 0
-    assert channels_list_v1(user_id)["channels"][0]["name"] == 'channel1'
 
-#Testing for name and channel_id are correct for two channels 
-def test2obj():
-    clear_v1()
-    user_id = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    channels_create_v1(user_id, "channel1", True)
-    channels_create_v1(user_id, "channel2", True)
-    assert channels_list_v1(user_id)["channels"][0]["channel_id"] == 0
-    assert channels_list_v1(user_id)["channels"][0]["name"] == 'channel1'
-    assert channels_list_v1(user_id)["channels"][1]["channel_id"] == 1
-    assert channels_list_v1(user_id)["channels"][1]["name"] == 'channel2'
-    
-#Testing to show only channels the user is part of show up
-def testuserchannels():
-    clear_v1()
-    user_id1 = auth_register_v1("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")["auth_user_id"]
-    user_id2 = auth_register_v1("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")["auth_user_id"]
-    channels_create_v1(user_id1, "channel1", True)
-    channels_create_v1(user_id2, "channel2", True)
-    channels_create_v1(user_id1, "channel3", True)
-    assert channels_list_v1(user_id1)["channels"][0]["channel_id"] == 0
-    assert channels_list_v1(user_id1)["channels"][0]["name"] == 'channel1'
-    assert channels_list_v1(user_id1)["channels"][1]["channel_id"] == 2
-    assert channels_list_v1(user_id1)["channels"][1]["name"] == 'channel3'
-    assert channels_list_v1(user_id2)["channels"][0]["channel_id"] == 1
-    assert channels_list_v1(user_id2)["channels"][0]["name"] == 'channel2'
+def test_invalid_token():
+    requests.delete(f"{BASE_URL}/clear/v1")
+    input = {
+        "token": "invalidtoken"
+    }
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params=input)
+    assert response.status_code == 403
+
+
+def test_single_channel_list(user_init):
+    requests.delete(f"{BASE_URL}/clear/v1")
+    auth_response = requests.post(
+        f"{BASE_URL}/auth/register/v2", json=user_init)
+    token = auth_response.json()["token"]
+    input1 = {
+        "token": token,
+        "name": "channel1",
+        "is_public": True
+    }
+    requests.post(f"{BASE_URL}/channels/create/v2", json=input1)
+    list_input = {
+        "token": token
+    }
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params=list_input)
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data[0]["channel_id"] == 0
+    assert response_data[0]["name"] == "channel1"
+
+
+def test_multiple_channel_list(user_init):
+    requests.delete(f"{BASE_URL}/clear/v1")
+    auth_response = requests.post(
+        f"{BASE_URL}/auth/register/v2", json=user_init)
+    token = auth_response.json()["token"]
+    input1 = {
+        "token": token,
+        "name": "channel1",
+        "is_public": True
+    }
+    requests.post(f"{BASE_URL}/channels/create/v2", json=input1)
+    input2 = {
+        "token": token,
+        "name": "channel2",
+        "is_public": True
+    }
+    requests.post(f"{BASE_URL}/channels/create/v2", json=input2)
+    list_input = {
+        "token": token
+    }
+    response = requests.get(f"{BASE_URL}/channels/list/v2", params=list_input)
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data[0]["channel_id"] == 0
+    assert response_data[0]["name"] == "channel1"
+    assert response_data[1]["channel_id"] == 1
+    assert response_data[1]["name"] == "channel2"

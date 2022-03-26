@@ -1,5 +1,6 @@
 from src.data_store import data_store
 
+
 def clear_v1():
     '''Resets the internal data of the application to its initial state
 
@@ -58,7 +59,39 @@ def clear_v1():
                     'time_sent': None,
                 },
             ]
-        }  
+        }
+    ]
+    store['dms'] = [
+        {
+            'dm_id': None,
+            'name': None,
+            'owner_members': [
+                {
+                    'u_id': None,
+                    'email': None,
+                    'name_first': None,
+                    'name_last': None,
+                    'handle_str': None,
+                }
+            ],
+            'all_members': [
+                {
+                    'u_id': None,
+                    'email': None,
+                    'name_first': None,
+                    'name_last': None,
+                    'handle_str': None,
+                }
+            ],
+            'messages': [
+                {
+                    'message_id': None,
+                    'u_id': None,
+                    'message': None,
+                    'time_sent': None,
+                },
+            ]
+        }
     ]
 
     data_store.set(store)

@@ -3,6 +3,7 @@ from src.error import InputError
 import hashlib
 import re
 import jwt
+import src.error_help
 
 SECRET = 'jroilin'
 
@@ -152,4 +153,31 @@ def auth_register_v1(email, password, name_first, name_last):
     return {
         "auth_user_id": id,
         "token": encoded_jwt,
+    }
+
+
+
+def auth_logout_v1(token):
+    '''Given an active token, invalidates the token to log the user out.
+
+    Arguments:
+        token (str) - jwt passed in
+
+    Exceptions:
+        AccessError - Occurs when:
+            token passed in is not valid
+
+    Return Value:
+        (dict): returns an empty dictionary
+    '''
+    store = data_store.get()
+    
+    auth_user_id = src.error_help.check_valid_token(token, store)
+    for tokens in store["users"][auth_user_id]["valid_tokens"]:
+        if tokens == store["users"][auth_user_id]["valid_tokens"]:
+            store["users"][auth_user_id]["valid_tokens"].remove(tokens)
+
+    data_store.set(store)
+
+    return {
     }

@@ -1,7 +1,4 @@
 from src.data_store import data_store
-from src import auth, channel, channels, error, other
-from src.data_store import data_store
-from src.channels import channels_create_v1
 from src.error import InputError, AccessError
 from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel
 
@@ -32,14 +29,11 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     check_valid_id(auth_user_id, store)
     has_u_id = False
-    which_auth = 0
-    for idx, user in enumerate(store["users"]):
-        if user["u_id"] == u_id:
-            if auth_user_id != None:    
-                has_u_id = True
-                which_auth = idx
+    for user in store["users"]:
+        if user["u_id"] == u_id and u_id != None:  
+            has_u_id = True
     if has_u_id == False:
-        raise InputError(f"Error: User does not have a valid ID")
+        raise InputError(f"Error: {u_id} does not have a valid ID")
 
     validate_channel(store, channel_id)
 
@@ -49,15 +43,17 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     # Once the above functions run and confirm that the auth_user is in channel and that u_id valid, u_id will be added to channel 
     add_user_info = {
-        'u_id': store['users'][which_auth]['u_id'],
-        'email': store['users'][which_auth]['email'],
-        'name_first': store['users'][which_auth]['name_first'],
-        'name_last': store['users'][which_auth]['name_last'],
-        'handle_str': store['users'][which_auth]['handle_str'],
+        'u_id': store['users'][u_id]['u_id'],
+        'email': store['users'][u_id]['email'],
+        'name_first': store['users'][u_id]['name_first'],
+        'name_last': store['users'][u_id]['name_last'],
+        'handle_str': store['users'][u_id]['handle_str'],
     }
+
     users = store["channels"][channel_id]["all_members"]
     users.append(add_user_info)
     data_store.set(store)
+
     return {
     }
 
@@ -181,7 +177,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     messages = store['channels'][channel_id]['messages']
 
     if start > len(messages):
-        raise error.InputError(f"start must be smaller than total amount of messages")
+        raise InputError(f"start must be smaller than total amount of messages")
 
     if start + 50 > len(messages):
         messagesreturn['end'] = -1
@@ -212,23 +208,23 @@ def channel_join_v1(auth_user_id, channel_id):
     '''
     
     store = data_store.get()
-
-    # Checks if the auth_user_id is valid
-    which_auth = check_valid_id(auth_user_id, store)
+    check_valid_id(auth_user_id, store)
     validate_channel(store, channel_id)
-    check_channel_priv(store, channel_id, which_auth)
+    check_channel_priv(store, channel_id, auth_user_id)
     check_channel_user(store, auth_user_id, channel_id)
     
     # Once confirmed that user is not in channel, user will be added
     add_user_info = {
-        'u_id': store['users'][which_auth]['u_id'],
-        'email': store['users'][which_auth]['email'],
-        'name_first': store['users'][which_auth]['name_first'],
-        'name_last': store['users'][which_auth]['name_last'],
-        'handle_str': store['users'][which_auth]['handle_str'],
+        'u_id': store['users'][auth_user_id]['u_id'],
+        'email': store['users'][auth_user_id]['email'],
+        'name_first': store['users'][auth_user_id]['name_first'],
+        'name_last': store['users'][auth_user_id]['name_last'],
+        'handle_str': store['users'][auth_user_id]['handle_str'],
     }
+
     users = store["channels"][channel_id]["all_members"]
     users.append(add_user_info)
     data_store.set(store)
+
     return {
     }
