@@ -9,7 +9,6 @@ def test_invalid_token(user_init):
     requests.delete(f"{BASE_URL}/clear/v1")
     auth_response = requests.post(
         f"{BASE_URL}/auth/register/v2", json=user_init)
-    token = auth_response.json()["token"]
     u_id = auth_response.json()["auth_user_id"]
     input = {
         "token": "incorrecttoken",
@@ -24,7 +23,6 @@ def test_invalid_uid(user_init):
     auth_response = requests.post(
         f"{BASE_URL}/auth/register/v2", json=user_init)
     token = auth_response.json()["token"]
-    u_id = auth_response.json()["auth_user_id"]
     input = {
         "token": token,
         "u_ids": []
