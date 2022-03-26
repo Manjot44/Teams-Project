@@ -79,6 +79,15 @@ def test_valid_start():
     response3 = requests.get(f"{BASE_URL}/channel/messages/v2", json={'token': token1, 'channel_id': channel_id, 'start': 0})
     assert response3.status_code == 200
 
+    messagesreturn = {
+        'messages': [],
+        'start': 0, 
+        'end': -1
+    } 
+
+    response_data = response3.json()
+    assert response_data == messagesreturn
+
 def test_user_registered():  
     requests.delete(f"{BASE_URL}/clear/v1")
 
