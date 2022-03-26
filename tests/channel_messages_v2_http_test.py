@@ -20,7 +20,7 @@ def test_invalid_channel_id():
     response2 = requests.post(f"{BASE_URL}/channels/create/v2", json=input)
     channel_id = response2.json()['channel_id']
 
-    response3 = requests.get(f"{BASE_URL}/channel/messages/v2", json={'token': token1, 'channel_id': "invalid channel_id", 'start': 0})
+    response3 = requests.get(f"{BASE_URL}/channel/messages/v2", params={'token': token1, 'channel_id': "invalid channel_id", 'start': 0})
     assert response3.status_code == 400
 
 def test_user_invalid():  
@@ -40,7 +40,7 @@ def test_user_invalid():
     response3 = requests.post(f"{BASE_URL}/channels/create/v2", json=input)
     channel_id = response3.json()['channel_id']
 
-    response4 = requests.get(f"{BASE_URL}/channel/messages/v2", json={'token': token2, 'channel_id': channel_id, 'start': 0})
+    response4 = requests.get(f"{BASE_URL}/channel/messages/v2", params={'token': token2, 'channel_id': channel_id, 'start': 0})
     assert response4.status_code == 403
 
 def test_valid_start_no_messages():
@@ -58,7 +58,7 @@ def test_valid_start_no_messages():
     response2 = requests.post(f"{BASE_URL}/channels/create/v2", json=input)
     channel_id = response2.json()['channel_id']
 
-    response3 = requests.get(f"{BASE_URL}/channel/messages/v2", json={'token': token1, 'channel_id': channel_id, 'start': 10})
+    response3 = requests.get(f"{BASE_URL}/channel/messages/v2", params={'token': token1, 'channel_id': channel_id, 'start': 10})
     assert response3.status_code == 400
 
 def test_valid_start():
@@ -76,7 +76,7 @@ def test_valid_start():
     response2 = requests.post(f"{BASE_URL}/channels/create/v2", json=input)
     channel_id = response2.json()['channel_id']
 
-    response3 = requests.get(f"{BASE_URL}/channel/messages/v2", json={'token': token1, 'channel_id': channel_id, 'start': 0})
+    response3 = requests.get(f"{BASE_URL}/channel/messages/v2", params={'token': token1, 'channel_id': channel_id, 'start': 0})
     assert response3.status_code == 200
 
     messagesreturn = {
@@ -103,7 +103,7 @@ def test_user_registered():
     response2 = requests.post(f"{BASE_URL}/channels/create/v2", json=input)
     channel_id = response2.json()['channel_id']
 
-    response3 = requests.get(f"{BASE_URL}/channel/messages/v2", json={'token': "unregistered user", 'channel_id': channel_id, 'start': 0})
+    response3 = requests.get(f"{BASE_URL}/channel/messages/v2", params={'token': "unregistered user", 'channel_id': channel_id, 'start': 0})
     assert response3.status_code == 403
 
 def test_invalid_token():
@@ -121,5 +121,5 @@ def test_invalid_token():
     response2 = requests.post(f"{BASE_URL}/channels/create/v2", json=input)
     channel_id = response2.json()['channel_id']
 
-    response3 = requests.get(f"{BASE_URL}/channel/messages/v2", json={'token': "invalid token", 'channel_id': channel_id, 'start': 0})
+    response3 = requests.get(f"{BASE_URL}/channel/messages/v2", params={'token': "invalid token", 'channel_id': channel_id, 'start': 0})
     assert response3.status_code == 403 

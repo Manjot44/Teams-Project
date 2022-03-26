@@ -128,17 +128,16 @@ def handle_channels_list():
 @APP.route("/channel/messages/v2", methods=['GET'])
 def handle_channel_messages():
     
-    request_data = request.get_json()
     store = data_store.data_store.get()
-    u_id = store["users"][error_help.check_valid_token(
-        request_data.get("token", None), store)]["u_id"]
+    u_id = error_help.check_valid_token(request.args.get("token", None), store)
     
     channel_id = request.args.get('channel_id', None)
-    if channel_id != None:
-        int(channel_id)
+    if isinstance(channel_id, int) == False:
+        channel_id = None
+
     start = request.args.get('start', None)
-    if start != None:
-        int(start)
+    if isinstance(start, int) == False:
+        start = None
 
     return_value = channel.channel_messages_v1(u_id, channel_id, start)
 
@@ -156,12 +155,21 @@ def handle_userpermission_change():
     token = request_data.get("token", None)
     if token != None:
         str(token)
+
     u_id = request_data.get("u_id", None)
     if isinstance(u_id, int) == False:
         u_id = None
     permission_id = request_data.get("permission_id", None)
     if isinstance(permission_id, int) == False:
         permission_id = None
+
+    # channel_id = request.args.get('channel_id', None)
+    # if channel_id != None:
+    #     int(channel_id)
+    # start = request.args.get('start', None)
+    # if start != None:
+    #     int(start)
+
 
     return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
 
