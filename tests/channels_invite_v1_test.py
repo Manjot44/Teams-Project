@@ -119,8 +119,6 @@ HTTP Wrapper Tests
 # test if valid user is added to the channel after being invited - Public Channel
 def test_add_user_public(register_three_users):
     token1 = register_three_users["token"][0]
-    token2 = register_three_users["token"][1]
-    u_id1 = register_three_users["id"][0]
     u_id2 = register_three_users["id"][1]
 
     response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token" : token1, "name" : "channel1", "is_public" : True})
@@ -133,8 +131,6 @@ def test_add_user_public(register_three_users):
 # test if valid user is added to the channel after being invited - Private Channel
 def test_add_user_priv(register_three_users):
     token1 = register_three_users["token"][0]
-    token2 = register_three_users["token"][1]
-    u_id1 = register_three_users["id"][0]
     u_id2 = register_three_users["id"][1]
 
     response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token" : token1, "name" : "channel1", "is_public" : False})
@@ -159,8 +155,6 @@ def test_add_invalid_id(register_three_users):
 # Test where auth_user tries to add someone to the channel who is already in the channel
 def test_if_channel_member(register_three_users):
     token1 = register_three_users["token"][0]
-    token2 = register_three_users["token"][1]
-    u_id1 = register_three_users["id"][0]
     u_id2 = register_three_users["id"][1]
 
     response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token" : token1, "name" : "channel1", "is_public" : True})
@@ -188,11 +182,8 @@ def test_invite_chat_owner(register_three_users):
 # auth_user_id who is trying to invite another user is not a member of the channel
 def test_add_invalid_member(register_three_users):
     token1 = register_three_users["token"][0]
-    token2 = register_three_users["token"][1]
     token3 = register_three_users["token"][2]
-    u_id1 = register_three_users["id"][0]
     u_id2 = register_three_users["id"][1]
-    u_id3 = register_three_users["id"][2]
 
     # u_id1 creates the channel
     response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token" : token1, "name" : "channel1", "is_public" : True})
@@ -206,8 +197,6 @@ def test_add_invalid_member(register_three_users):
 # Test if an invalid channel_id is put in 
 def test_input_invalid_channel(register_three_users):  
     token1 = register_three_users["token"][0]
-    token2 = register_three_users["token"][1]
-    u_id1 = register_three_users["id"][0]
     u_id2 = register_three_users["id"][1]
 
     response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token" : token1, "name" : "channel1", "is_public" : True})
