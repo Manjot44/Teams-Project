@@ -62,11 +62,8 @@ def test_normal_dualchannel(user_init):
     assert response_data2["channel_id"] == 1
 
 
-def test_invalid_token(user_init):
+def test_invalid_token():
     requests.delete(f"{BASE_URL}/clear/v1")
-    auth_response = requests.post(
-        f"{BASE_URL}/auth/register/v2", json=user_init)
-    token = auth_response.json()["token"]
     input = {
         "token": "invalidtoken",
         "name": "channel1",
