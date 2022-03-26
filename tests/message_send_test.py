@@ -9,7 +9,7 @@ BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 # i will test these as other functions become complete
 
 def test_valid_message(register_three_users):
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token:": register_three_users["token"][0], "name": "channel_name", "is_public": True})
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token": register_three_users["token"][0], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
     channel_id = response_data["channel_id"]
@@ -18,14 +18,14 @@ def test_valid_message(register_three_users):
     assert response.status_code == 200
 
 def test_invalid_channel(register_three_users):
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token:": register_three_users["token"][0], "name": "channel_name", "is_public": True})
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token": register_three_users["token"][0], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
 
-    response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][0], "channel_id": None, "message": "Hello Sanjam"})
+    response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][0], "channel_id": "landejend", "message": "Hello Sanjam"})
     assert response.status_code == 400
 
 def test_bad_message(register_three_users):
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token:": register_three_users["token"][0], "name": "channel_name", "is_public": True})
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token": register_three_users["token"][0], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
     channel_id = response_data["channel_id"]
@@ -34,7 +34,7 @@ def test_bad_message(register_three_users):
     assert response.status_code == 400
 
 def test_not_user(register_three_users):
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token:": register_three_users["token"][0], "name": "channel_name", "is_public": True})
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token": register_three_users["token"][0], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
     channel_id = response_data["channel_id"]

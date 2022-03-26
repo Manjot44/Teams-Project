@@ -9,7 +9,7 @@ def message_send_v1(token, channel_id, message):
     
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.validate_channel(store, channel_id)
-    if len(message) < 1 or len(message) > 1000:
+    if message == None or len(message) < 1 or len(message) > 1000:
         raise InputError(f"Error: length of message is less than 1 or over 1000 characters")
     src.error_help.user_not_in_channel(store, auth_user_id, channel_id)
 
