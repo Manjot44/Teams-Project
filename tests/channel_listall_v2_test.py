@@ -3,7 +3,7 @@ import requests
 from src import auth, channel, channels, error, data_store, other
 
 BASE_ADDRESS = 'http://127.0.0.1'
-BASE_PORT = 8181
+BASE_PORT = 8080
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
 def test_listall_invalid_user():
