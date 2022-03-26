@@ -4,7 +4,6 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src.data_store import data_store
 from src.error_help import check_valid_token
 from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, dm, channel, admin
 import src.admin
@@ -82,7 +81,7 @@ def handle_auth_login():
 @APP.route("/channels/listall/v2", methods=['GET'])
 def channel_listall():
     token = str(request.args.get('token')) # line might be dodge; alt: req = request.get_json() first
-    data = data_store.get()
+    data = data_store.data_store.get()
 
     u_id = check_valid_token(token, data)
 
@@ -102,7 +101,7 @@ def channel_details():
     else:
         channel_id = int(request.args.get('channel_id', None))
 
-    data = data_store.get()
+    data = data_store.data_store.get()
     u_id = check_valid_token(token, data)
     
     return dumps(channel.channel_details_v1(u_id, channel_id))
