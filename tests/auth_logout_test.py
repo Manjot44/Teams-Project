@@ -5,8 +5,6 @@ BASE_ADDRESS = 'http://127.0.0.1'
 BASE_PORT = 8080
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
-# as other functions have not yet been written, I will be writing a draft of the tests 
-# i will test these as other functions become complete
 
 def test_valid_logout(register_three_users, user_init):
     user_init['email'] = "aBc123._%+-@aBc123.-.Co"
