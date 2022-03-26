@@ -66,4 +66,4 @@ def test_dm_normal(user_init):
     response = requests.post(f"{BASE_URL}/dm/create/v1", json=input)
     response_data = response.json()
     assert response.status_code == 200
-    assert response_data["dm_id"] == 1
+    assert response_data["dm_id"] == 0

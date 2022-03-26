@@ -130,6 +130,16 @@ def handle_channels_list():
     return dumps(channels.channels_list_v1(auth_user_id))
 
 
+@APP.route("/dm/list/v1", methods=['GET'])
+def handle_dms_list():
+    token = str(request.args.get('token'))
+    store = data_store.data_store.get()
+    u_id = store["users"][error_help.check_valid_token(
+        token, store)]["u_id"]
+
+    return dumps(dm.dm_list_v1(u_id))
+
+
 @APP.route("/clear/v1", methods=['DELETE'])
 def handle_clear():
     other.clear_v1()

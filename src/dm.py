@@ -38,7 +38,7 @@ def dm_create_v1(token, u_ids):
         raise InputError(f"Duplicate users in u_ids list")
 
     # Assigning new dm details
-    dm_id = len(store["dms"])
+    dm_id = len(store["dms"]) - 1
     user_handles = []
     user_details_list = []
 
@@ -84,3 +84,36 @@ def dm_create_v1(token, u_ids):
     return {
         'dm_id': dm_id,
     }
+
+
+def dm_list_v1(u_id):
+    '''Provide a list of all dms that the authorised user is part of.
+
+    Arguments:
+        token (string) - user authentication
+
+    Exceptions:
+        AccessError - Occurs when:
+            token passed in is not valid
+
+    Return Value:
+        Returns {
+            'dm_id': dm_id (int)
+            'namme': name (string)
+        }
+    '''
+
+    # Getting Data from data storage file
+    store = data_store.get()
+
+    dm_list = []
+
+    for dm in store["dms"]:
+        for dm_user in dm["all_members"]:
+            if dm_user["u_id"] == u_id:
+                dm_list.append({
+                    'dm_id': dm['dm_id'],
+                    'name': dm['name']
+                })
+
+    return dm_list
