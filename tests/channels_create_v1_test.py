@@ -1,13 +1,15 @@
 import requests
 
 BASE_ADDRESS = 'http://127.0.0.1'
-BASE_PORT = 8080
+BASE_PORT = 10000
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
 
-def test_long_name(register_three_users):
+def test_long_name(user_init):
     requests.delete(f"{BASE_URL}/clear/v1")
-    token1 = register_three_users["token"][0]
+    auth_response2 = requests.post(
+        f"{BASE_URL}/auth/register/v2", json=user_init)
+    token1 = auth_response2.json()["token"]
     input = {
         "token": token1,
         "name": "12345678klmopqrstuvwx",
@@ -17,12 +19,14 @@ def test_long_name(register_three_users):
     assert response.status_code == 400
 
 
-def test_short_name(register_three_users):
+def test_short_name(user_init):
     requests.delete(f"{BASE_URL}/clear/v1")
-    token1 = register_three_users["token"][0]
+    auth_response2 = requests.post(
+        f"{BASE_URL}/auth/register/v2", json=user_init)
+    token1 = auth_response2.json()["token"]
     input = {
         "token": token1,
-        "name": "",
+        "name": "12345678klmopqrstuvwx",
         "is_public": False
     }
     response = requests.post(f"{BASE_URL}/channels/create/v2", json=input)
