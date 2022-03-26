@@ -4,7 +4,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, other, channel, channels
+from src import config, auth, other, channel, channels, admin
 from src.data_store import data_store
 from src.error_help import check_valid_token
 
@@ -70,20 +70,17 @@ def channel_listall():
     token = str(request.args.get('token')) # line might be dodge; alt: req = request.get_json() first
     data = data_store.get()
 
-    u_id = check_valid_token(token, data) # see if instead of data data_store.get() just works
-            # potential errors; have to see if u_id returned is valid 
+    u_id = check_valid_token(token, data)
 
     return dumps(channels.channels_listall_v1(u_id))
 
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details():
     token = str(request.args.get('token'))
-    channel_id = int(request.args.get('channel_id')) # receive args from the req
+    channel_id = int(request.args.get('channel_id', -1))
 
     data = data_store.get()
-    u_id = check_valid_token(token, data) # retrieve u_id from token if valid
-        # see if instead of data data_store.get() just works
-        # potential errors; have to see if u_id returned is valid 
+    u_id = check_valid_token(token, data)
     
     return dumps(channel.channel_details_v1(u_id, channel_id))
     
@@ -112,10 +109,10 @@ def handle_userpermission_change():
     u_id = int(request_data.get("u_id", None))
     permission_id = int(request_data.get("permission_id", None))
 
-    return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
+    return dumps(admin.admin_userpermission_change(token, u_id, permission_id))
 
 # NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port, debug = True) # Do not edit this port
+    APP.run(port=config.port) # Do not edit this port
