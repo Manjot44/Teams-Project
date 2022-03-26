@@ -72,7 +72,7 @@ def handle_auth_logout():
 
     return dumps(auth.auth_logout_v1(token))
 
-@APP.route("message/send/v1", methods=['POST'])
+@APP.route("/message/send/v1", methods=['POST'])
 def handle_message_send():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
