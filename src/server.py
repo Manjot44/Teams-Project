@@ -4,7 +4,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store
+from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, channel
 import src.admin
 
 
@@ -125,6 +125,24 @@ def handle_channels_list():
 
     return dumps(channels.channels_list_v1(auth_user_id))
 
+@APP.route("/channel/messages/v2", methods=['GET'])
+def handle_channel_messages():
+    # token = request.args.get('token')
+    # data = data_store.get()
+
+    # u_id = int(error_help.check_valid_token(token, data))
+    
+    request_data = request.get_json()
+    store = data_store.data_store.get()
+    u_id = store["users"][error_help.check_valid_token(
+        request_data.get("token", None), store)]["u_id"]
+    
+    channel_id = int(request.args.get('channel_id'))
+    start = int(request.args.get('start'))
+
+    return_value = channel.channel_messages_v1(u_id, channel_id, start)
+
+    return dumps(return_value)
 
 @APP.route("/clear/v1", methods=['DELETE'])
 def handle_clear():
