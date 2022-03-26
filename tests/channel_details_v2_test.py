@@ -56,7 +56,7 @@ def test_channel_details_invalid_token_invalid_channel():
     invalid_token = None
     invalid_channel_id = -1
     response = requests.get(f"{BASE_URL}/channel/details/v2?token={invalid_token}&channel_id={invalid_channel_id}")
-    details = response.json()
+    # details = response.json()
     # assert details == 0
     assert response.status_code == 403
 
@@ -64,7 +64,7 @@ def test_channel_details_valid_token_invalid_channel(register_three_users):
     valid_token = register_three_users['token'][0]
     invalid_channel_id = -1
     response = requests.get(f"{BASE_URL}/channel/details/v2?token={valid_token}&channel_id={invalid_channel_id}")
-    details = response.json()
+    # details = response.json()
     # assert details == 0
     assert response.status_code == 400
 

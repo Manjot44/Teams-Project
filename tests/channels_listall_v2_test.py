@@ -10,7 +10,7 @@ def test_listall_invalid_user():
     requests.delete(f"{BASE_URL}/clear/v1")
     token = None
     response = requests.get(f"{BASE_URL}/channels/listall/v2?token={token}")
-    assert response.status_code == 403 # check if it is the right code; 403?
+    assert response.status_code == 403
     
 def test_listall_valid_user_no_channel():
     # CLEAR
