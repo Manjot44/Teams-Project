@@ -151,13 +151,24 @@ def handle_dms_list():
     return dumps(dm.dm_list_v1(u_id))
 
 
-@APP.route("/clear/v1", methods=['DELETE'])
+@APP.route("/dm/details/v1", methods=['GET'])
+def handle_dms_details():
+    token = str(request.args.get('token'))
+    dm_id = int(request.args.get('dm_id'))
+    store = data_store.data_store.get()
+    u_id = store["users"][error_help.check_valid_token(
+        token, store)]["u_id"]
+
+    return dumps(dm.dm_details_v1(u_id, dm_id))
+
+
+@ APP.route("/clear/v1", methods=['DELETE'])
 def handle_clear():
     other.clear_v1()
     return dumps({})
 
 
-@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+@ APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def handle_userpermission_change():
     request_data = request.get_json()
     token = request_data.get("token", None)
@@ -173,7 +184,7 @@ def handle_userpermission_change():
     return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
 
 
-@APP.route("/dm/create/v1", methods=['POST'])
+@ APP.route("/dm/create/v1", methods=['POST'])
 def dm_create():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
@@ -182,7 +193,7 @@ def dm_create():
     return dumps(dm.dm_create_v1(token, u_ids))
 
 
-@APP.route("/channel/invite/v2", methods=['POST'])
+@ APP.route("/channel/invite/v2", methods=['POST'])
 def handle_channel_invite():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
@@ -195,7 +206,7 @@ def handle_channel_invite():
     return dumps(channel.channel_invite_v1(auth_user_id, channel_id, u_id))
 
 
-@APP.route("/channel/join/v2", methods=['POST'])
+@ APP.route("/channel/join/v2", methods=['POST'])
 def handle_channel_join():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
