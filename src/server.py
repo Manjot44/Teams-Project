@@ -4,7 +4,8 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, dm, channel
+from src.error_help import check_valid_token
+from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, dm, channel, admin
 import src.admin
 
 
@@ -77,6 +78,34 @@ def handle_auth_login():
 
     return dumps(auth.auth_login_v1(email, password))
 
+@APP.route("/channels/listall/v2", methods=['GET'])
+def channel_listall():
+    token = str(request.args.get('token')) # line might be dodge; alt: req = request.get_json() first
+    data = data_store.data_store.get()
+
+    u_id = check_valid_token(token, data)
+
+    return dumps(channels.channels_listall_v1(u_id))
+
+@APP.route("/channel/details/v2", methods=['GET'])
+def channel_details():
+    token = str(request.args.get('token', None))
+    
+
+    # channel_id = request.args.get('channel_id', None)
+    # if isinstance(channel_id, int) == False:
+    #     channel_id = None
+    channel_id = request.args.get('channel_id', None)
+    if channel_id == None:
+        channel_id = None
+    else:
+        channel_id = int(request.args.get('channel_id', None))
+
+    data = data_store.data_store.get()
+    u_id = check_valid_token(token, data)
+    
+    return dumps(channel.channel_details_v1(u_id, channel_id))
+    
 
 @APP.route("/auth/logout/v1", methods=['POST'])
 def handle_auth_logout():
@@ -222,5 +251,5 @@ def handle_channel_join():
 
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(port=config.port)  # Do not edit this port
+    signal.signal(signal.SIGINT, quit_gracefully) # For coverage
+    APP.run(port=config.port) # Do not edit this port

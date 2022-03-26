@@ -126,6 +126,8 @@ def channels_listall_v1(auth_user_id):
 
     # copying channels to 'listall' dict from saved channel data
     listall['channels'] = saved_data['channels']
+    if listall['channels'][0]['channel_id'] == None:
+        listall['channels'] = []
 
     return listall
 
