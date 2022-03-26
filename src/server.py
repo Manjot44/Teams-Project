@@ -61,7 +61,7 @@ def handle_auth_login():
 
 @APP.route("/channels/listall/v2", methods=['GET'])
 def channel_listall():
-    token = request.args.get('token') # line might be dodge; alt: req = request.get_json() first
+    token = str(request.args.get('token')) # line might be dodge; alt: req = request.get_json() first
     data = data_store.get()
 
     u_id = check_valid_token(token, data) # see if instead of data data_store.get() just works
@@ -71,8 +71,8 @@ def channel_listall():
 
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details():
-    token = request.args.get('token')
-    channel_id = request.args.get('channel_id') # receive args from the req
+    token = str(request.args.get('token'))
+    channel_id = int(request.args.get('channel_id')) # receive args from the req
 
     data = data_store.get()
     u_id = check_valid_token(token, data) # retrieve u_id from token if valid
