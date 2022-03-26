@@ -1,6 +1,7 @@
 from src.error import InputError, AccessError
 from src.data_store import data_store
-from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel
+from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel, check_valid_token
+
 
 def channels_list_v1(auth_user_id):
     '''Provide a list of all channels (and their associated details) that the authorised user is part of.
@@ -45,17 +46,17 @@ def channels_list_v1(auth_user_id):
             ]
         }
     '''
-    
-    #Getting Data from data storage file
+
+    # Getting Data from data storage file
     store = data_store.get()
-    
-    #Assessing for Access Error
+
+    # Assessing for Access Error
     check_valid_id(auth_user_id, store)
-    
-    #Creating empty list for the channels the user is part of
+
+    # Creating empty list for the channels the user is part of
     channels_list = []
 
-    #Looping through all channels and adding the channels that the user is part of to "channels_list"
+    # Looping through all channels and adding the channels that the user is part of to "channels_list"
     for channel in store["channels"]:
         for member in channel["all_members"]:
             if auth_user_id == member["u_id"]:
@@ -65,6 +66,7 @@ def channels_list_v1(auth_user_id):
         "channels": channels_list
     }
     return fixstore
+
 
 def channels_listall_v1(auth_user_id):
     '''Provide a list of all channels, including private channels, (and their associated details)
@@ -109,7 +111,7 @@ def channels_listall_v1(auth_user_id):
             ]
         }
     '''
-    
+
     # dictionary that is to be returned by function
     listall = {
         'channels': []
@@ -122,9 +124,8 @@ def channels_listall_v1(auth_user_id):
 
     # copying channels to 'listall' dict from saved channel data
     listall['channels'] = saved_data['channels']
-    
-    return listall
 
+    return listall
 
 
 def channels_create_v1(auth_user_id, name, is_public):
@@ -146,17 +147,17 @@ def channels_create_v1(auth_user_id, name, is_public):
         }
     '''
 
-    #Getting Data from data storage file
+    # Getting Data from data storage file
     store = data_store.get()
 
-    #Assessing for exception
+    # Assessing for exception
     namelen = len(name)
     if namelen < 1 or namelen > 20:
         raise InputError(f"Name must be between 1 and 20 characters long")
-    
+
     which_user = check_valid_id(auth_user_id, store)
 
-    #Creates and adds the new channel to the channels list
+    # Creates and adds the new channel to the channels list
     if store["channels"][0]["channel_id"] == None:
         store["channels"] = []
     channel_id = len(store["channels"])
@@ -164,10 +165,10 @@ def channels_create_v1(auth_user_id, name, is_public):
     nc["channel_id"] = channel_id
     store["channels"].append(nc)
 
-    #Assigning variable to newly created channel
+    # Assigning variable to newly created channel
     current_channel = store["channels"][channel_id]
 
-    #Assigning user inputs
+    # Assigning user inputs
     current_channel["channel_id"] = channel_id
     current_channel["name"] = name
     current_channel["is_public"] = is_public
@@ -184,10 +185,9 @@ def channels_create_v1(auth_user_id, name, is_public):
     current_channel["all_members"] = [add_user]
     current_channel["owner_members"] = [add_user]
 
-    #Saving to datastore
+    # Saving to datastore
     data_store.set(store)
 
     return {
         'channel_id': channel_id,
     }
-
