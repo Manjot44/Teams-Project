@@ -61,15 +61,15 @@ initial_object = {
                 }
             ],
             'is_public': None,
-            'messages': [
-                {
-                    'message_id': None,
-                    'u_id': None,
-                    'message': None,
-                    'time_sent': None,
-                },
-            ]
         }  
+    ],
+    'messages': [
+        {
+            'message_id': None,
+            'u_id': None,
+            'message': None,
+            'time_sent': None,
+        },
     ],
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
