@@ -66,6 +66,7 @@ initial_object = {
     'messages': [
         {
             'message_id': None,
+            'channel_id': None,
             'u_id': None,
             'message': None,
             'time_sent': None,

@@ -26,6 +26,7 @@ def message_send_v1(token, channel_id, message):
         "u_id": auth_user_id,
         "message": message,
         "time_sent": unix_timestamp,
+        "channel_id": channel_id,
     }
 
 
