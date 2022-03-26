@@ -4,7 +4,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store
+from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, dm
 import src.admin
 
 
@@ -74,8 +74,9 @@ def handle_auth_login():
     password = str(request_data.get("password", None))
     if password != None:
         str(password)
-    
+
     return dumps(auth.auth_login_v1(email, password))
+
 
 @APP.route("/auth/logout/v1", methods=['POST'])
 def handle_auth_logout():
@@ -85,6 +86,7 @@ def handle_auth_logout():
         str(token)
 
     return dumps(auth.auth_logout_v1(token))
+
 
 @APP.route("/message/send/v1", methods=['POST'])
 def handle_message_send():
@@ -98,14 +100,16 @@ def handle_message_send():
     message = request_data.get("message", None)
     if message != None:
         str(message)
-        
+
     return dumps(messages.message_send_v1(token, channel_id, message))
+
 
 @APP.route("/channels/create/v2", methods=['POST'])
 def handle_channels_create():
     request_data = request.get_json()
     store = data_store.data_store.get()
-    auth_user_id = error_help.check_valid_token(request_data.get("token", None), store)
+    auth_user_id = error_help.check_valid_token(
+        request_data.get("token", None), store)
     name = request_data.get("name", None)
     if name != None:
         str(name)
@@ -146,6 +150,16 @@ def handle_userpermission_change():
         permission_id = None
 
     return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
+
+
+@APP.route("/dm/create/v1", methods=['POST'])
+def dm_create():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    u_ids = list(request_data.get("u_ids", []))
+
+    return dumps(dm.dm_create_v1(token, u_ids))
+
 
 # NO NEED TO MODIFY BELOW THIS POINT
 
