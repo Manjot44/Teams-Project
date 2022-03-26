@@ -120,6 +120,17 @@ def handle_channels_create():
     return dumps(channels.channels_create_v1(auth_user_id, name, is_public))
 
 
+@APP.route("/dm/remove/v1", methods=['DELETE'])
+def handle_dm_delete():
+    request_data = request.get_json()
+    store = data_store.data_store.get()
+    auth_user_id = error_help.check_valid_token(
+        request_data.get("token", None), store)
+    dm_id = int(request_data.get("dm_id", None))
+    dm.dm_remove_v1(auth_user_id, dm_id)
+    return dumps({})
+
+
 @APP.route("/channels/list/v2", methods=['GET'])
 def handle_channels_list():
     token = str(request.args.get('token'))
@@ -170,6 +181,7 @@ def dm_create():
 
     return dumps(dm.dm_create_v1(token, u_ids))
 
+
 @APP.route("/channel/invite/v2", methods=['POST'])
 def handle_channel_invite():
     request_data = request.get_json()
@@ -181,6 +193,7 @@ def handle_channel_invite():
     auth_user_id = error_help.check_valid_token(token, store)
 
     return dumps(channel.channel_invite_v1(auth_user_id, channel_id, u_id))
+
 
 @APP.route("/channel/join/v2", methods=['POST'])
 def handle_channel_join():
