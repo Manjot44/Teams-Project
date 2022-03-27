@@ -67,7 +67,9 @@ def channels_list_v1(auth_user_id):
                     'name': name
                 })
 
-    return channels_list
+    return {
+        "channels": channels_list
+    }
 
 
 def channels_listall_v1(auth_user_id):
