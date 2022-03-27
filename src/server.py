@@ -318,6 +318,23 @@ def handle_user_profile_sethandle():
 
     return dumps(user.user_profile_sethandle_v1(token, handle_str))
 
+@APP.route("/message/edit/v1", methods=['PUT'])
+def handle_message_edit():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = int(request_data.get("message_id", None))
+    message = str(request_data.get("message", None))
+
+    return dumps(messages.message_edit_v1(token, message_id, message))
+
+@APP.route("/message/remove/v1", methods=['DELETE'])
+def hendle_message_remove():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = int(request_data.get("message_id", None))
+
+    return dumps(messages.message_remove_v1(token, message_id))
+
 # NO NEED TO MODIFY BELOW THIS POINT
 
 
