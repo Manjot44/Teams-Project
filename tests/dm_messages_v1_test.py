@@ -30,14 +30,14 @@ def test_dm_messages_start_invalid_2_messages(register_three_users):
     response = requests.post(f"{BASE_URL}/dm/create/v1", json={'token': token, 'u_ids': [member_id]})
     assert response.status_code == 200
     dm_id = response.json()
-    response = requests.post(f"{BASE_URL}/dm/senddm/v1", json={
+    response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         'token': token,
         'dm_id': dm_id['dm_id'],
         'message': "Your"
     })
     assert response.status_code == 200
     member_token = register_three_users['token'][1]
-    response = requests.post(f"{BASE_URL}/dm/senddm/v1", json={
+    response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         'token': member_token,
         'dm_id': dm_id['dm_id'],
         'message': "Mother"
