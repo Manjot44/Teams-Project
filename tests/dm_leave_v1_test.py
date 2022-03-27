@@ -48,5 +48,4 @@ def test_dm_leave_valid_input_creator_leaving(register_three_users):
     response = requests.get(f"{BASE_URL}/dm/details/v1?token={member_token}&dm_id={dm_id}")
     assert response.status_code == 200
     details = response.json()
-    for members in details['members']:
-        assert members['u_id'] != register_three_users['id'][0]
+    assert len(details['members']) == 1
