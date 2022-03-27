@@ -33,5 +33,46 @@ The purpose of this meeting was to ensure everyone's code was up to scratch and 
 
 Our next meeting time will be to review the feedback received and to look over iteration 2
 
+\\Meeting 4 Minutes//
+12/03/22 10pm
+
+Attendees: All group members
+
+The purpose of this meeting was to have a collective reading of the iteration 2 specification. This ensured that all the members in the group had a general understanding of how we were going to approach this iteration. We also discussed http wrapping and who was going to wrap what functions. We settled for the easy option of making everyone wrap the function that they wrote in iteration 1. 
+
+Our next meeting time will be in a weeks time on 19/03/33. The goals we hope to acheive by this time is for everyone to have finished their http wrappers and have them merged into master.
+
+\\Meeting 5 Minutes//
+19/03/22 10pm
+
+Attendees: All group members
+
+The purpose of this meeting was to have a review of the http wrappers and delegate the new iteration 2 functions. We first did some mild trouble shooting for some http wrappers, and then got to assigning new functions. When doing this, we tried to make sure that people would be doing functions that were similar in nature to their iteration 2 functions. We assigned them as:
+Jerry: message_edit, message_remove, admin_user_remove, admin_user_permission_change
+Manjot: auth_logout, channel_leave, channel_remove_owner, messages_send
+Ashwin: dm_create, dm_list, dm_remove, dm_details
+Iqtidar: dm_messages, dm_leave, message_senddm, users_all
+Sanjam: user_profile, user_profile_setname, user_profile_setemail, user_profile_sethandle
+
+Our next meeting time will be in a weeks time on 26/03/33. The goals we hope to achieve by this time is for everyone to have finished their new 
+functions.
+
+\\Meeting 6 Minutes//
+26/03/22 10pm
+
+Attendees: All group members
+
+The purpose of this meeting was to have a review of the master branch and help eachother sort out any errors in the functions. Overall we were pretty happy and just made sure that if any of us hadnt finished their function yet they would finish by tomorrow.
+
+Our next meeting time will be tomorrow, and hopefully everything will be merged and all functions completed by then.
+
+\\Meeting 7 Minutes//
+27/03/22 10pm
+
+Attendees: All group members
+
+The purpose of this meeting was to ensure all functions were outputing correctly and all the pipelines were passing, and we plan on submitting soon.
+
+Our next meeting time will be next week, and will be to review any feedback and look over iteration 3 if it has been released
 
 
