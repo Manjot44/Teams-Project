@@ -14,6 +14,13 @@ def test_dm_messages_dm_id_invalid(register_three_users):
     response = requests.get(f"{BASE_URL}/dm/messages/v1?token={token}&dm_id={dm_id}&start={start}")
     assert response.status_code == 400
 
+def test_initialised_dmid_invalid(register_three_users):
+    requests.post(f"{BASE_URL}/dm/create/v1", json = {"token": register_three_users['token'][0], "u_ids": [register_three_users['id'][1]]})
+    dm_id = None
+    start = 0
+    response = requests.get(f"{BASE_URL}/dm/messages/v1?token={register_three_users['token'][0]}&dm_id={dm_id}&start={start}")
+    assert response.status_code == 400
+
 def test_dm_messages_start_invalid_0_messages(register_three_users):
     token = register_three_users['token'][0]
     member_id = register_three_users['id'][1]

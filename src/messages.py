@@ -196,6 +196,10 @@ def message_senddm_v1(token, dm_id, message):
         member_index += 1
     if valid_member == False:
         raise AccessError(f"User is not member of DM")
+
+    if store["dms"][dm_index]["messages"][0]["message_id"] == None:
+        store["dms"][dm_index]["messages"] = []
+
     # Assigning unique message_id
     channel_mess_id = store["messages"][-1]["message_id"]
     if channel_mess_id == None:
@@ -203,7 +207,7 @@ def message_senddm_v1(token, dm_id, message):
     
     dm_message_id = -1
     for dms in store["dms"]:
-        if (dms["messages"][-1]["message_id"] != None) and (dms["messages"][-1]["message_id"] > dm_message_id):
+        if (dms["messages"] != []) and (dms["messages"][-1]["message_id"] > dm_message_id):
             dm_message_id = dms['messages'][-1]["message_id"]
     
     if dm_message_id > channel_mess_id:

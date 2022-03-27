@@ -162,8 +162,7 @@ def handle_message_senddm():
     if token != None:
         str(token)
     dm_id = request_data.get("dm_id", None)
-    if isinstance(dm_id, int) == False:
-        dm_id = None
+    dm_id = return_int_helper(dm_id)
     message = request_data.get("message", None)
     if message != None:
         str(message)
