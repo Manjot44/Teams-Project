@@ -109,3 +109,41 @@ def user_profile_sethandle_v1(token, handle_str):
         if user['u_id'] == u_id:
             user['handle_str'] = handle_str
         return   
+
+def users_all_v1(token):
+    '''Returns all authorised users.
+
+    Arguments:
+        token (str) - user authentication
+
+    Exceptions:
+        AccessError - Occurs when:
+            token passed in is not valid
+
+    Return Value:
+        Returns {
+            'users': [],
+        }
+    '''
+    store = data_store.get()
+    check_valid_token(token, store)
+    users_all = {
+        'users': []
+    }
+    for users in store['users']:
+        user_dict = {
+            'u_id': None,
+            'email': None,
+            'name_first': None,
+            'name_last': None,
+            'handle_str': None,
+        }
+        if users['u_id'] != None:
+            user_dict['u_id'] = users['u_id']
+            user_dict['email'] = users['email']
+            user_dict['name_first'] = users['name_first']
+            user_dict['name_last'] = users['name_last']
+            user_dict['handle_str'] = users['handle_str']
+            users_all['users'].append(user_dict)
+
+    return users_all

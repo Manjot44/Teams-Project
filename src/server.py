@@ -415,6 +415,14 @@ def handle_admin_user_remove():
 
     return dumps(src.admin.admin_user_remove(token, u_id))
 
+
+@APP.route("/users/all/v1", methods=['GET'])
+def users_all():
+    token = str(request.args.get('token', None))
+
+    return dumps(user.users_all_v1(token))
+
+
 # NO NEED TO MODIFY BELOW THIS POINT
 
 
