@@ -128,9 +128,13 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError(f"Error: last name must be between 1 and 50 characters long inclusive")
 
     handle = generate_handle(name_first, name_last)
-    if store["users"][0]["u_id"] == None:
-            store["users"] = []
-    id = len(store["users"])
+    
+    id = store["users"][-1]["u_id"]
+    if id == None:
+        id = 0
+    else:
+        id += 1
+    
     perm_id = 2
     if id == 0:
         perm_id = 1
