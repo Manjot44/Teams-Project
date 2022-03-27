@@ -131,6 +131,7 @@ def auth_register_v1(email, password, name_first, name_last):
     
     id = store["users"][-1]["u_id"]
     if id == None:
+        store["users"] = []
         id = 0
     else:
         id += 1
@@ -150,6 +151,8 @@ def auth_register_v1(email, password, name_first, name_last):
         "perm_id": perm_id,
         "valid_tokens": [encoded_jwt],
     }
+
+    print(new_user)
 
     store["users"].append(new_user)
     data_store.set(store)

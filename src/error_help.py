@@ -11,11 +11,11 @@ def check_valid_token(token, data):
                 which_auth = idx
     if valid_token == False:
         raise AccessError(f"Error: User does not have a valid token")
-    
     return which_auth
 
 def check_valid_id(auth_user_id, data):
     has_auth_user = False
+    which_auth = 0
     for idx, auth_user in enumerate(data["users"]):
         if auth_user["u_id"] == auth_user_id and auth_user_id != None:
             has_auth_user = True

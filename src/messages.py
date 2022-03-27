@@ -37,6 +37,7 @@ def message_send_v1(token, channel_id, message):
 
     channel_mess_id = store["messages"][-1]["message_id"]
     if channel_mess_id == None:
+        store["messages"] = []
         channel_mess_id = -1
     
     dm_message_id = -1

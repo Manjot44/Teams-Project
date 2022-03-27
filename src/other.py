@@ -51,14 +51,6 @@ def clear_v1():
                 }
             ],
             'is_public': None,
-            'messages': [
-                {
-                    'message_id': None,
-                    'u_id': None,
-                    'message': None,
-                    'time_sent': None,
-                },
-            ]
         }
     ]
     store['dms'] = [
@@ -93,5 +85,13 @@ def clear_v1():
             ]
         }
     ]
-
+    store['messages'] = [
+        {
+            'message_id': None,
+            'u_id': None,
+            'message': None,
+            'time_sent': None,
+        },
+    ]
+    
     data_store.set(store)
