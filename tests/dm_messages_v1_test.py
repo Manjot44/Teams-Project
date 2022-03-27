@@ -82,3 +82,27 @@ def test_dm_messages_token_invalid_dm_id_invalid(register_three_users):
     start = 0
     response = requests.get(f"{BASE_URL}/dm/messages/v1?token={token}&dm_id={dm_id}&start={start}")
     assert response.status_code == 403
+
+def test_dm_messages_valid_input(register_three_users):
+    token = register_three_users['token'][0]
+    member_id = register_three_users['id'][1]
+    response = requests.post(f"{BASE_URL}/dm/create/v1", json={'token': token, 'u_ids': [member_id]})
+    assert response.status_code == 200
+    dm_id = response.json()
+    response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        'token': token,
+        'dm_id': dm_id['dm_id'],
+        'message': "Your"
+    })
+    assert response.status_code == 200
+    member_token = register_three_users['token'][1]
+    response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        'token': member_token,
+        'dm_id': dm_id['dm_id'],
+        'message': "Mother"
+    })
+    assert response.status_code == 200
+    start = 0
+    response = requests.get(f"{BASE_URL}/dm/messages/v1?token={token}&dm_id={dm_id['dm_id']}&start={start}")
+    assert response.status_code == 200
+    
