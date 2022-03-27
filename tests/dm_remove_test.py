@@ -128,6 +128,7 @@ def test_normal(user_init):
     response = requests.delete(f"{BASE_URL}/dm/remove/v1", json=input1)
     assert response.status_code == 200
     # Testing that the new dm id is the same as the last one, as the dm had been deleted
-    dm_create_data = requests.post(
+    dm_create_data1 = requests.post(
         f"{BASE_URL}/dm/create/v1", json=dm_create_input)
-    assert dm_create_data.json()["dm_id"] == 0
+    assert dm_create_data1.status_code == 200
+    assert dm_create_data1.json()["dm_id"] == 0
