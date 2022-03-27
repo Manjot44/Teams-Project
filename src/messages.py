@@ -153,3 +153,21 @@ def message_remove_v1(token, message_id):
     data_store.set(store)
     return {
     }
+
+def message_senddm_v1(token, dm_id, message):
+    ''' DOCSTRING '''
+    # Checks if token is valid
+    # Checks if dm_id is valid
+    # Checks if message is valid
+
+    # Assigning unique message_id
+    store = data_store.get()
+    message_id = 0
+    is_unique = True
+    for dm_groups in store['dms']:
+        for m_ids in dm_groups['messages']:
+            if m_ids['message_id'] == message_id:
+                is_unique = False
+    if channel_messages in store['messages']
+
+    if store['dms'][0]['messages']['message_id'] == 
