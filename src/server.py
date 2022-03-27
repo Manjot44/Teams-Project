@@ -4,7 +4,8 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
-from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, dm, channel
+from src.error_help import check_valid_token
+from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, dm, channel, admin
 import src.admin
 
 
@@ -77,6 +78,34 @@ def handle_auth_login():
 
     return dumps(auth.auth_login_v1(email, password))
 
+@APP.route("/channels/listall/v2", methods=['GET'])
+def channel_listall():
+    token = str(request.args.get('token')) # line might be dodge; alt: req = request.get_json() first
+    data = data_store.data_store.get()
+
+    u_id = check_valid_token(token, data)
+
+    return dumps(channels.channels_listall_v1(u_id))
+
+@APP.route("/channel/details/v2", methods=['GET'])
+def channel_details():
+    token = str(request.args.get('token', None))
+    
+
+    # channel_id = request.args.get('channel_id', None)
+    # if isinstance(channel_id, int) == False:
+    #     channel_id = None
+    channel_id = request.args.get('channel_id', None)
+    if channel_id == None:
+        channel_id = None
+    else:
+        channel_id = int(request.args.get('channel_id', None))
+
+    data = data_store.data_store.get()
+    u_id = check_valid_token(token, data)
+    
+    return dumps(channel.channel_details_v1(u_id, channel_id))
+    
 
 @APP.route("/auth/logout/v1", methods=['POST'])
 def handle_auth_logout():
@@ -120,6 +149,17 @@ def handle_channels_create():
     return dumps(channels.channels_create_v1(auth_user_id, name, is_public))
 
 
+@APP.route("/dm/remove/v1", methods=['DELETE'])
+def handle_dm_delete():
+    request_data = request.get_json()
+    store = data_store.data_store.get()
+    auth_user_id = error_help.check_valid_token(
+        request_data.get("token", None), store)
+    dm_id = int(request_data.get("dm_id", None))
+    dm.dm_remove_v1(auth_user_id, dm_id)
+    return dumps({})
+
+
 @APP.route("/channels/list/v2", methods=['GET'])
 def handle_channels_list():
     token = str(request.args.get('token'))
@@ -140,13 +180,24 @@ def handle_dms_list():
     return dumps(dm.dm_list_v1(u_id))
 
 
-@APP.route("/clear/v1", methods=['DELETE'])
+@APP.route("/dm/details/v1", methods=['GET'])
+def handle_dms_details():
+    token = str(request.args.get('token'))
+    dm_id = int(request.args.get('dm_id'))
+    store = data_store.data_store.get()
+    u_id = store["users"][error_help.check_valid_token(
+        token, store)]["u_id"]
+
+    return dumps(dm.dm_details_v1(u_id, dm_id))
+
+
+@ APP.route("/clear/v1", methods=['DELETE'])
 def handle_clear():
     other.clear_v1()
     return dumps({})
 
 
-@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+@ APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def handle_userpermission_change():
     request_data = request.get_json()
     token = request_data.get("token", None)
@@ -162,7 +213,7 @@ def handle_userpermission_change():
     return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
 
 
-@APP.route("/dm/create/v1", methods=['POST'])
+@ APP.route("/dm/create/v1", methods=['POST'])
 def dm_create():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
@@ -196,7 +247,8 @@ def handle_channel_invite():
 
     return dumps(channel.channel_invite_v1(auth_user_id, channel_id, u_id))
 
-@APP.route("/channel/join/v2", methods=['POST'])
+
+@ APP.route("/channel/join/v2", methods=['POST'])
 def handle_channel_join():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
@@ -212,5 +264,5 @@ def handle_channel_join():
 
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGINT, quit_gracefully)  # For coverage
-    APP.run(port=config.port)  # Do not edit this port
+    signal.signal(signal.SIGINT, quit_gracefully) # For coverage
+    APP.run(port=config.port) # Do not edit this port

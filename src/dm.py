@@ -1,6 +1,7 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel, check_valid_token
+from src.other import clear_v1
 
 
 def dm_create_v1(token, u_ids):
@@ -38,7 +39,9 @@ def dm_create_v1(token, u_ids):
         raise InputError(f"Duplicate users in u_ids list")
 
     # Assigning new dm details
-    dm_id = len(store["dms"]) - 1
+    if store["dms"][0]["dm_id"] == None:
+        store["dms"] = []
+    dm_id = len(store["dms"])
     user_handles = []
     user_details_list = []
 
@@ -76,9 +79,10 @@ def dm_create_v1(token, u_ids):
             },
         ]
     }
-
     # Saving to datastore
     store["dms"].append(new_dm)
+    # if store['dms'][0]['dm_id'] == None:
+    #     store['dms'][0].remove()
     data_store.set(store)
 
     return {
@@ -118,6 +122,89 @@ def dm_list_v1(u_id):
 
     return dm_list
 
+
+
+def dm_remove_v1(u_id, dm_id):
+    '''Remove an existing DM, so all members are no longer in the DM. 
+    This can only be done by the original creator of the DM.
+
+    Arguments:
+        u_id (int) - user authentication int
+        dm_id (ints) - dm identification number
+
+    Exceptions:
+        InputError - Occurs when:
+            - dm_id does not refer to a valid DM
+        AccessError - Occurs when:
+            - token is not valid
+            - dm_id is valid and the authorised user is not the original DM creator
+            - dm_id is valid and the authorised user is no longer in the DM
+
+    Return Value:
+        Returns {}
+    '''
+
+    # Getting Data from data storage file
+    store = data_store.get()
+
+    valid_dm_id = False
+    for dm in store["dms"]:
+        if dm["dm_id"] == dm_id:
+            valid_dm_id = True
+    if valid_dm_id == False:
+        raise InputError(f"dm_id is not valid")
+
+    dm_member = False
+    for user in store["dms"][dm_id]["all_members"]:
+        if user["u_id"] == u_id:
+            dm_member = True
+    if dm_member == False:
+        raise AccessError(f"You are not part of this dm")
+
+    if u_id != store["dms"][dm_id]["owner_members"][0]["u_id"]:
+        raise AccessError(f"Only the original creator can remove a dm")
+
+    if dm_id == 0:
+        store['dms'] = [
+            {
+                'dm_id': None,
+                'name': None,
+                'owner_members': [
+                    {
+                        'u_id': None,
+                        'email': None,
+                        'name_first': None,
+                        'name_last': None,
+                        'handle_str': None,
+                    }
+                ],
+                'all_members': [
+                    {
+                        'u_id': None,
+                        'email': None,
+                        'name_first': None,
+                        'name_last': None,
+                        'handle_str': None,
+                    }
+                ],
+                'messages': [
+                    {
+                        'message_id': None,
+                        'u_id': None,
+                        'message': None,
+                        'time_sent': None,
+                    },
+                ]
+            }
+        ]
+    else:
+        del store["dms"][dm_id]
+
+    # Saving to datastore
+    data_store.set(store)
+
+    return
+
 def dm_leave_v1(token, dm_id):
     '''User in DM is removed from members list.
 
@@ -133,15 +220,13 @@ def dm_leave_v1(token, dm_id):
         AccessError - Occurs when:
             user is not member of DM
 
-    Return Value:
-        Returns {}
     '''
     store = data_store.get()
     # Checks if token is valid
     leaver_id = check_valid_token(token, store)
     # Checks if dm_id is valid
-    # if store['dms'][0]['dm_id'] == None:
-    #     raise InputError(f"dm_id is not valid because there are no DMs")
+    if store['dms'][0]['dm_id'] == None:
+        raise InputError(f"dm_id is not valid because there are no DMs")
     valid_dm = False
     dm_index = 0
     for dm in store['dms']:
@@ -175,3 +260,55 @@ def dm_leave_v1(token, dm_id):
         store['dms'][dm_index]['owner_members'].remove(store['dms'][dm_index]['all_members'][owner_index])
     store['dms'][dm_index]['all_members'].remove(store['dms'][dm_index]['all_members'][member_index])
     return {}
+
+
+def dm_details_v1(u_id, dm_id):
+    '''Given a DM with ID dm_id that the authorised user is a member of, 
+    provide basic details about the DM.
+
+    Arguments:
+        u_id (int) - user authentication int
+        dm_id (ints) - dm identification number
+
+    Exceptions:
+        InputError - Occurs when:
+            - dm_id does not refer to a valid DM
+        AccessError - Occurs when:
+            - dm_id is valid and the authorised user is not a member of the DM
+
+    Return Value:
+        Returns {
+            'name': name
+            'members': [
+                {
+                    'u_id': None,
+                    'email': None,
+                    'name_first': None,
+                    'name_last': None,
+                    'handle_str': None,
+                }
+            ]
+        }
+    '''
+
+    # Getting Data from data storage file
+    store = data_store.get()
+
+    valid_dm_id = False
+    for dm in store["dms"]:
+        if dm["dm_id"] == dm_id:
+            valid_dm_id = True
+    if valid_dm_id == False:
+        raise InputError(f"dm_id is not valid")
+
+    dm_member = False
+    for user in store["dms"][dm_id]["all_members"]:
+        if user["u_id"] == u_id:
+            dm_member = True
+    if dm_member == False:
+        raise AccessError(f"You are not part of this dm")
+
+    return {
+        "name": store["dms"][dm_id]["name"],
+        "members": store["dms"][dm_id]["all_members"]
+    }

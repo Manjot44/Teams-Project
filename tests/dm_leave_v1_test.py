@@ -1,7 +1,7 @@
 import requests
 
 BASE_ADDRESS = 'http://127.0.0.1'
-BASE_PORT = 7777
+BASE_PORT = 8080
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
 def test_dm_leave_input_error_valid_token_invalid_dm_id(register_three_users):
@@ -33,7 +33,6 @@ def test_dm_leave_access_error_valid_dm_id_user_not_member(register_three_users)
     dm_id = dm_id['dm_id']
     #run dm leave with wrong token and dm_id
     response = requests.post(f"{BASE_URL}/dm/leave/v1", json={'token': nonmember_token, 'dm_id': dm_id})
-    assert response.json() == 293
     assert response.status_code == 403
 
 def test_dm_leave_valid_input_creator_leaving(register_three_users):
@@ -47,8 +46,7 @@ def test_dm_leave_valid_input_creator_leaving(register_three_users):
     assert response.status_code == 200
     member_token = register_three_users['token'][1]
     response = requests.get(f"{BASE_URL}/dm/details/v1?token={member_token}&dm_id={dm_id}")
-    assert response.json() == 633
     assert response.status_code == 200
     details = response.json()
     for members in details['members']:
-        assert members != register_three_users['id'][0]
+        assert members['u_id'] != register_three_users['id'][0]
