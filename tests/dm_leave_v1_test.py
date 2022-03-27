@@ -1,7 +1,7 @@
 import requests
 
 BASE_ADDRESS = 'http://127.0.0.1'
-BASE_PORT = 8080
+BASE_PORT = 7777
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
 def test_dm_leave_input_error_valid_token_invalid_dm_id(register_three_users):
