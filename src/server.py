@@ -155,6 +155,22 @@ def handle_message_send():
     return dumps(messages.message_send_v1(token, channel_id, message))
 
 
+@APP.route("/message/senddm/v1", methods=['POST'])
+def handle_message_senddm():
+    request_data = request.get_json()
+    token = request_data.get("token", None)
+    if token != None:
+        str(token)
+    dm_id = request_data.get("dm_id", None)
+    if isinstance(dm_id, int) == False:
+        dm_id = None
+    message = request_data.get("message", None)
+    if message != None:
+        str(message)
+
+    return dumps(messages.message_senddm_v1(token, dm_id, message))
+
+
 @APP.route("/channels/create/v2", methods=['POST'])
 def handle_channels_create():
     request_data = request.get_json()
