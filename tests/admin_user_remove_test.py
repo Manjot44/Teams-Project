@@ -23,7 +23,6 @@ def test_valid_remove(register_three_users):
     response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
     assert response.status_code == 200
     response_data = response.json()
-    message_id = response_data["message_id"]
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = {"token" : register_three_users["token"][0], "u_id" : register_three_users["id"][1], "permission_id" : 1})
     assert response.status_code == 200
@@ -50,7 +49,6 @@ def test_invalid_id(register_three_users):
     response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
     assert response.status_code == 200
     response_data = response.json()
-    message_id = response_data["message_id"]
 
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = {"token": 'incorrect token', "u_id": register_three_users["id"][1]})
 
@@ -66,7 +64,6 @@ def test_invalid_uid(register_three_users):
     response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
     assert response.status_code == 200
     response_data = response.json()
-    message_id = response_data["message_id"]
 
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = {"token": register_three_users["token"][0], "u_id": register_three_users["id"][1] + 50})
 
@@ -82,7 +79,6 @@ def test_only_global_owner(register_three_users):
     response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
     assert response.status_code == 200
     response_data = response.json()
-    message_id = response_data["message_id"]
 
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = {"token": register_three_users["token"][0], "u_id": register_three_users["id"][0]})
 
@@ -98,7 +94,6 @@ def test_non_global_owner_remove(register_three_users):
     response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][0], "channel_id": channel_id, "message": "Hello Sanjam"})
     assert response.status_code == 200
     response_data = response.json()
-    message_id = response_data["message_id"]
 
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = {"token": register_three_users["token"][1], "u_id": register_three_users["id"][0]})
 
