@@ -174,7 +174,7 @@ def auth_logout_v1(token):
     
     auth_user_id = src.error_help.check_valid_token(token, store)
     for tokens in store["users"][auth_user_id]["valid_tokens"]:
-        if tokens == store["users"][auth_user_id]["valid_tokens"]:
+        if tokens == token:
             store["users"][auth_user_id]["valid_tokens"].remove(tokens)
 
     data_store.set(store)
