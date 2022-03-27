@@ -285,24 +285,27 @@ def dm_messages_v1(token, dm_id, start):
     if valid_member == False:
         raise AccessError(f"User is not member of DM")
     # Checks if start is greater than number of messages
+    total_message_list = store['dms'][dm_index]['messages']
     if start == None:
         raise InputError(f"Invalid value for 'start' variable")
-    if start > len(store['dms'][dm_index]['messages']):
+    if start > len(total_message_list):
         raise InputError(f"Start greater than number of messages in DM.")
+    if total_message_list[0]['message_id'] == None:
+        if start > 0:
+            raise InputError(f"List is empty, start value higher than 0 not valid")
+
     # Returning messages
-    end = -1
+    end = start + 50
     messages = {
         'messages': [],
         'start': start,
         'end': end,
     }
-    total_message_list = store['dms'][dm_index]['messages']
     last_idx = len(total_message_list)
     if len(total_message_list[start:last_idx]) <= 50:
         messages['end'] = -1
         messages['messages'].append(total_message_list[start:last_idx])
     else:
-        messages['end'] = start + 50
         messages['messages'].append(total_message_list[start:start + 50])
 
     return messages

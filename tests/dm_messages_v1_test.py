@@ -43,7 +43,7 @@ def test_dm_messages_start_invalid_2_messages(register_three_users):
         'message': "Mother"
     })
     assert response.status_code == 200
-    start = 2
+    start = 3
     response = requests.get(f"{BASE_URL}/dm/messages/v1?token={token}&dm_id={dm_id['dm_id']}&start={start}")
     assert response.status_code == 400
 
@@ -60,8 +60,9 @@ def test_dm_messages_dm_id_valid_user_not_member(register_three_users):
 
 def test_dm_messages_token_invalid_dm_id_valid(register_three_users):
     token = None
+    valid_token = register_three_users['token'][0]
     member_id = register_three_users['id'][1]
-    response = requests.post(f"{BASE_URL}/dm/create/v1", json={'token': token, 'u_ids': [member_id]})
+    response = requests.post(f"{BASE_URL}/dm/create/v1", json={'token': valid_token, 'u_ids': [member_id]})
     assert response.status_code == 200
     dm_id = response.json()
     start = 0
