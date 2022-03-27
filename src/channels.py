@@ -178,7 +178,6 @@ def channels_create_v1(auth_user_id, name, is_public):
     current_channel["channel_id"] = channel_id
     current_channel["name"] = name
     current_channel["is_public"] = is_public
-    current_channel["messages"] = []
 
     add_user = {
         'u_id': store['users'][which_user]['u_id'],
