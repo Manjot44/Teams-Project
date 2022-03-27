@@ -40,8 +40,8 @@ def message_send_v1(token, channel_id, message):
         channel_mess_id = -1
     
     dm_message_id = -1
-    for dms in store["dms"]["messages"]:
-        if (dms["message_id"] != None) and (dms["message_id"] > dm_message_id):
+    for dms in store["dms"]:
+        if (dms["messages"][-1]["message_id"] != None) and (dms["messages"][-1]["message_id"] > dm_message_id):
             dm_message_id = dms["message_id"]
     
     if dm_message_id > channel_mess_id:
