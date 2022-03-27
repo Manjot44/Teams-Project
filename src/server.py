@@ -78,9 +78,21 @@ def handle_auth_login():
 
     return dumps(auth.auth_login_v1(email, password))
 
+@APP.route("/channel/leave/v1", methods=['POST'])
+def handle_channel_leave():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    if token != None:
+        str(token)
+    channel_id = request_data.get("channel_id", None)
+    if isinstance(channel_id, int) == False:
+        channel_id = None
+
+    return dumps(channel_expansion.channel_leave_v1(token, channel_id))
+
 @APP.route("/channels/listall/v2", methods=['GET'])
 def channel_listall():
-    token = str(request.args.get('token')) # line might be dodge; alt: req = request.get_json() first
+    token = str(request.args.get('token')) 
     data = data_store.data_store.get()
 
     u_id = check_valid_token(token, data)
@@ -90,11 +102,6 @@ def channel_listall():
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details():
     token = str(request.args.get('token', None))
-    
-
-    # channel_id = request.args.get('channel_id', None)
-    # if isinstance(channel_id, int) == False:
-    #     channel_id = None
     channel_id = request.args.get('channel_id', None)
     if channel_id == None:
         channel_id = None

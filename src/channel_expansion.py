@@ -20,6 +20,7 @@ def channel_leave_v1(token, channel_id):
         (dict): returns an empty dictionary
     '''
     store = data_store.get()
+    
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.validate_channel(store, channel_id)
     src.error_help.user_not_in_channel(store, auth_user_id, channel_id)    
@@ -34,6 +35,7 @@ def channel_leave_v1(token, channel_id):
             store["channels"][channel_id]["owner_members"].pop(idx)
             break
     
+    data_store.set(store)
     return {
     }
 
