@@ -175,7 +175,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
     
     messages = store['messages']
-
+    print(store["messages"])
     for message in messages:
         if message["channel_id"] == channel_id:
             new_message = {
