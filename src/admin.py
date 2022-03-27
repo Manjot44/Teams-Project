@@ -57,3 +57,137 @@ def admin_userpermission_change(token, u_id, permission_id):
     data_store.set(store)
     return {
     }
+
+# Prevents a 'removed user' from being added to the removed_user list twice
+def check_removed_user_in_list(u_id, data_store):
+    has_removed_user = False
+    for removed_user in data_store["removed_users"]:
+        if removed_user["u_id"] == u_id:
+            has_removed_user = True
+
+    return has_removed_user
+
+def admin_user_remove(token, u_id):
+    ''' Given a user by their u_id, remove them from the Seams. 
+        This means they should be removed from all channels/DMs, and will not be included in the list of users returned by users/all. 
+        Seams owners can remove other Seams owners (including the original first owner). 
+        Once users are removed, the contents of the messages they sent will be replaced by 'Removed user'. 
+        Their profile must still be retrievable with user/profile, however name_first should be 'Removed' and name_last should be 'user'. 
+        The user's email and handle should be reusable.
+
+        Arguments:
+            token (str) - token string (for user that removing other user)
+            u_id (int) - user authentication id number (for user that is being removed)
+
+        Exceptions:
+            InputError  - Occurs when:
+                u_id does not refer to a valid user
+                u_id refers to a user who is the only global owner
+
+            AccessError - Occurs when:
+                the authorised user is not a global owner
+
+        Return Value:
+            Returns {}
+    '''
+    store = data_store.get()
+
+    # Check if auth_user_id and u_id are valid
+    auth_user = check_valid_token(token, store)
+    check_valid_id(u_id, store)
+    check_valid_id(auth_user, store)
+
+    # AccessError if auth_user is not a global owner
+    if store['users'][auth_user]['perm_id'] == 2:
+        raise AccessError(f"Error: {auth_user} is not a global owner")
+
+    # Ensures that there is at least one global owner
+    global_count = 0
+    if store['users'][auth_user]['perm_id'] == 1:
+        for user in store['users']:
+            if user['perm_id'] == 1:
+                global_count += 1
+    if global_count == 1:
+        raise InputError(f"Error: Need to at least have one one global owner")
+
+    # Remove from channel
+    for channel in store["channels"]:
+        for user in channel["all_members"]:
+            if user["u_id"] == u_id:
+                del user
+
+                add_removed_user = {
+                    'u_id': u_id,
+                    'email': None,
+                    'name_first': 'Removed',
+                    'name_last': 'user',
+                    'handle_str': None,
+                }
+                
+                has_removed_user = check_removed_user_in_list(u_id, store)
+                if has_removed_user == False:
+                    store["removed_users"].append(add_removed_user)
+        
+        for user1 in channel["owner_members"]: # meant to remove from both the all_members and owner_members list 
+            if user1["u_id"] == u_id:
+                del user1
+                
+                add_removed_user = {
+                    'u_id': u_id,
+                    'email': None,
+                    'name_first': 'Removed',
+                    'name_last': 'user',
+                    'handle_str': None,
+                }
+                
+                has_removed_user = check_removed_user_in_list(u_id, store)
+                if has_removed_user == False:
+                    store["removed_users"].append(add_removed_user)
+            
+    # Remove from DM
+    for dm in store["dms"]:
+        for user_dm in dm["all_members"]:
+            if user_dm["u_id"] == u_id:
+                del user_dm 
+
+                add_removed_user = {
+                    'u_id': u_id,
+                    'email': None,
+                    'name_first': 'Removed',
+                    'name_last': 'user',
+                    'handle_str': None,
+                }
+                
+                has_removed_user = check_removed_user_in_list(u_id, store)
+                if has_removed_user == False:
+                    store["removed_users"].append(add_removed_user)
+        
+        for user_dm1 in dm["owner_members"]:
+            if user_dm1["u_id"] == u_id:
+                del user_dm1
+        
+                add_removed_user = {
+                    'u_id': u_id,
+                    'email': None,
+                    'name_first': 'Removed',
+                    'name_last': 'user',
+                    'handle_str': None,
+                }
+                
+                has_removed_user = check_removed_user_in_list(u_id, store)
+                if has_removed_user == False:
+                    store["removed_users"].append(add_removed_user)
+
+        # Replace all dms sent with "Replace user"
+        for dm_message in dm["messages"]:
+            if dm_message["u_id"] == u_id:
+                dm_message["message"] = 'Removed user'
+
+    # Remove Channel messages 
+    for msg in store["messages"]:
+        if msg["u_id"] == u_id:
+            msg["message"] = 'Removed user'
+
+    data_store.set(store)
+    return {
+    }

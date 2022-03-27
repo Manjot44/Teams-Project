@@ -175,7 +175,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
     
     messages = store['messages']
-    print(store["messages"])
     for message in messages:
         if message["channel_id"] == channel_id:
             new_message = {
@@ -189,13 +188,13 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if start > len(messagesreturn['messages']):
         raise InputError(f"start must be smaller than total amount of messages")
 
-    
     if start + 50 > len(messagesreturn['messages']):
         messagesreturn['end'] = -1
-        messagesreturn['messages'] = messagesreturn['messages'][start:-1]
+        messagesreturn['messages'] = messagesreturn['messages'][start:]
+        
     else:
         messagesreturn['messages'] = messagesreturn['messages'][start:start + 50]
-
+        messagesreturn['end'] = start + 50
     return messagesreturn        
 
 def channel_join_v1(auth_user_id, channel_id):
