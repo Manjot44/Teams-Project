@@ -132,7 +132,13 @@ def channel_removeowner_v1(token, channel_id, u_id):
 
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.validate_channel(store, channel_id)
-    src.error_help.check_valid_id(u_id, store)
+    
+    has_auth_user = False
+    for auth_user in store["users"]:
+        if auth_user["u_id"] == u_id and u_id != None:
+            has_auth_user = True
+    if has_auth_user == False:
+        raise InputError(f"Error: {u_id} does not have a valid ID")
 
     is_auth_owner = False
     is_uid_owner = False
@@ -142,7 +148,6 @@ def channel_removeowner_v1(token, channel_id, u_id):
         if owner["u_id"] == u_id:
             is_uid_owner = True
             which_owner = idx
-
     
     if is_uid_owner == False:
         raise InputError(f"Error: u_id refers to a user who is not an owner of the channel")
