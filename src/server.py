@@ -205,6 +205,48 @@ def handle_channels_list():
 
     return dumps(channels.channels_list_v1(auth_user_id))
 
+@APP.route("/channel/messages/v2", methods=['GET'])
+def handle_channel_messages():
+
+    token = str(request.args.get('token'))
+
+    store = data_store.data_store.get()
+    u_id = error_help.check_valid_token(token, store)   
+
+    channel_id = request.args.get('channel_id', None)
+    if channel_id == None:
+        channel_id = None
+    else:
+        channel_id = int(request.args.get('channel_id', None))
+
+    start = request.args.get('start', None)
+    if start== None:
+        start = None
+    else:
+        start = int(request.args.get('start', None))
+
+
+    # token = str(request.args.get('token'))
+    # store = data_store.data_store.get()
+    # u_id = error_help.check_valid_token(token, store)
+
+    # channel_id = int(request.args.get('channel_id'))
+    # start = int(request.args.get('start'))
+
+    # store = data_store.data_store.get()
+    # u_id = error_help.check_valid_token(request.args.get("token", None), store)
+    
+    # channel_id = request.args.get('channel_id', None)
+    # if isinstance(channel_id, int) == False:
+    #     channel_id = None
+
+    # start = request.args.get('start', None)
+    # if isinstance(start, int) == False:
+    #     start = None
+
+    return_value = channel.channel_messages_v1(u_id, channel_id, start)
+
+    return dumps(return_value)
 
 @APP.route("/dm/list/v1", methods=['GET'])
 def handle_dms_list():
@@ -239,12 +281,21 @@ def handle_userpermission_change():
     token = request_data.get("token", None)
     if token != None:
         str(token)
+
     u_id = request_data.get("u_id", None)
     if isinstance(u_id, int) == False:
         u_id = None
     permission_id = request_data.get("permission_id", None)
     if isinstance(permission_id, int) == False:
         permission_id = None
+
+    # channel_id = request.args.get('channel_id', None)
+    # if channel_id != None:
+    #     int(channel_id)
+    # start = request.args.get('start', None)
+    # if start != None:
+    #     int(start)
+
 
     return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
 
