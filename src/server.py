@@ -102,11 +102,6 @@ def channel_listall():
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details():
     token = str(request.args.get('token', None))
-    
-
-    # channel_id = request.args.get('channel_id', None)
-    # if isinstance(channel_id, int) == False:
-    #     channel_id = None
     channel_id = request.args.get('channel_id', None)
     if channel_id == None:
         channel_id = None
