@@ -100,7 +100,11 @@ def message_edit_v1(token, message_id, message):
 
     # Ensure that the length of the edited message is > 0 and <= 1000 characters before its edited. If 0 characters long, message_id will be deleted
     if len(message) == 0:
-        del store["messages"][message_id]
+        store["messages"][message_id]["message_id"] = None
+        store["messages"][message_id]["channel_id"] = None
+        store["messages"][message_id]["u_id"] = None
+        store["messages"][message_id]["message"] = None
+        store["messages"][message_id]["time_sent"] = None
     elif len(message) > 1000:
         raise InputError(f"Error: Message over 1000 characters long")
     else:
@@ -148,7 +152,11 @@ def message_remove_v1(token, message_id):
     if store["messages"][message_id]["u_id"] != auth_user_id and store["users"][auth_user_id]["perm_id"] == 2:
         raise AccessError(f"Error: Forbidden from editing message")
 
-    del store["messages"][message_id]
+    store["messages"][message_id]["message_id"] = None
+    store["messages"][message_id]["channel_id"] = None
+    store["messages"][message_id]["u_id"] = None
+    store["messages"][message_id]["message"] = None
+    store["messages"][message_id]["time_sent"] = None
 
     data_store.set(store)
     return {
