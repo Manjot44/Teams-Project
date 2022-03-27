@@ -165,7 +165,9 @@ def handle_channels_create():
     name = request_data.get("name", None)
     if name != None:
         str(name)
-    is_public = bool(request_data.get("is_public"))
+    is_public = request_data.get("is_public")
+    if isinstance(is_public, bool) == False:
+        is_public = False
 
     return dumps(channels.channels_create_v1(auth_user_id, name, is_public))
 
