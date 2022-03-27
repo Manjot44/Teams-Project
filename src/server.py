@@ -128,6 +128,21 @@ def handle_channel_addowner():
 
     return dumps(channel_expansion.channel_addowner_v1(token, channel_id, u_id))
 
+@APP.route("/channel/removeowner/v1", methods=["POST"])
+def handle_channel_removeowner():
+    request_data = request.get_json()
+    token = request_data.get("token", None)
+    if token != None:
+        str(token)
+    channel_id = request_data.get("channel_id", None)
+    if isinstance(channel_id, int) == False:
+        channel_id = None
+    u_id = request_data.get("u_id", None)
+    if isinstance(u_id, int) == False:
+        u_id= None
+
+    return dumps(channel_expansion.channel_removeowner_v1(token, channel_id, u_id))
+
 @APP.route("/auth/logout/v1", methods=['POST'])
 def handle_auth_logout():
     request_data = request.get_json()
