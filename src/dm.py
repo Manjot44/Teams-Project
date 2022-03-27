@@ -1,6 +1,7 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel, check_valid_token
+from src.other import clear_v1
 
 
 def dm_create_v1(token, u_ids):
@@ -38,7 +39,9 @@ def dm_create_v1(token, u_ids):
         raise InputError(f"Duplicate users in u_ids list")
 
     # Assigning new dm details
-    dm_id = len(store["dms"]) - 1
+    if store["dms"][0]["dm_id"] == None:
+        store["dms"] = []
+    dm_id = len(store["dms"])
     user_handles = []
     user_details_list = []
 
@@ -150,16 +153,50 @@ def dm_remove_v1(u_id, dm_id):
         raise InputError(f"dm_id is not valid")
 
     dm_member = False
-    for user in store["dms"][dm_id + 1]["all_members"]:
+    for user in store["dms"][dm_id]["all_members"]:
         if user["u_id"] == u_id:
             dm_member = True
     if dm_member == False:
         raise AccessError(f"You are not part of this dm")
 
-    if u_id != store["dms"][dm_id + 1]["owner_members"][0]["u_id"]:
+    if u_id != store["dms"][dm_id]["owner_members"][0]["u_id"]:
         raise AccessError(f"Only the original creator can remove a dm")
 
-    del store["dms"][dm_id + 1]
+    if dm_id == 0:
+        store['dms'] = [
+            {
+                'dm_id': None,
+                'name': None,
+                'owner_members': [
+                    {
+                        'u_id': None,
+                        'email': None,
+                        'name_first': None,
+                        'name_last': None,
+                        'handle_str': None,
+                    }
+                ],
+                'all_members': [
+                    {
+                        'u_id': None,
+                        'email': None,
+                        'name_first': None,
+                        'name_last': None,
+                        'handle_str': None,
+                    }
+                ],
+                'messages': [
+                    {
+                        'message_id': None,
+                        'u_id': None,
+                        'message': None,
+                        'time_sent': None,
+                    },
+                ]
+            }
+        ]
+    else:
+        del store["dms"][dm_id]
 
     # Saving to datastore
     data_store.set(store)
@@ -207,13 +244,13 @@ def dm_details_v1(u_id, dm_id):
         raise InputError(f"dm_id is not valid")
 
     dm_member = False
-    for user in store["dms"][dm_id + 1]["all_members"]:
+    for user in store["dms"][dm_id]["all_members"]:
         if user["u_id"] == u_id:
             dm_member = True
     if dm_member == False:
         raise AccessError(f"You are not part of this dm")
 
     return {
-        "name": store["dms"][dm_id + 1]["name"],
-        "members": store["dms"][dm_id + 1]["all_members"]
+        "name": store["dms"][dm_id]["name"],
+        "members": store["dms"][dm_id]["all_members"]
     }
