@@ -41,7 +41,9 @@ def dm_create_v1(token, u_ids):
     # Assigning new dm details
     if store["dms"][0]["dm_id"] == None:
         store["dms"] = []
-    dm_id = len(store["dms"])
+        dm_id = 0
+    else:
+        dm_id = store["dms"][-1]["dm_id"] + 1
     user_handles = []
     user_details_list = []
 
