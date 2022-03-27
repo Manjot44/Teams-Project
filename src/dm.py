@@ -81,8 +81,6 @@ def dm_create_v1(token, u_ids):
     }
     # Saving to datastore
     store["dms"].append(new_dm)
-    # if store['dms'][0]['dm_id'] == None:
-    #     store['dms'][0].remove()
     data_store.set(store)
 
     return {
