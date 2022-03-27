@@ -34,18 +34,13 @@ APP.register_error_handler(Exception, defaultHandler)
 
 # NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
-# Example
-
-
-@APP.route("/echo", methods=['GET'])
-def echo():
-    data = request.args.get('data')
-    if data == 'echo':
-        raise InputError(description='Cannot echo "echo"')
-    return dumps({
-        'data': data
-    })
-
+def return_int_helper(num):
+    if num != None:
+        if (isinstance(num, int) == False) and (num.isdigit() == False):
+            num = None
+        else:
+            num = int(num)
+    return num
 
 @APP.route("/auth/register/v2", methods=['POST'])
 def handle_auth_register():
@@ -85,8 +80,7 @@ def handle_channel_leave():
     if token != None:
         str(token)
     channel_id = request_data.get("channel_id", None)
-    if isinstance(channel_id, int) == False:
-        channel_id = None
+    channel_id = return_int_helper(channel_id)
 
     return dumps(channel_expansion.channel_leave_v1(token, channel_id))
 
@@ -103,10 +97,7 @@ def channel_listall():
 def channel_details():
     token = str(request.args.get('token', None))
     channel_id = request.args.get('channel_id', None)
-    if channel_id == None:
-        channel_id = None
-    else:
-        channel_id = int(request.args.get('channel_id', None))
+    channel_id = return_int_helper(channel_id)
 
     data = data_store.data_store.get()
     u_id = check_valid_token(token, data)
@@ -120,11 +111,9 @@ def handle_channel_addowner():
     if token != None:
         str(token)
     channel_id = request_data.get("channel_id", None)
-    if isinstance(channel_id, int) == False:
-        channel_id = None
+    channel_id = return_int_helper(channel_id)
     u_id = request_data.get("u_id", None)
-    if isinstance(u_id, int) == False:
-        u_id= None
+    u_id = return_int_helper(u_id)
 
     return dumps(channel_expansion.channel_addowner_v1(token, channel_id, u_id))
 
@@ -135,11 +124,9 @@ def handle_channel_removeowner():
     if token != None:
         str(token)
     channel_id = request_data.get("channel_id", None)
-    if isinstance(channel_id, int) == False:
-        channel_id = None
+    channel_id = return_int_helper(channel_id)
     u_id = request_data.get("u_id", None)
-    if isinstance(u_id, int) == False:
-        u_id= None
+    u_id = return_int_helper(u_id)
 
     return dumps(channel_expansion.channel_removeowner_v1(token, channel_id, u_id))
 
@@ -160,13 +147,28 @@ def handle_message_send():
     if token != None:
         str(token)
     channel_id = request_data.get("channel_id", None)
-    if isinstance(channel_id, int) == False:
-        channel_id = None
+    channel_id = return_int_helper(channel_id)
     message = request_data.get("message", None)
     if message != None:
         str(message)
 
     return dumps(messages.message_send_v1(token, channel_id, message))
+
+
+@APP.route("/message/senddm/v1", methods=['POST'])
+def handle_message_senddm():
+    request_data = request.get_json()
+    token = request_data.get("token", None)
+    if token != None:
+        str(token)
+    dm_id = request_data.get("dm_id", None)
+    if isinstance(dm_id, int) == False:
+        dm_id = None
+    message = request_data.get("message", None)
+    if message != None:
+        str(message)
+
+    return dumps(messages.message_senddm_v1(token, dm_id, message))
 
 
 @APP.route("/channels/create/v2", methods=['POST'])
@@ -180,7 +182,7 @@ def handle_channels_create():
         str(name)
     is_public = request_data.get("is_public")
     if isinstance(is_public, bool) == False:
-        is_public = False
+        is_public = None
 
     return dumps(channels.channels_create_v1(auth_user_id, name, is_public))
 
@@ -191,8 +193,10 @@ def handle_dm_delete():
     store = data_store.data_store.get()
     auth_user_id = error_help.check_valid_token(
         request_data.get("token", None), store)
-    dm_id = int(request_data.get("dm_id", None))
+    dm_id = request_data.get("dm_id", None)
+    dm_id = return_int_helper(dm_id)
     dm.dm_remove_v1(auth_user_id, dm_id)
+    
     return dumps({})
 
 
@@ -205,6 +209,42 @@ def handle_channels_list():
 
     return dumps(channels.channels_list_v1(auth_user_id))
 
+@APP.route("/channel/messages/v2", methods=['GET'])
+def handle_channel_messages():
+
+    token = str(request.args.get('token'))
+
+    store = data_store.data_store.get()
+    u_id = error_help.check_valid_token(token, store)   
+
+    channel_id = request.args.get('channel_id', None)
+    channel_id = return_int_helper(channel_id)
+
+    start = request.args.get('start', None)
+    start = return_int_helper(start)
+
+
+    # token = str(request.args.get('token'))
+    # store = data_store.data_store.get()
+    # u_id = error_help.check_valid_token(token, store)
+
+    # channel_id = int(request.args.get('channel_id'))
+    # start = int(request.args.get('start'))
+
+    # store = data_store.data_store.get()
+    # u_id = error_help.check_valid_token(request.args.get("token", None), store)
+    
+    # channel_id = request.args.get('channel_id', None)
+    # if isinstance(channel_id, int) == False:
+    #     channel_id = None
+
+    # start = request.args.get('start', None)
+    # if isinstance(start, int) == False:
+    #     start = None
+
+    return_value = channel.channel_messages_v1(u_id, channel_id, start)
+
+    return dumps(return_value)
 
 @APP.route("/dm/list/v1", methods=['GET'])
 def handle_dms_list():
@@ -219,7 +259,8 @@ def handle_dms_list():
 @APP.route("/dm/details/v1", methods=['GET'])
 def handle_dms_details():
     token = str(request.args.get('token'))
-    dm_id = int(request.args.get('dm_id'))
+    dm_id = request.args.get('dm_id')
+    dm_id = return_int_helper(dm_id)
     store = data_store.data_store.get()
     u_id = store["users"][error_help.check_valid_token(
         token, store)]["u_id"]
@@ -257,12 +298,19 @@ def handle_userpermission_change():
     token = request_data.get("token", None)
     if token != None:
         str(token)
+
     u_id = request_data.get("u_id", None)
-    if isinstance(u_id, int) == False:
-        u_id = None
+    u_id = return_int_helper(u_id)
     permission_id = request_data.get("permission_id", None)
-    if isinstance(permission_id, int) == False:
-        permission_id = None
+    permission_id = return_int_helper(permission_id)
+
+    # channel_id = request.args.get('channel_id', None)
+    # if channel_id != None:
+    #     int(channel_id)
+    # start = request.args.get('start', None)
+    # if start != None:
+    #     int(start)
+
 
     return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
 
@@ -280,8 +328,10 @@ def dm_create():
 def handle_channel_invite():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
-    channel_id = int(request_data.get("channel_id", None))
-    u_id = int(request_data.get("u_id", None))
+    channel_id = request_data.get("channel_id", None)
+    channel_id = return_int_helper(channel_id)
+    u_id = request_data.get("u_id", None)
+    u_id = return_int_helper(u_id)
     store = data_store.data_store.get()
 
     auth_user_id = error_help.check_valid_token(token, store)
@@ -293,7 +343,8 @@ def handle_channel_invite():
 def handle_channel_join():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
-    channel_id = int(request_data.get("channel_id", None))
+    channel_id = request_data.get("channel_id", None)
+    channel_id = return_int_helper(channel_id)
     store = data_store.data_store.get()
 
     auth_user_id = error_help.check_valid_token(token, store)
@@ -304,7 +355,8 @@ def handle_channel_join():
 def handle_user_profile():
     
     token = request.args.get("token", None)
-    u_id = int(request.args.get("u_id", None))
+    u_id = request.args.get("u_id", None)
+    u_id = return_int_helper(u_id)
 
     return dumps(user.user_profile_v1(token, u_id))
 
@@ -335,6 +387,33 @@ def handle_user_profile_sethandle():
     handle_str = str(request_data.get("handle_str", None))
 
     return dumps(user.user_profile_sethandle_v1(token, handle_str))
+
+@APP.route("/message/edit/v1", methods=['PUT'])
+def handle_message_edit():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = request_data.get("message_id", None)
+    message_id = return_int_helper(message_id)
+    message = str(request_data.get("message", None))
+
+    return dumps(messages.message_edit_v1(token, message_id, message))
+
+@APP.route("/message/remove/v1", methods=['DELETE'])
+def hendle_message_remove():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = request_data.get("message_id", None)
+    message_id = return_int_helper(message_id)
+
+    return dumps(messages.message_remove_v1(token, message_id))
+
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
+def handle_admin_user_remove():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    u_id = int(request_data.get("u_id", None))
+
+    return dumps(src.admin.admin_user_remove(token, u_id))
 
 # NO NEED TO MODIFY BELOW THIS POINT
 

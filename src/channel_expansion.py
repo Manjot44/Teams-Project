@@ -28,12 +28,10 @@ def channel_leave_v1(token, channel_id):
     for idx, member in enumerate(store["channels"][channel_id]["all_members"]):
         if member["u_id"] == auth_user_id:
             store["channels"][channel_id]["all_members"].pop(idx)
-            break
     
     for idx, member in enumerate(store["channels"][channel_id]["owner_members"]):
         if member["u_id"] == auth_user_id:
             store["channels"][channel_id]["owner_members"].pop(idx)
-            break
     
     data_store.set(store)
     return {

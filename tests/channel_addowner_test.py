@@ -6,15 +6,15 @@ BASE_PORT = 8080
 BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
 
 def test_valid_add(register_three_users):
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token": register_three_users["token"][0], "name": "channel_name", "is_public": True})
+    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token": register_three_users["token"][1], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
     channel_id = response_data["channel_id"]
 
-    response = requests.post(f"{BASE_URL}/channel/invite/v2", json = {"token": register_three_users["token"][0], "channel_id": channel_id, "u_id": register_three_users["id"][1]})
+    response = requests.post(f"{BASE_URL}/channel/invite/v2", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "u_id": register_three_users["id"][0]})
     assert response.status_code == 200
 
-    response = requests.post(f"{BASE_URL}/channel/addowner/v1", json = {"token": register_three_users["token"][0], "channel_id": channel_id, "u_id": register_three_users["id"][1]})
+    response = requests.post(f"{BASE_URL}/channel/addowner/v1", json = {"token": register_three_users["token"][0], "channel_id": channel_id, "u_id": register_three_users["id"][0]})
     assert response.status_code == 200
 
     response = requests.get(f"{BASE_URL}/channel/details/v2?token={register_three_users['token'][0]}&channel_id={channel_id}")
@@ -24,7 +24,7 @@ def test_valid_add(register_three_users):
 
     is_owner = False
     for owner in owner_members:
-        if owner["u_id"] == register_three_users["id"][1]:
+        if owner["u_id"] == register_three_users["id"][0]:
             is_owner = True
     assert is_owner
 
