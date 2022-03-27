@@ -104,6 +104,15 @@ initial_object = {
             ]
         }
     ],
+    'removed_users': [
+        {
+            'u_id': None,
+            'email': None,
+            'name_first': None,
+            'name_last': None,
+            'handle_str': None,
+        }
+    ]
 }
 # YOU SHOULD MODIFY THIS OBJECT ABOVE
 
