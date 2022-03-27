@@ -267,6 +267,24 @@ def handle_dms_details():
 
     return dumps(dm.dm_details_v1(u_id, dm_id))
 
+@APP.route("/dm/messages/v1", methods=['GET'])
+def dm_messages():
+    token = str(request.args.get('token', None))
+    
+    dm_id = request.args.get('dm_id', None)
+    if dm_id.isdigit() == True:
+        dm_id = int(dm_id)
+    else:
+        dm_id = None
+    
+    start = request.args.get('start', None)
+    if start.isdigit() == True:
+        start = int(start)
+    else:
+        start == None
+    
+    return dumps(dm.dm_messages_v1(token, dm_id, start))
+
 
 @ APP.route("/clear/v1", methods=['DELETE'])
 def handle_clear():

@@ -256,3 +256,59 @@ def dm_details_v1(u_id, dm_id):
         "name": store["dms"][dm_id]["name"],
         "members": store["dms"][dm_id]["all_members"]
     }
+
+
+def dm_messages_v1(token, dm_id, start):
+    ''' DOC STRING ''' # Throw token, dm_id into help function
+    
+    store = data_store.get()
+    # Checks if token is valid
+    u_id = check_valid_token(token, store)
+    # Checks if dm_id is valid
+    if store['dms'][0]['dm_id'] == None:
+        raise InputError(f"dm_id is not valid because there are no DMs")
+    valid_dm = False
+    dm_index = 0
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            valid_dm = True
+            break
+        dm_index += 1
+    if valid_dm == False:
+        raise InputError(f"dm_id = {dm_id} is not valid")
+    # Checks if user is member of DM
+    valid_member = False
+    member_index = 0
+    for members in store['dms'][dm_index]['all_members']:
+        if members['u_id'] == u_id:
+            valid_member = True
+            break
+        member_index += 1
+    if valid_member == False:
+        raise AccessError(f"User is not member of DM")
+    # Checks if start is greater than number of messages
+    total_message_list = store['dms'][dm_index]['messages']
+    if start == None:
+        raise InputError(f"Invalid value for 'start' variable")
+    if start > len(total_message_list):
+        raise InputError(f"Start greater than number of messages in DM.")
+    if total_message_list[0]['message_id'] == None:
+        if start > 0:
+            raise InputError(f"List is empty, start value higher than 0 not valid")
+
+    # Returning messages
+    end = start + 50
+    messages = {
+        'messages': [],
+        'start': start,
+        'end': end,
+    }
+    last_idx = len(total_message_list)
+    if len(total_message_list[start:last_idx]) <= 50:
+        messages['end'] = -1
+        messages['messages'].append(total_message_list[start:last_idx])
+    else:
+        messages['messages'].append(total_message_list[start:start + 50])
+
+    return messages
+    
