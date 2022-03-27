@@ -157,17 +157,64 @@ def message_remove_v1(token, message_id):
 def message_senddm_v1(token, dm_id, message):
     ''' DOCSTRING '''
     # Checks if token is valid
-    # Checks if dm_id is valid
-    # Checks if message is valid
-
-    # Assigning unique message_id
     store = data_store.get()
-    message_id = 0
-    is_unique = True
-    for dm_groups in store['dms']:
-        for m_ids in dm_groups['messages']:
-            if m_ids['message_id'] == message_id:
-                is_unique = False
-    if channel_messages in store['messages']
+    auth_user_id = src.error_help.check_valid_token(token, store)
+    # Checks if dm_id is valid
+    if store['dms'][0]['dm_id'] == None:
+        raise InputError(f"dm_id is not valid because there are no DMs")
+    valid_dm = False
+    dm_index = 0
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            valid_dm = True
+            break
+        dm_index += 1
+    if valid_dm == False:
+        raise InputError(f"dm_id = {dm_id} is not valid")
+    # Checks if message is valid
+    if message == None or len(message) < 1 or len(message) > 1000:
+        raise InputError(f"Error: length of message is less than 1 or over 1000 characters")
+    # Checks if user is in dm
+    valid_member = False
+    member_index = 0
+    for members in store['dms'][dm_index]['all_members']:
+        if members['u_id'] == auth_user_id:
+            valid_member = True
+            break
+        member_index += 1
+    if valid_member == False:
+        raise AccessError(f"User is not member of DM")
+    # Assigning unique message_id
+    channel_mess_id = store["messages"][-1]["message_id"]
+    if channel_mess_id == None:
+        channel_mess_id = -1
+    
+    dm_message_id = -1
+    for dms in store["dms"]:
+        if (dms["messages"][-1]["message_id"] != None) and (dms["messages"][-1]["message_id"] > dm_message_id):
+            dm_message_id = dms["message_id"]
+    
+    if dm_message_id > channel_mess_id:
+        id = dm_message_id + 1
+    else:
+        id = channel_mess_id + 1
 
-    if store['dms'][0]['messages']['message_id'] == 
+    
+    current_time = datetime.datetime.now(datetime.timezone.utc)
+    utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
+    unix_timestamp = utc_time.timestamp()
+
+    new_message = {
+        "message_id": id,
+        "u_id": auth_user_id,
+        "message": message,
+        "time_sent": int(unix_timestamp),
+    }
+
+
+    store['dms'][dm_index]['messages'].append(new_message)
+    data_store.set(store)
+
+    return {
+        "message_id": id
+    }

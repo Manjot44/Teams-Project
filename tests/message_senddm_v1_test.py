@@ -30,7 +30,7 @@ def test_message_senddm_message_len_0(register_three_users):                # 40
     response = requests.post(f"{BASE_URL}/dm/create/v1", json={'token': token, 'u_ids': [member_id]})
     assert response.status_code == 200
     dm_id = response.json()
-    message = "W"
+    message = ""
     response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
         'token': token,
         'dm_id': dm_id['dm_id'],
@@ -77,7 +77,31 @@ def test_message_senddm_token_invalid_dm_id_invalid(register_three_users):  # 40
     assert response.status_code == 403
 
 def test_message_senddm_message_len_1000(register_three_users):
-    pass
+    token = register_three_users['token'][0]
+    member_id = register_three_users['id'][1]
+    response = requests.post(f"{BASE_URL}/dm/create/v1", json={'token': token, 'u_ids': [member_id]})
+    assert response.status_code == 200
+    dm_id = response.json()
+    message = "W" * 1000
+    response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        'token': token,
+        'dm_id': dm_id['dm_id'],
+        'message': message
+    })
+    assert response.status_code == 200
+
 
 def test_message_senddm_message_len_1(register_three_users):
-    pass
+    token = register_three_users['token'][0]
+    member_id = register_three_users['id'][1]
+    response = requests.post(f"{BASE_URL}/dm/create/v1", json={'token': token, 'u_ids': [member_id]})
+    assert response.status_code == 200
+    dm_id = response.json()
+    message = "W"
+    response = requests.post(f"{BASE_URL}/message/senddm/v1", json={
+        'token': token,
+        'dm_id': dm_id['dm_id'],
+        'message': message
+    })
+    assert response.status_code == 200
+
