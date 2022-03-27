@@ -5,7 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src.error_help import check_valid_token
-from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, dm, channel, admin
+from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, dm, channel, admin, user
 import src.admin
 
 
@@ -246,6 +246,41 @@ def handle_channel_join():
 
     return dumps(channel.channel_join_v1(auth_user_id, channel_id))
 
+@APP.route("/user/profile/v1", methods=['GET'])
+def handle_user_profile():
+    
+    token = request.args.get("token", None)
+    u_id = int(request.args.get("u_id", None))
+
+    return dumps(user.user_profile_v1(token, u_id))
+
+@APP.route("/user/profile/setname/v1", methods=['PUT'])
+def handle_user_profile_setname():
+    request_data = request.get_json()
+
+    token = request_data.get("token", None)
+    name_first = str(request_data.get("name_first", None))
+    name_last = str(request_data.get("name_last", None))
+
+    return dumps(user.user_profile_setname_v1(token, name_first, name_last))
+
+@APP.route("/user/profile/setemail/v1", methods=['PUT'])
+def handle_user_profile_setemail():
+    request_data = request.get_json()
+    
+    token = str(request_data.get("token", None))
+    email = str(request_data.get("email", None))
+
+    return dumps(user.user_profile_setemail_v1(token, email))
+
+@APP.route("/user/profile/sethandle/v1", methods=['PUT'])
+def handle_user_profile_sethandle():
+    request_data = request.get_json()
+    
+    token = str(request_data.get("token", None))
+    handle_str = str(request_data.get("handle_str", None))
+
+    return dumps(user.user_profile_sethandle_v1(token, handle_str))
 
 # NO NEED TO MODIFY BELOW THIS POINT
 
