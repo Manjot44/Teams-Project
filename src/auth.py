@@ -152,8 +152,6 @@ def auth_register_v1(email, password, name_first, name_last):
         "valid_tokens": [encoded_jwt],
     }
 
-    print(new_user)
-
     store["users"].append(new_user)
     data_store.set(store)
 

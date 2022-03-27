@@ -88,6 +88,7 @@ def clear_v1():
     store['messages'] = [
         {
             'message_id': None,
+            'channel_id': None,
             'u_id': None,
             'message': None,
             'time_sent': None,

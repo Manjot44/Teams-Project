@@ -247,6 +247,8 @@ def test_handle_double_repeat(user_init):
     response_data = response.json()
     channel_id = response_data["channel_id"]
 
+    print(channel_id)
+    
     response = requests.get(f"{BASE_URL}/channel/details/v2?token={token}&channel_id={channel_id}")
     assert response.status_code == 200
     response_data = response.json()
