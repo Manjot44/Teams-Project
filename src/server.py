@@ -127,17 +127,42 @@ def handle_channels_list():
 
 @APP.route("/channel/messages/v2", methods=['GET'])
 def handle_channel_messages():
-    
+
+    token = str(request.args.get('token'))
+
     store = data_store.data_store.get()
-    u_id = error_help.check_valid_token(request.args.get("token", None), store)
-    
+    u_id = error_help.check_valid_token(token, store)   
+
     channel_id = request.args.get('channel_id', None)
-    if isinstance(channel_id, int) == False:
+    if channel_id == None:
         channel_id = None
+    else:
+        channel_id = int(request.args.get('channel_id', None))
 
     start = request.args.get('start', None)
-    if isinstance(start, int) == False:
+    if start== None:
         start = None
+    else:
+        start = int(request.args.get('start', None))
+
+
+    # token = str(request.args.get('token'))
+    # store = data_store.data_store.get()
+    # u_id = error_help.check_valid_token(token, store)
+
+    # channel_id = int(request.args.get('channel_id'))
+    # start = int(request.args.get('start'))
+
+    # store = data_store.data_store.get()
+    # u_id = error_help.check_valid_token(request.args.get("token", None), store)
+    
+    # channel_id = request.args.get('channel_id', None)
+    # if isinstance(channel_id, int) == False:
+    #     channel_id = None
+
+    # start = request.args.get('start', None)
+    # if isinstance(start, int) == False:
+    #     start = None
 
     return_value = channel.channel_messages_v1(u_id, channel_id, start)
 
