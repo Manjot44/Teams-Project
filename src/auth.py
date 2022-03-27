@@ -128,9 +128,14 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError(f"Error: last name must be between 1 and 50 characters long inclusive")
 
     handle = generate_handle(name_first, name_last)
-    if store["users"][0]["u_id"] == None:
-            store["users"] = []
-    id = len(store["users"])
+    
+    id = store["users"][-1]["u_id"]
+    if id == None:
+        store["users"] = []
+        id = 0
+    else:
+        id += 1
+    
     perm_id = 2
     if id == 0:
         perm_id = 1
@@ -174,7 +179,7 @@ def auth_logout_v1(token):
     
     auth_user_id = src.error_help.check_valid_token(token, store)
     for tokens in store["users"][auth_user_id]["valid_tokens"]:
-        if tokens == store["users"][auth_user_id]["valid_tokens"]:
+        if tokens == token:
             store["users"][auth_user_id]["valid_tokens"].remove(tokens)
 
     data_store.set(store)
