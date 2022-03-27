@@ -24,7 +24,7 @@ Example usage:
     data_store.set(store)
 '''
 
-## YOU SHOULD MODIFY THIS OBJECT BELOW
+# YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'users': [
         {
@@ -49,7 +49,6 @@ initial_object = {
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
-                    'perm_id': None,
                 }
             ],
             'all_members': [
@@ -59,10 +58,42 @@ initial_object = {
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
-                    'perm_id': None,
                 }
             ],
             'is_public': None,
+        }
+    ],
+    'messages': [
+        {
+            'message_id': None,
+            'channel_id': None,
+            'u_id': None,
+            'message': None,
+            'time_sent': None,
+        },
+    ],
+    'dms': [
+        {
+            'dm_id': None,
+            'name': None,
+            'owner_members': [
+                {
+                    'u_id': None,
+                    'email': None,
+                    'name_first': None,
+                    'name_last': None,
+                    'handle_str': None,
+                }
+            ],
+            'all_members': [
+                {
+                    'u_id': None,
+                    'email': None,
+                    'name_first': None,
+                    'name_last': None,
+                    'handle_str': None,
+                }
+            ],
             'messages': [
                 {
                     'message_id': None,
@@ -71,12 +102,14 @@ initial_object = {
                     'time_sent': None,
                 },
             ]
-        }  
+        }
     ],
 }
-## YOU SHOULD MODIFY THIS OBJECT ABOVE
+# YOU SHOULD MODIFY THIS OBJECT ABOVE
 
-## YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
+# YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
+
+
 class Datastore:
     def __init__(self):
         self.__store = initial_object
