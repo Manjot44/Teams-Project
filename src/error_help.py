@@ -16,13 +16,14 @@ def check_valid_token(token, data):
 
 def check_valid_id(auth_user_id, data):
     has_auth_user = False
-    for auth_user in data["users"]:
+    for idx, auth_user in enumerate(data["users"]):
         if auth_user["u_id"] == auth_user_id and auth_user_id != None:
             has_auth_user = True
+            which_auth = idx
     if has_auth_user == False:
         raise AccessError(f"Error: {auth_user_id} does not have a valid ID")
 
-    return auth_user_id
+    return which_auth
 
 def validate_channel(data, channel_id):
     valid_channel = False
