@@ -126,7 +126,7 @@ def users_all_v1(token):
         }
     '''
     store = data_store.get()
-    u_id = check_valid_token(token, store)
+    check_valid_token(token, store)
     users_all = {
         'users': []
     }
