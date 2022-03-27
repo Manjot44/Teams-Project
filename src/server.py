@@ -373,6 +373,14 @@ def hendle_message_remove():
 
     return dumps(messages.message_remove_v1(token, message_id))
 
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
+def handle_admin_user_remove():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    u_id = int(request_data.get("u_id", None))
+
+    return dumps(src.admin.admin_user_remove(token, u_id))
+
 # NO NEED TO MODIFY BELOW THIS POINT
 
 
