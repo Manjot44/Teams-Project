@@ -72,8 +72,10 @@ def handle_channel_leave():
     if token != None:
         str(token)
     channel_id = request_data.get("channel_id", None)
-    if isinstance(channel_id, int) == False:
+    if channel_id.isdigit() == False:
         channel_id = None
+    else:
+        channel_id = int(channel_id)
 
     return dumps(channel_expansion.channel_leave_v1(token, channel_id))
 
@@ -90,10 +92,10 @@ def channel_listall():
 def channel_details():
     token = str(request.args.get('token', None))
     channel_id = request.args.get('channel_id', None)
-    if channel_id == None:
+    if channel_id.isdigit() == False:
         channel_id = None
     else:
-        channel_id = int(request.args.get('channel_id', None))
+        channel_id = int(channel_id)
 
     data = data_store.data_store.get()
     u_id = check_valid_token(token, data)
@@ -107,11 +109,15 @@ def handle_channel_addowner():
     if token != None:
         str(token)
     channel_id = request_data.get("channel_id", None)
-    if isinstance(channel_id, int) == False:
+    if channel_id.isdigit() == False:
         channel_id = None
+    else:
+        channel_id = int(channel_id)
     u_id = request_data.get("u_id", None)
-    if isinstance(u_id, int) == False:
-        u_id= None
+    if u_id.isdigit() == False:
+        u_id = None
+    else:
+        u_id = int(u_id)
 
     return dumps(channel_expansion.channel_addowner_v1(token, channel_id, u_id))
 
@@ -122,11 +128,15 @@ def handle_channel_removeowner():
     if token != None:
         str(token)
     channel_id = request_data.get("channel_id", None)
-    if isinstance(channel_id, int) == False:
+    if channel_id.isdigit() == False:
         channel_id = None
+    else:
+        channel_id = int(channel_id)
     u_id = request_data.get("u_id", None)
-    if isinstance(u_id, int) == False:
-        u_id= None
+    if u_id.isdigit() == False:
+        u_id = None
+    else:
+        u_id = int(u_id)
 
     return dumps(channel_expansion.channel_removeowner_v1(token, channel_id, u_id))
 
@@ -147,8 +157,10 @@ def handle_message_send():
     if token != None:
         str(token)
     channel_id = request_data.get("channel_id", None)
-    if isinstance(channel_id, int) == False:
+    if channel_id.isdigit() == False:
         channel_id = None
+    else:
+        channel_id = int(channel_id)
     message = request_data.get("message", None)
     if message != None:
         str(message)
@@ -167,7 +179,7 @@ def handle_channels_create():
         str(name)
     is_public = request_data.get("is_public")
     if isinstance(is_public, bool) == False:
-        is_public = False
+        is_public = None
 
     return dumps(channels.channels_create_v1(auth_user_id, name, is_public))
 
@@ -178,7 +190,11 @@ def handle_dm_delete():
     store = data_store.data_store.get()
     auth_user_id = error_help.check_valid_token(
         request_data.get("token", None), store)
-    dm_id = int(request_data.get("dm_id", None))
+    dm_id = request_data.get("dm_id", None)
+    if dm_id.isdigit() == False:
+        dm_id = None
+    else:
+        dm_id = int(dm_id)
     dm.dm_remove_v1(auth_user_id, dm_id)
     return dumps({})
 
@@ -201,16 +217,16 @@ def handle_channel_messages():
     u_id = error_help.check_valid_token(token, store)   
 
     channel_id = request.args.get('channel_id', None)
-    if channel_id == None:
+    if channel_id.isdigit() == False:
         channel_id = None
     else:
-        channel_id = int(request.args.get('channel_id', None))
+        channel_id = int(channel_id)
 
     start = request.args.get('start', None)
-    if start== None:
+    if start.isdigit() == False:
         start = None
     else:
-        start = int(request.args.get('start', None))
+        start = int(channel_id)
 
 
     # token = str(request.args.get('token'))
@@ -248,7 +264,11 @@ def handle_dms_list():
 @APP.route("/dm/details/v1", methods=['GET'])
 def handle_dms_details():
     token = str(request.args.get('token'))
-    dm_id = int(request.args.get('dm_id'))
+    dm_id = request.args.get('dm_id')
+    if dm_id.isdigit() == False:
+        dm_id = None
+    else:
+        dm_id = int(dm_id)
     store = data_store.data_store.get()
     u_id = store["users"][error_help.check_valid_token(
         token, store)]["u_id"]
@@ -270,11 +290,15 @@ def handle_userpermission_change():
         str(token)
 
     u_id = request_data.get("u_id", None)
-    if isinstance(u_id, int) == False:
+    if u_id.isdigit() == False:
         u_id = None
+    else:
+        u_id = int(u_id)
     permission_id = request_data.get("permission_id", None)
-    if isinstance(permission_id, int) == False:
+    if permission_id.isdigit() == False:
         permission_id = None
+    else:
+        permission_id = int(u_id)
 
     # channel_id = request.args.get('channel_id', None)
     # if channel_id != None:
@@ -300,8 +324,16 @@ def dm_create():
 def handle_channel_invite():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
-    channel_id = int(request_data.get("channel_id", None))
-    u_id = int(request_data.get("u_id", None))
+    channel_id = request_data.get("channel_id", None)
+    if isinstance(channel_id, int) == False and channel_id.isdigit() == False:
+        channel_id = None
+    else:
+        channel_id = int(channel_id)
+    u_id = request_data.get("u_id", None)
+    if u_id.isdigit() == False:
+        u_id = None
+    else:
+        u_id = int(u_id)
     store = data_store.data_store.get()
 
     auth_user_id = error_help.check_valid_token(token, store)
