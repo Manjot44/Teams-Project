@@ -31,8 +31,8 @@ def test_single_channel_list(user_init):
     response = requests.get(f"{BASE_URL}/channels/list/v2", params=list_input)
     assert response.status_code == 200
     response_data = response.json()
-    assert response_data[0]["channel_id"] == 0
-    assert response_data[0]["name"] == "channel1"
+    assert response_data["channels"][0]["channel_id"] == 0
+    assert response_data["channels"][0]["name"] == "channel1"
 
 
 def test_multiple_channel_list(user_init):
@@ -58,7 +58,7 @@ def test_multiple_channel_list(user_init):
     response = requests.get(f"{BASE_URL}/channels/list/v2", params=list_input)
     assert response.status_code == 200
     response_data = response.json()
-    assert response_data[0]["channel_id"] == 0
-    assert response_data[0]["name"] == "channel1"
-    assert response_data[1]["channel_id"] == 1
-    assert response_data[1]["name"] == "channel2"
+    assert response_data["channels"][0]["channel_id"] == 0
+    assert response_data["channels"][0]["name"] == "channel1"
+    assert response_data["channels"][1]["channel_id"] == 1
+    assert response_data["channels"][1]["name"] == "channel2"
