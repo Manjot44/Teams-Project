@@ -81,7 +81,6 @@ def dm_create_v1(token, u_ids):
             },
         ]
     }
-
     # Saving to datastore
     store["dms"].append(new_dm)
     data_store.set(store)
@@ -122,6 +121,7 @@ def dm_list_v1(u_id):
                 })
 
     return dm_list
+
 
 
 def dm_remove_v1(u_id, dm_id):
@@ -204,6 +204,62 @@ def dm_remove_v1(u_id, dm_id):
     data_store.set(store)
 
     return
+
+def dm_leave_v1(token, dm_id):
+    '''User in DM is removed from members list.
+
+    Arguments:
+        token (string) - user authentication
+        dm_id (int) - dm that is specified
+
+    Exceptions:
+        AccessError - Occurs when:
+            token passed in is not valid
+        InputError - Occurs when:
+            dm_id passed is not valid
+        AccessError - Occurs when:
+            user is not member of DM
+
+    '''
+    store = data_store.get()
+    # Checks if token is valid
+    leaver_id = check_valid_token(token, store)
+    # Checks if dm_id is valid
+    if store['dms'][0]['dm_id'] == None:
+        raise InputError(f"dm_id is not valid because there are no DMs")
+    valid_dm = False
+    dm_index = 0
+    for dm in store['dms']:
+        if dm['dm_id'] == dm_id:
+            valid_dm = True
+            break
+        dm_index += 1
+    if valid_dm == False:
+        raise InputError(f"dm_id = {dm_id} is not valid")
+    # Checks if user is member of DM
+    valid_member = False
+    member_index = 0
+    for members in store['dms'][dm_index]['all_members']:
+        if members['u_id'] == leaver_id:
+            valid_member = True
+            break
+        member_index += 1
+    if valid_member == False:
+        raise AccessError(f"User is not member of DM")
+    # User is verified member from this point on
+    # Check if member is owner member
+    valid_owner = False
+    owner_index = 0
+    for members in store['dms'][dm_index]['owner_members']:
+        if members['u_id'] == leaver_id:
+            valid_owner = True
+            break
+        owner_index += 1
+    # Removing leaver from member lists
+    if valid_owner == True:
+        store['dms'][dm_index]['owner_members'].remove(store['dms'][dm_index]['all_members'][owner_index])
+    store['dms'][dm_index]['all_members'].remove(store['dms'][dm_index]['all_members'][member_index])
+    return {}
 
 
 def dm_details_v1(u_id, dm_id):
