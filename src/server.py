@@ -222,25 +222,6 @@ def handle_channel_messages():
     start = request.args.get('start', None)
     start = return_int_helper(start)
 
-
-    # token = str(request.args.get('token'))
-    # store = data_store.data_store.get()
-    # u_id = error_help.check_valid_token(token, store)
-
-    # channel_id = int(request.args.get('channel_id'))
-    # start = int(request.args.get('start'))
-
-    # store = data_store.data_store.get()
-    # u_id = error_help.check_valid_token(request.args.get("token", None), store)
-    
-    # channel_id = request.args.get('channel_id', None)
-    # if isinstance(channel_id, int) == False:
-    #     channel_id = None
-
-    # start = request.args.get('start', None)
-    # if isinstance(start, int) == False:
-    #     start = None
-
     return_value = channel.channel_messages_v1(u_id, channel_id, start)
 
     return dumps(return_value)
@@ -271,16 +252,10 @@ def dm_messages():
     token = str(request.args.get('token', None))
     
     dm_id = request.args.get('dm_id', None)
-    if dm_id.isdigit() == True:
-        dm_id = int(dm_id)
-    else:
-        dm_id = None
+    dm_id = return_int_helper(dm_id)
     
     start = request.args.get('start', None)
-    if start.isdigit() == True:
-        start = int(start)
-    else:
-        start == None
+    start = return_int_helper(start)
     
     return dumps(dm.dm_messages_v1(token, dm_id, start))
 
@@ -303,14 +278,6 @@ def handle_userpermission_change():
     permission_id = request_data.get("permission_id", None)
     permission_id = return_int_helper(permission_id)
 
-    # channel_id = request.args.get('channel_id', None)
-    # if channel_id != None:
-    #     int(channel_id)
-    # start = request.args.get('start', None)
-    # if start != None:
-    #     int(start)
-
-
     return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
 
 
@@ -330,8 +297,7 @@ def dm_leave():
     if token != None:
         token = str(token)
     dm_id = request_data.get("dm_id", None)
-    if isinstance(dm_id, int) == False:
-        dm_id = None
+    dm_id = return_int_helper(dm_id)
     
     return dumps(dm.dm_leave_v1(token, dm_id))
 
