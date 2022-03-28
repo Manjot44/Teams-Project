@@ -63,7 +63,8 @@ def user_profile_setname_v1(token, name_first, name_last):
         if user['u_id'] == u_id:
             user['name_first'] = name_first
             user['name_last'] = name_last       
-        return    
+    return {
+    }
 
 def user_profile_setemail_v1(token, email):
     store = data_store.get()
@@ -86,7 +87,8 @@ def user_profile_setemail_v1(token, email):
     for user in user_info:
         if user['u_id'] == u_id:
             user['email'] = email
-        return    
+    return {
+    }    
 
 def user_profile_sethandle_v1(token, handle_str):
     store = data_store.get()
@@ -108,7 +110,8 @@ def user_profile_sethandle_v1(token, handle_str):
     for user in user_info:
         if user['u_id'] == u_id:
             user['handle_str'] = handle_str
-        return   
+    return {
+    }
 
 def users_all_v1(token):
     '''Returns all authorised users.
