@@ -49,3 +49,4 @@ def test_dm_leave_valid_input_creator_leaving(register_three_users):
     assert response.status_code == 200
     details = response.json()
     assert len(details['members']) == 1
+    
