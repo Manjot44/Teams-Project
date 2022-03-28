@@ -252,16 +252,10 @@ def dm_messages():
     token = str(request.args.get('token', None))
     
     dm_id = request.args.get('dm_id', None)
-    if dm_id.isdigit() == True:
-        dm_id = int(dm_id)
-    else:
-        dm_id = None
+    dm_id = return_int_helper(dm_id)
     
     start = request.args.get('start', None)
-    if start.isdigit() == True:
-        start = int(start)
-    else:
-        start == None
+    start = return_int_helper(start)
     
     return dumps(dm.dm_messages_v1(token, dm_id, start))
 
@@ -303,8 +297,7 @@ def dm_leave():
     if token != None:
         token = str(token)
     dm_id = request_data.get("dm_id", None)
-    if isinstance(dm_id, int) == False:
-        dm_id = None
+    dm_id = return_int_helper(dm_id)
     
     return dumps(dm.dm_leave_v1(token, dm_id))
 
