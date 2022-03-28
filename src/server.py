@@ -323,7 +323,20 @@ def dm_create():
     return dumps(dm.dm_create_v1(token, u_ids))
 
 
-@ APP.route("/channel/invite/v2", methods=['POST'])
+@APP.route("/dm/leave/v1", methods=['POST'])
+def dm_leave():
+    request_data = request.get_json()
+    token = request_data.get('token', None)
+    if token != None:
+        token = str(token)
+    dm_id = request_data.get("dm_id", None)
+    if isinstance(dm_id, int) == False:
+        dm_id = None
+    
+    return dumps(dm.dm_leave_v1(token, dm_id))
+
+
+@APP.route("/channel/invite/v2", methods=['POST'])
 def handle_channel_invite():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
