@@ -37,7 +37,6 @@ def clear_v1():
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
-                    'perm_id': None,
                 }
             ],
             'all_members': [
@@ -47,7 +46,6 @@ def clear_v1():
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
-                    'perm_id': None,
                 }
             ],
             'is_public': None,
@@ -93,6 +91,15 @@ def clear_v1():
             'message': None,
             'time_sent': None,
         },
+    ]
+    store['removed_users'] = [
+        {
+            'u_id': None,
+            'email': None,
+            'name_first': None,
+            'name_last': None,
+            'handle_str': None,
+        }
     ]
     
     data_store.set(store)

@@ -37,7 +37,6 @@ def user_profile_v1(token, u_id):
                 user_info_dict['user']['name_first'] = user['name_first']
                 user_info_dict['user']['name_last'] = user['name_last']
                 user_info_dict['user']['handle_str'] = user['handle_str']
-            return user_info_dict
     elif valid_u_id == "valid_removed_user":
         for user in removed_user_info:
             if user['u_id'] == u_id:  
@@ -46,7 +45,8 @@ def user_profile_v1(token, u_id):
                 user_info_dict['user']['name_first'] = user['name_first']
                 user_info_dict['user']['name_last'] = user['name_last']
                 user_info_dict['user']['handle_str'] = user['handle_str']
-            return user_info_dict
+    
+    return user_info_dict
 
 def user_profile_setname_v1(token, name_first, name_last):
     store = data_store.get()
