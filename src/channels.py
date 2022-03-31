@@ -127,8 +127,8 @@ def channels_listall_v1(auth_user_id):
     check_valid_id(auth_user_id, saved_data)
 
     # returning channel data to listall_return from saved channel data
-    if listall['channels'][0]['channel_id'] == None:
-        listall['channels'] = []
+    if saved_data['channels'][0]['channel_id'] == None:
+        listall_return['channels'] = []
     else:
         for channel in saved_data['channels']:
             appended_channel = {
