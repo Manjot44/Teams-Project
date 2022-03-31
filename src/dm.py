@@ -257,7 +257,7 @@ def dm_leave_v1(token, dm_id):
         owner_index += 1
     # Removing leaver from member lists
     if valid_owner == True:
-        store['dms'][dm_index]['owner_members'].remove(store['dms'][dm_index]['all_members'][owner_index])
+        store['dms'][dm_index]['owner_members'].remove(store['dms'][dm_index]['owner_members'][owner_index])
     store['dms'][dm_index]['all_members'].remove(store['dms'][dm_index]['all_members'][member_index])
     return {}
 
