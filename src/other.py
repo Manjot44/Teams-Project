@@ -1,6 +1,5 @@
 from src.data_store import data_store
 
-
 def clear_v1():
     '''Resets the internal data of the application to its initial state
 
@@ -91,7 +90,7 @@ def clear_v1():
             'message': None,
             'time_sent': None,
         },
-    ]
+    ],
     store['removed_users'] = [
         {
             'u_id': None,
