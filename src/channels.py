@@ -137,7 +137,7 @@ def channels_listall_v1(auth_user_id):
             }
             listall_return.append(appended_channel)
 
-    return listall
+    return listall_return
 
 
 def channels_create_v1(auth_user_id, name, is_public):
