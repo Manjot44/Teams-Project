@@ -135,7 +135,7 @@ def channels_listall_v1(auth_user_id):
                 'channel_id': channel['channel_id'],
                 'name': channel['name']
             }
-            listall_return.append(appended_channel)
+            listall_return['channels'].append(appended_channel)
 
     return listall_return
 
