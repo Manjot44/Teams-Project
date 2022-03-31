@@ -257,7 +257,7 @@ def dm_leave_v1(token, dm_id):
         owner_index += 1
     # Removing leaver from member lists
     if valid_owner == True:
-        store['dms'][dm_index]['owner_members'].remove(store['dms'][dm_index]['all_members'][owner_index])
+        store['dms'][dm_index]['owner_members'].remove(store['dms'][dm_index]['owner_members'][owner_index])
     store['dms'][dm_index]['all_members'].remove(store['dms'][dm_index]['all_members'][member_index])
     return {}
 
@@ -362,9 +362,9 @@ def dm_messages_v1(token, dm_id, start):
     last_idx = len(total_message_list)
     if len(total_message_list[start:last_idx]) <= 50:
         messages['end'] = -1
-        messages['messages'].append(total_message_list[start:last_idx])
+        messages['messages'] = total_message_list[start:last_idx]
     else:
-        messages['messages'].append(total_message_list[start:start + 50])
+        messages['messages'] = total_message_list[start:start + 50]
 
     return messages
     

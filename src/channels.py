@@ -117,7 +117,7 @@ def channels_listall_v1(auth_user_id):
     '''
 
     # dictionary that is to be returned by function
-    listall = {
+    listall_return = {
         'channels': []
     }
 
@@ -126,12 +126,18 @@ def channels_listall_v1(auth_user_id):
     # validate auth user id
     check_valid_id(auth_user_id, saved_data)
 
-    # copying channels to 'listall' dict from saved channel data
-    listall['channels'] = saved_data['channels']
-    if listall['channels'][0]['channel_id'] == None:
-        listall['channels'] = []
+    # returning channel data to listall_return from saved channel data
+    if saved_data['channels'][0]['channel_id'] == None:
+        listall_return['channels'] = []
+    else:
+        for channel in saved_data['channels']:
+            appended_channel = {
+                'channel_id': channel['channel_id'],
+                'name': channel['name']
+            }
+            listall_return['channels'].append(appended_channel)
 
-    return listall
+    return listall_return
 
 
 def channels_create_v1(auth_user_id, name, is_public):
