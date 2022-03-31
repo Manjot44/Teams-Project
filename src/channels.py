@@ -132,7 +132,7 @@ def channels_listall_v1(auth_user_id):
     else:
         for channel in saved_data['channels']:
             appended_channel = {
-                'channel_id': channel['channel_id'][],
+                'channel_id': channel['channel_id'],
                 'name': channel['name']
             }
             listall_return.append(appended_channel)
