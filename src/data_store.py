@@ -35,7 +35,7 @@ initial_object = {
             'handle_str': None,
             'password': None,
             'perm_id': None,
-            'valid_tokens': []
+            'valid_tokens': [],
         }
     ],
     'channels': [
@@ -62,15 +62,6 @@ initial_object = {
             ],
             'is_public': None,
         }
-    ],
-    'messages': [
-        {
-            'message_id': None,
-            'channel_id': None,
-            'u_id': None,
-            'message': None,
-            'time_sent': None,
-        },
     ],
     'dms': [
         {
@@ -101,7 +92,7 @@ initial_object = {
                     'message': None,
                     'time_sent': None,
                 },
-            ]
+            ],
         }
     ],
     'removed_users': [
@@ -112,8 +103,18 @@ initial_object = {
             'name_last': None,
             'handle_str': None,
         }
-    ]
+    ],
+    'messages': [
+        {
+            'message_id': None,
+            'channel_id': None,
+            'u_id': None,
+            'message': None,
+            'time_sent': None,
+        },
+    ],
 }
+
 # YOU SHOULD MODIFY THIS OBJECT ABOVE
 
 # YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH

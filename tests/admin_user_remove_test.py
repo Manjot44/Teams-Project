@@ -67,7 +67,7 @@ def test_invalid_uid(register_three_users):
 
     response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = {"token": register_three_users["token"][0], "u_id": register_three_users["id"][1] + 50})
 
-    assert response.status_code == 403
+    assert response.status_code == 400
 
 # Single global owner tries to remove themselves from Seams
 def test_only_global_owner(register_three_users):

@@ -77,4 +77,4 @@ def test_invalid_id_http(register_three_users):
     id2 = register_three_users["id"][1]
 
     response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = {"token" : token1, "u_id" : id2 + 5, "permission_id" : 1})
-    assert response.status_code == 403
+    assert response.status_code == 400

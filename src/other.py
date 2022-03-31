@@ -22,7 +22,7 @@ def clear_v1():
             'handle_str': None,
             'password': None,
             'perm_id': None,
-            'valid_tokens': []
+            'valid_tokens': [],
         }
     ]
     store['channels'] = [
@@ -79,7 +79,16 @@ def clear_v1():
                     'message': None,
                     'time_sent': None,
                 },
-            ]
+            ],
+        }
+    ]
+    store['removed_users'] = [
+        {
+            'u_id': None,
+            'email': None,
+            'name_first': None,
+            'name_last': None,
+            'handle_str': None,
         }
     ]
     store['messages'] = [
@@ -90,15 +99,6 @@ def clear_v1():
             'message': None,
             'time_sent': None,
         },
-    ],
-    store['removed_users'] = [
-        {
-            'u_id': None,
-            'email': None,
-            'name_first': None,
-            'name_last': None,
-            'handle_str': None,
-        }
     ]
-    
+
     data_store.set(store)

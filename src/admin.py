@@ -28,11 +28,12 @@ def admin_userpermission_change(token, u_id, permission_id):
 
     auth_user = check_valid_token(token, store)
     has_auth_user = False
-    for auth_user in store["users"]:
-        if auth_user["u_id"] == u_id and u_id != None:
+    for user in store["users"]:
+        if user["u_id"] == u_id and u_id != None:
             has_auth_user = True
     if has_auth_user == False:
         raise InputError(f"Error: {u_id} does not have a valid ID")
+    
     check_valid_id(auth_user, store)
 
     if permission_id < 1 or permission_id > 2:
@@ -87,12 +88,14 @@ def admin_user_remove(token, u_id):
     store = data_store.get()
 
     auth_user = check_valid_token(token, store)
+    
     has_auth_user = False
-    for auth_user in store["users"]:
-        if auth_user["u_id"] == u_id and u_id != None:
+    for user in store["users"]:
+        if user["u_id"] == u_id and u_id != None:
             has_auth_user = True
     if has_auth_user == False:
         raise InputError(f"Error: {u_id} does not have a valid ID")
+    
     check_valid_id(auth_user, store)
 
     if store['users'][auth_user]['perm_id'] == 2:
@@ -103,11 +106,11 @@ def admin_user_remove(token, u_id):
     for user in store['users']:
         if user['perm_id'] == 1:
             global_count += 1
-            if user["u_id"] == True:
+            if user["u_id"] == u_id:
                 removing_only_global = True
     if global_count == 1 and removing_only_global == True:
         raise InputError(f"Error: Need to at least have one one global owner")
-    if store['remove_users'][0]['u_id'] == None:
+    if store['removed_users'][0]['u_id'] == None:
         store['removed_users'] = []
     add_removed_user = {
         'u_id': u_id,
