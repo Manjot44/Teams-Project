@@ -13,13 +13,16 @@ def user_profile_v1(token, u_id):
     
     u_id_check = store['users']
     for user in u_id_check:
-        if user['u_id'] == u_id:
-            valid_u_id = "valid_user"
+        if u_id != None: 
+            if user['u_id'] == u_id:
+                valid_u_id = "valid_user"
     
     removed_u_id_check = store['removed_users']
     for user in removed_u_id_check:
-        if user['u_id'] == u_id:
-            valid_u_id = "valid_removed_user"
+        if u_id != None: 
+            if user['u_id'] == u_id:
+                valid_u_id = "valid_removed_user"
+
     if valid_u_id == "invalid":
         raise InputError(f"u_id does not refer to a valid user")
 
@@ -37,7 +40,7 @@ def user_profile_v1(token, u_id):
                 user_info_dict['user']['name_first'] = user['name_first']
                 user_info_dict['user']['name_last'] = user['name_last']
                 user_info_dict['user']['handle_str'] = user['handle_str']
-            return user_info_dict
+                return user_info_dict
     elif valid_u_id == "valid_removed_user":
         for user in removed_user_info:
             if user['u_id'] == u_id:  
@@ -46,7 +49,7 @@ def user_profile_v1(token, u_id):
                 user_info_dict['user']['name_first'] = user['name_first']
                 user_info_dict['user']['name_last'] = user['name_last']
                 user_info_dict['user']['handle_str'] = user['handle_str']
-            return user_info_dict
+                return user_info_dict
 
 def user_profile_setname_v1(token, name_first, name_last):
     store = data_store.get()
@@ -69,10 +72,13 @@ def user_profile_setname_v1(token, name_first, name_last):
 def user_profile_setemail_v1(token, email):
     store = data_store.get()
 
+    u_id = check_valid_token(token, store)
+
     user_info = store['users']
     for user in user_info:
-        if user['email'] == email:
-            raise InputError(f"email address is already being used by another user")
+        if user['u_id'] != u_id:
+            if user['email'] == email:
+                raise InputError(f"email address is already being used by another user")
 
     valid_email = True
     regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
@@ -80,8 +86,6 @@ def user_profile_setemail_v1(token, email):
         valid_email = False
     if valid_email == False:
         raise InputError(f"email entered is not a valid email ")
-
-    u_id = check_valid_token(token, store)
     
     user_info = store['users']
     for user in user_info:
@@ -99,12 +103,12 @@ def user_profile_sethandle_v1(token, handle_str):
     if not handle_str.isalnum():
         raise InputError(f"handle_str contains characters that are not alphanumeric")
 
+    u_id = check_valid_token(token, store)
     user_info = store['users']
     for user in user_info:
-        if user['handle_str'] == handle_str:
-            raise InputError(f"the handle is already used by another user")
-    
-    u_id = check_valid_token(token, store) 
+        if user['u_id'] != u_id:
+            if user['handle_str'] == handle_str:
+                raise InputError(f"the handle is already used by another user")
 
     user_info = store['users']
     for user in user_info:
