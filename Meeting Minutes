@@ -1,4 +1,3 @@
-(these are also located in the project wiki)
 \\Meeting 1 Minutes//
 1/03/22 10pm
 
@@ -74,5 +73,20 @@ Attendees: All group members
 The purpose of this meeting was to ensure all functions were outputing correctly and all the pipelines were passing, and we plan on submitting soon.
 
 Our next meeting time will be next week, and will be to review any feedback and look over iteration 3 if it has been released
+
+\\Meeting 8 Minutes//
+2/04/22 10pm
+
+Attendees: All group members
+
+The purpose of this meeting was to go over the feedback from iteration 2. Most of the time the focus was on editing datastore to ensure that function style could be streamlined. On top of this, we also assigned functions to each person, although for now it is rudimentary:
+Jerry: message_sendlater, message_sendlaterdm, message_share
+Manjot: notifications, search, auth_passwordreset_requests, auth_passwordreset_reset
+Ashwin: message_react, message_unreact, message_pin, message_unpin
+Iqtidar: standup_start, standup_active, standup_send
+Sanjam: user_profile_uploadphoto, user_stats, users_stats
+
+Our next meeting time will be in a weeks time on 26/03/33. The goals we hope to achieve by this time is for everyone to have finished their new 
+functions.
 
 
