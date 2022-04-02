@@ -85,9 +85,9 @@ def clear_v1():
             'time_sent': None,
         },
     }
-    store['u_id'] = None
-    store['channel_id'] = None
-    store['dm_id'] = None
-    store['message_id'] = None
+    store['u_id'] = -1
+    store['channel_id'] = -1
+    store['dm_id'] = -1
+    store['message_id'] = -1
 
     data_store.set(store)
