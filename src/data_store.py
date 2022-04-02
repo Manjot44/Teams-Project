@@ -98,6 +98,10 @@ initial_object = {
             'time_sent': None,
         },
     },
+    'u_id': None,
+    'channel_id': None,
+    'dm_id': None,
+    'message_id': None,
 }
 
 # YOU SHOULD MODIFY THIS OBJECT ABOVE
