@@ -83,6 +83,7 @@ def channel_addowner_v1(token, channel_id, u_id):
         if owner["u_id"] == u_id:
             raise InputError(f"Error: {u_id} is already an owner of the channel")
     
+    src.error_help.user_not_in_channel(store, auth_user_id, channel_id)
     is_owner = False
     for owner in store["channels"][channel_id]["owner_members"]:
         if owner["u_id"] == auth_user_id:
@@ -140,6 +141,7 @@ def channel_removeowner_v1(token, channel_id, u_id):
 
     is_auth_owner = False
     is_uid_owner = False
+    src.error_help.user_not_in_channel(store, auth_user_id, channel_id)
     for idx, owner in enumerate(store["channels"][channel_id]["owner_members"]):
         if owner["u_id"] == auth_user_id:
             is_auth_owner = True

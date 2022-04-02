@@ -207,7 +207,7 @@ def message_senddm_v1(token, dm_id, message):
     
     dm_message_id = -1
     for dms in store["dms"]:
-        if (dms["messages"] != []) and (dms["messages"][-1]["message_id"] > dm_message_id):
+        if (dms["messages"]) and (dms["messages"][-1]["message_id"] > dm_message_id):
             dm_message_id = dms['messages'][-1]["message_id"]
     
     if dm_message_id > channel_mess_id:
@@ -226,7 +226,8 @@ def message_senddm_v1(token, dm_id, message):
         "message": message,
         "time_sent": int(unix_timestamp),
     }
-
+    print(new_message)
+    print(store['dms'])
 
     store['dms'][dm_index]['messages'].append(new_message)
     data_store.set(store)
