@@ -62,7 +62,6 @@ def clear_v1():
     }
     store['removed_users'] = {None:
         {
-            'u_id': None,
             'email': None,
             'name_first': None,
             'name_last': None,

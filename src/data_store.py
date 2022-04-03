@@ -75,7 +75,6 @@ initial_object = {
     },
     'removed_users': {None:
         {
-            'u_id': None,
             'email': None,
             'name_first': None,
             'name_last': None,
