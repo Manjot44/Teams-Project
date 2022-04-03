@@ -6,6 +6,8 @@ import jwt
 import src.error_help
 
 SECRET = 'jroilin'
+OWNER = 1
+MEMBER = 2
 
 def auth_login_v1(email, password):
     '''Given a registered user's email and password, returns their 'auth_user_id' value and a new 'token'.
@@ -27,25 +29,26 @@ def auth_login_v1(email, password):
     
     
     valid_email = False
-    for user in store["users"]:
-        if user["email"] == email and email != None:
+    u_id = 0
+    for user in store["users"].items():
+        if user[1]["email"] == email and email != None:
             valid_email = True
-            if user["password"] != hashlib.sha256(password.encode()).hexdigest():
-                raise InputError(f"Error: password is incorrect")
-            else:
-                id = user["u_id"]
-                session_id = len(user["valid_tokens"])
-                encoded_jwt = jwt.encode({'handle_str': user["handle_str"], "session_id": session_id}, SECRET, algorithm='HS256')
-                user["valid_tokens"].append(encoded_jwt)
-            break
-
+            u_id = user[0]
     if valid_email == False:
         raise InputError(f"Error: email does not belong to a user")
+    
+    user =  store["users"][u_id]
+    if user["password"] != hashlib.sha256(password.encode()).hexdigest():
+        raise InputError(f"Error: password is incorrect")
+    
+    session_id = len(user["valid_tokens"])
+    encoded_jwt = jwt.encode({'handle_str': user["handle_str"], "session_id": session_id}, SECRET, algorithm='HS256')
+    user["valid_tokens"].append(encoded_jwt)
     
     data_store.set(store)
 
     return {
-        "auth_user_id": id,
+        "auth_user_id": u_id,
         "token": encoded_jwt,
     }
 
@@ -74,7 +77,7 @@ def generate_handle(name_first, name_last):
     handle = alpha_nfirst[:20]
 
     same_handle = -1
-    for user in store["users"]:
+    for user in store["users"].values():
         if user["handle_str"] == handle:
             same_handle += 1
             if same_handle == 0:
@@ -114,7 +117,7 @@ def auth_register_v1(email, password, name_first, name_last):
     if not (re.search(regex, email)):
         raise InputError(f"Error: email entered is not valid")
 
-    for user in store["users"]:
+    for user in store["users"].values():
         if user["email"] == email:
             raise InputError(f"Error: email address is already being used by another user")
 
@@ -129,17 +132,12 @@ def auth_register_v1(email, password, name_first, name_last):
 
     handle = generate_handle(name_first, name_last)
     
-    id = store["users"][-1]["u_id"]
-    if id == None:
-        store["users"] = []
-        id = 0
-    else:
-        id += 1
-    
-    perm_id = 2
+    store["u_id"] += 1
+    id = store["u_id"]  
+    perm_id = MEMBER
     if id == 0:
-        perm_id = 1
-    encoded_jwt = jwt.encode({'handle_str': handle, "session_id": 0}, SECRET, algorithm='HS256')
+        perm_id = OWNER
+    encoded_jwt = jwt.encode({'handle_str': handle, 'session_id': 0}, SECRET, algorithm='HS256')
 
     new_user = {
         "email": email,
@@ -147,12 +145,15 @@ def auth_register_v1(email, password, name_first, name_last):
         "name_first": name_first,
         "name_last": name_last,
         "handle_str": handle,
-        "u_id": id,
         "perm_id": perm_id,
         "valid_tokens": [encoded_jwt],
     }
 
-    store["users"].append(new_user)
+    for user in store["users"].values():
+        if user["email"] == None:
+            store["users"] = {}
+    store["users"][id] = new_user
+    
     data_store.set(store)
 
     return {
