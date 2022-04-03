@@ -35,36 +35,21 @@ def message_send_v1(token, channel_id, message):
         raise InputError(f"Error: length of message is less than 1 or over 1000 characters")
     src.error_help.user_not_in_channel(store, auth_user_id, channel_id)
 
-    channel_mess_id = store["messages"][-1]["message_id"]
-    if channel_mess_id == None:
-        store["messages"] = []
-        channel_mess_id = -1
-    
-    dm_message_id = -1
-    for dms in store["dms"]:
-        if (dms["messages"][-1]["message_id"] != None) and (dms["messages"][-1]["message_id"] > dm_message_id):
-            dm_message_id = dms['messages'][-1]["message_id"]
-    
-    if dm_message_id > channel_mess_id:
-        id = dm_message_id + 1
-    else:
-        id = channel_mess_id + 1
+    store["message_id"] += 1
+    id = store["message_id"]
 
-    
     current_time = datetime.datetime.now(datetime.timezone.utc)
     utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
     unix_timestamp = utc_time.timestamp()
 
     new_message = {
-        "message_id": id,
         "u_id": auth_user_id,
         "message": message,
         "time_sent": int(unix_timestamp),
         "channel_id": channel_id,
     }
-
-
-    store["messages"].append(new_message)
+    store["messages"][id] = new_message
+    
     data_store.set(store)
 
     return {

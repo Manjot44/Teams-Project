@@ -2,6 +2,8 @@ from src.data_store import data_store
 import src.error_help
 from src.error import InputError, AccessError
 
+MEMBER = 2
+
 def channel_leave_v1(token, channel_id):
     '''Given a channel with ID channel_id that the authorised user is a member of, remove them as a member of the channel
 
@@ -25,13 +27,9 @@ def channel_leave_v1(token, channel_id):
     src.error_help.validate_channel(store, channel_id)
     src.error_help.user_not_in_channel(store, auth_user_id, channel_id)    
     
-    for idx, member in enumerate(store["channels"][channel_id]["all_members"]):
-        if member["u_id"] == auth_user_id:
-            store["channels"][channel_id]["all_members"].pop(idx)
-    
-    for idx, member in enumerate(store["channels"][channel_id]["owner_members"]):
-        if member["u_id"] == auth_user_id:
-            store["channels"][channel_id]["owner_members"].pop(idx)
+    store["channels"][channel_id]["all_members"].pop(auth_user_id)
+    if auth_user_id in store["channels"][channel_id]["owner_members"].keys():
+        store["channels"][channel_id]["owner_members"].pop(auth_user_id)
     
     data_store.set(store)
     return {
@@ -62,44 +60,19 @@ def channel_addowner_v1(token, channel_id, u_id):
     
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.validate_channel(store, channel_id)
-    
-    has_auth_user = False
-    for auth_user in store["users"]:
-        if auth_user["u_id"] == u_id and u_id != None:
-            has_auth_user = True
-    if has_auth_user == False:
-        raise InputError(f"Error: {u_id} does not have a valid ID")
-    
-    in_channel = False
-    check_user = store["channels"][channel_id]["all_members"]
-    for check in check_user:
-        if check['u_id'] == u_id and u_id != None:
-            in_channel = True
-            break
-    if in_channel == False:
-        raise InputError(f"Error: {u_id} not in specific channel")
-
-    for owner in store["channels"][channel_id]["owner_members"]:
-        if owner["u_id"] == u_id:
-            raise InputError(f"Error: {u_id} is already an owner of the channel")
-    
-    src.error_help.user_not_in_channel(store, auth_user_id, channel_id)
-    is_owner = False
-    for owner in store["channels"][channel_id]["owner_members"]:
-        if owner["u_id"] == auth_user_id:
-            is_owner = True
-    if is_owner == False:
-        if store["users"][auth_user_id]["perm_id"] == 2:
-            raise AccessError(f"Error: channel_id is valid and the authorised user does not have owner permissions in the channel")
+    src.error_help.check_valid_id(u_id, store)
+    src.error_help.user_not_in_channel(store, u_id, channel_id)
+    if u_id in store["channels"][channel_id]["owner_members"].keys():
+        raise InputError(f"Error: {u_id} is already an owner of the channel")
+    src.error_help.auth_channel_owner_perm(store, auth_user_id, channel_id)
 
     add_user_info = {
-        'u_id': store['users'][u_id]['u_id'],
         'email': store['users'][u_id]['email'],
         'name_first': store['users'][u_id]['name_first'],
         'name_last': store['users'][u_id]['name_last'],
         'handle_str': store['users'][u_id]['handle_str'],
     }
-    store["channels"][channel_id]["owner_members"].append(add_user_info)
+    store["channels"][channel_id]["owner_members"][u_id] = add_user_info
 
     data_store.set(store)
 
@@ -131,35 +104,14 @@ def channel_removeowner_v1(token, channel_id, u_id):
 
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.validate_channel(store, channel_id)
-    
-    has_auth_user = False
-    for auth_user in store["users"]:
-        if auth_user["u_id"] == u_id and u_id != None:
-            has_auth_user = True
-    if has_auth_user == False:
-        raise InputError(f"Error: {u_id} does not have a valid ID")
-
-    is_auth_owner = False
-    is_uid_owner = False
-    src.error_help.user_not_in_channel(store, auth_user_id, channel_id)
-    for idx, owner in enumerate(store["channels"][channel_id]["owner_members"]):
-        if owner["u_id"] == auth_user_id:
-            is_auth_owner = True
-        if owner["u_id"] == u_id:
-            is_uid_owner = True
-            which_owner = idx
-    
-    if is_uid_owner == False:
-        raise InputError(f"Error: u_id refers to a user who is not an owner of the channel")
-
+    src.error_help.check_valid_id(u_id, store)
+    if u_id not in store["channels"][channel_id]["owner_members"].keys():
+        raise InputError(f"Error: {u_id} refers to a user who is not an owner of the channel")
     if len(store["channels"][channel_id]["owner_members"]) == 1:
-        raise InputError(f"u_id refers to a user who is currently the only owner of the channel")
-
-    if is_auth_owner == False:
-        if store["users"][auth_user_id]["perm_id"] == 2:
-            raise AccessError(f"Error: channel_id is valid and the authorised user does not have owner permissions in the channel")
+        raise InputError(f"Error: {u_id} refers to a user who is currently the only owner of the channel")
+    src.error_help.auth_channel_owner_perm(store, auth_user_id, channel_id)
     
-    store["channels"][channel_id]["owner_members"].pop(which_owner)
+    store["channels"][channel_id]["owner_members"].pop(u_id)
 
     data_store.set(store)
 
