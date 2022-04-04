@@ -167,34 +167,29 @@ def channels_create_v1(auth_user_id, name, is_public):
     if namelen < 1 or namelen > 20:
         raise InputError(f"Name must be between 1 and 20 characters long")
 
-    which_user = check_valid_id(auth_user_id, store)
+    check_valid_id(auth_user_id, store)
 
-    # Creates and adds the new channel to the channels list
-    if store["channels"][0]["channel_id"] == None:
-        store["channels"] = []
-    channel_id = len(store["channels"])
-    nc = {}
-    nc["channel_id"] = channel_id
-    store["channels"].append(nc)
-
-    # Assigning variable to newly created channel
-    current_channel = store["channels"][channel_id]
-
-    # Assigning user inputs
-    current_channel["channel_id"] = channel_id
-    current_channel["name"] = name
-    current_channel["is_public"] = is_public
+    # Creates channel id
+    store["channel_id"] += 1
+    channel_id = store["channel_id"]
 
     add_user = {
-        'u_id': store['users'][which_user]['u_id'],
-        'email': store['users'][which_user]['email'],
-        'name_first': store['users'][which_user]['name_first'],
-        'name_last': store['users'][which_user]['name_last'],
-        'handle_str': store['users'][which_user]['handle_str'],
+        'email': store['users'][auth_user_id]['email'],
+        'name_first': store['users'][auth_user_id]['name_first'],
+        'name_last': store['users'][auth_user_id]['name_last'],
+        'handle_str': store['users'][auth_user_id]['handle_str'],
     }
 
-    current_channel["all_members"] = [add_user]
-    current_channel["owner_members"] = [add_user]
+    for channel in store["channels"].values():
+        if channel["name"] == None:
+            store["channels"] = {}
+
+    # Assigning user inputs
+    current_channel = store["channels"][channel_id]
+    current_channel["name"] = name
+    current_channel["owner_members"][0] = add_user
+    current_channel["all_members"][0] = add_user
+    current_channel["is_public"] = is_public
 
     # Saving to datastore
     data_store.set(store)
