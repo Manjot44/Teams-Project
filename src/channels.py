@@ -180,11 +180,12 @@ def channels_create_v1(auth_user_id, name, is_public):
         'handle_str': store['users'][auth_user_id]['handle_str'],
     }
 
-    # for channel in store["channels"].values():
-    #     if channel == None:
-    store["channels"] = {
-        channel_id: {}
-    }
+    for channel in store["channels"].values():
+        if channel["email"] == None:
+            store["channels"] = {
+                channel_id: {}
+            }
+            break
 
     # Assigning user inputs
     current_channel = store["channels"][channel_id]
