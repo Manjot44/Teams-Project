@@ -173,7 +173,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     store["channel_id"] += 1
     channel_id = store["channel_id"]
 
-    add_user = {k: store['users'][auth_user_id] for k in ('email', 'name_first', 'name_last', 'handle_str')}
+    add_user = {k: store['users'][auth_user_id][k] for k in ('email', 'name_first', 'name_last', 'handle_str')}
 
     for channel in store["channels"].values():
         if channel["email"] == None:
