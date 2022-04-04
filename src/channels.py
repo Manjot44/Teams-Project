@@ -140,18 +140,18 @@ def channels_listall_v1(auth_user_id):
     return listall_return
 
 
-def channels_create_v1(auth_user_id, name, is_public):
+def channels_create_v1(token, name, is_public):
     '''Creates a new channel with the given name that is either a public or private channel. 
     The user who created it automatically joins the channel.
 
     Arguments:
-        auth_user_id (int) - user authentication id number
+        token (str) - user authentication token
 
     Exceptions:
         InputError - Occurs when:
             length of name is less than 1 or more than 20 characters
         AccessError - Occurs when:
-            auth_user_id passed in is not valid
+            Token passed in is not valid
 
     Return Value:
         Returns {
@@ -159,17 +159,14 @@ def channels_create_v1(auth_user_id, name, is_public):
         }
     '''
 
-    # Getting Data from data storage file
     store = data_store.get()
 
-    # Assessing for exception
     namelen = len(name)
     if namelen < 1 or namelen > 20:
         raise InputError(f"Name must be between 1 and 20 characters long")
 
-    check_valid_id(auth_user_id, store)
+    auth_user_id = check_valid_token(token, store)
 
-    # Creates channel id
     store["channel_id"] += 1
     channel_id = store["channel_id"]
 
@@ -182,14 +179,12 @@ def channels_create_v1(auth_user_id, name, is_public):
             }
             break
 
-    # Assigning user inputs
     current_channel = store["channels"][channel_id]
     current_channel["name"] = name
-    current_channel["owner_members"][0] = add_user
-    current_channel["all_members"][0] = add_user
+    current_channel["owner_members"][auth_user_id] = add_user
+    current_channel["all_members"][auth_user_id] = add_user
     current_channel["is_public"] = is_public
 
-    # Saving to datastore
     data_store.set(store)
 
     return {
