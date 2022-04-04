@@ -166,7 +166,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     namelen = len(name)
     if namelen < 1 or namelen > 20:
         raise InputError(f"Name must be between 1 and 20 characters long")
-
+    auth_user_id = 0
     check_valid_id(auth_user_id, store)
 
     # Creates channel id
