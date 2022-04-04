@@ -63,7 +63,7 @@ def test_normal_dualchannel(user_init):
     response2 = requests.post(f"{BASE_URL}/channels/create/v2", json=input2)
     assert response2.status_code == 200
     response_data2 = response2.json()
-    assert response_data2["channel_id"] == 1
+    assert response_data2["channel_id"] == 0
 
 
 def test_invalid_token():
