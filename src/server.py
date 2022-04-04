@@ -173,17 +173,16 @@ def handle_message_senddm():
 @APP.route("/channels/create/v2", methods=['POST'])
 def handle_channels_create():
     request_data = request.get_json()
-    store = data_store.data_store.get()
-    auth_user_id = error_help.check_valid_token(
-        request_data.get("token", None), store)
     name = request_data.get("name", None)
     if name != None:
         str(name)
     is_public = request_data.get("is_public")
     if isinstance(is_public, bool) == False:
         is_public = None
-
-    return dumps(channels.channels_create_v1(auth_user_id, name, is_public))
+    token = request_data.get("token", None)
+    if token != None:
+        str(token)
+    return dumps(channels.channels_create_v1(token, name, is_public))
 
 
 @APP.route("/dm/remove/v1", methods=['DELETE'])
