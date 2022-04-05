@@ -182,12 +182,10 @@ def handle_channels_create():
 @APP.route("/dm/remove/v1", methods=['DELETE'])
 def handle_dm_delete():
     request_data = request.get_json()
-    store = data_store.data_store.get()
-    auth_user_id = error_help.check_valid_token(
-        request_data.get("token", None), store)
+    token = str(request_data.get("token", None))
     dm_id = request_data.get("dm_id", None)
     dm_id = return_int_helper(dm_id)
-    dm.dm_remove_v1(auth_user_id, dm_id)
+    dm.dm_remove_v1(token, dm_id)
     
     return dumps({})
 
@@ -195,11 +193,7 @@ def handle_dm_delete():
 @APP.route("/channels/list/v2", methods=['GET'])
 def handle_channels_list():
     token = str(request.args.get('token'))
-    store = data_store.data_store.get()
-    auth_user_id = store["users"][error_help.check_valid_token(
-        token, store)]["u_id"]
-
-    return dumps(channels.channels_list_v1(auth_user_id))
+    return dumps(channels.channels_list_v1(token))
 
 @APP.route("/channel/messages/v2", methods=['GET'])
 def handle_channel_messages():
@@ -222,11 +216,7 @@ def handle_channel_messages():
 @APP.route("/dm/list/v1", methods=['GET'])
 def handle_dms_list():
     token = str(request.args.get('token'))
-    store = data_store.data_store.get()
-    u_id = store["users"][error_help.check_valid_token(
-        token, store)]["u_id"]
-
-    return dumps(dm.dm_list_v1(u_id))
+    return dumps(dm.dm_list_v1(token))
 
 
 @APP.route("/dm/details/v1", methods=['GET'])
@@ -234,11 +224,7 @@ def handle_dms_details():
     token = str(request.args.get('token'))
     dm_id = request.args.get('dm_id')
     dm_id = return_int_helper(dm_id)
-    store = data_store.data_store.get()
-    u_id = store["users"][error_help.check_valid_token(
-        token, store)]["u_id"]
-
-    return dumps(dm.dm_details_v1(u_id, dm_id))
+    return dumps(dm.dm_details_v1(token, dm_id))
 
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages():

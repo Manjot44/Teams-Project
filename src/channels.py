@@ -1,10 +1,9 @@
-from distutils.command.build_scripts import first_line_re
 from src.error import InputError, AccessError
 from src.data_store import data_store
 from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel, check_valid_token
 
 
-def channels_list_v1(auth_user_id):
+def channels_list_v1(token):
     '''Provide a list of all channels (and their associated details) that the authorised user is part of.
 
     Arguments:
@@ -15,57 +14,20 @@ def channels_list_v1(auth_user_id):
             auth_user_id passed in is not valid
 
     Return Value:
-        Returns {
-            'channel_id': channel_id (int),
-            'name': channel_name (str),
-            'owner_members': [
-                {
-                    'u_id': id (int),
-                    'email': email (str),
-                    'name_first': name_first (str),
-                    'name_last': name_last (str),
-                    'handle_str': handle (str),
-                }
-            ],
-            'all_members': [
-                {
-                    'u_id': id (int),
-                    'email': email (str),
-                    'name_first': name_first (str),
-                    'name_last': name_last (str),
-                    'handle_str': handle (str),
-                }
-            ],
-            'is_public': public (bool),
-            'messages': [
-                {
-                    'message_id': message_id (int),
-                    'u_id': u_id (int),
-                    'message': message (str),
-                    'time_sent': time (int),
-                },
-            ]
-        }
+        (dict): returns a dictionary with the list of channels the user is a part of, displayed as channel_id and name 
     '''
 
-    # Getting Data from data storage file
     store = data_store.get()
 
-    # Assessing for Access Error
-    check_valid_id(auth_user_id, store)
+    auth_user_id = check_valid_token(token, store)
 
-    # Creating empty list for the channels the user is part of
     channels_list = []
 
-    # Looping through all channels and adding the channels that the user is part of to "channels_list"
-    for channel in store["channels"]:
-        for member in channel["all_members"]:
-            if auth_user_id == member["u_id"]:
-                name = channel["name"]
-                channel_id = channel["channel_id"]
-                channels_list.append({
-                    'channel_id': channel_id,
-                    'name': name
+    for channel in store["channels"].items():
+        if auth_user_id in channel[1]["all_members"]:
+            channels_list.append({
+                    'channel_id': channel[0],
+                    'name': channel[1]["name"]
                 })
 
     return {
@@ -151,10 +113,9 @@ def channels_create_v1(token, name, is_public):
         AccessError - Occurs when:
             Token passed in is not valid
 
-    Return Value:
-        Returns {
-            'channel_id': channel_id,
-        }
+    Return Value: 
+        (dict): returns a dictionary with the newly created channel_id 
+
     '''
 
     store = data_store.get()
@@ -170,18 +131,20 @@ def channels_create_v1(token, name, is_public):
 
     add_user = {k: store['users'][auth_user_id][k] for k in ('email', 'name_first', 'name_last', 'handle_str')}
 
-    for channel in store["channels"].values():
-        if channel["email"] == None:
-            store["channels"] = {
-                channel_id: {}
+    if None in store["channels"].keys():
+        store["channels"] = {
             }
-            break
 
-    current_channel = store["channels"][channel_id]
-    current_channel["name"] = name
-    current_channel["owner_members"][auth_user_id] = add_user
-    current_channel["all_members"][auth_user_id] = add_user
-    current_channel["is_public"] = is_public
+    store["channels"][channel_id] = {
+        "name": name,
+        "owner_members": {
+            auth_user_id: add_user
+        },
+        "all_members": {
+            auth_user_id: add_user
+        },
+        "is_public": is_public
+    }
 
     data_store.set(store)
 
