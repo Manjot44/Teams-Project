@@ -149,8 +149,8 @@ def auth_register_v1(email, password, name_first, name_last):
         "valid_tokens": [encoded_jwt],
     }
 
-    user = list(store["users"].values())
-    if user[0]["email"] == None:
+    user = list(store["users"].keys())
+    if user[0] == None:
         store["users"] = {}
     store["users"][id] = new_user
     

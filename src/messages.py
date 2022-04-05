@@ -48,7 +48,11 @@ def message_send_v1(token, channel_id, message):
         "time_sent": int(unix_timestamp),
         "channel_id": channel_id,
     }
-    store["messages"][id] = new_message
+
+    messages = list(store["channel_messages"].keys())
+    if messages[0] == None:
+        store["channel_messages"] = {}
+    store["channel_messages"][id] = new_message
     
     data_store.set(store)
 
