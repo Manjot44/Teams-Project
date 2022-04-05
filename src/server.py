@@ -95,11 +95,8 @@ def channel_details():
     token = str(request.args.get('token', None))
     channel_id = request.args.get('channel_id', None)
     channel_id = return_int_helper(channel_id)
-
-    data = data_store.data_store.get()
-    u_id = check_valid_token(token, data)
     
-    return dumps(channel.channel_details_v1(u_id, channel_id))
+    return dumps(channel.channel_details_v1(token, channel_id))
 
 @APP.route("/channel/addowner/v1", methods=['POST'])
 def handle_channel_addowner():

@@ -15,11 +15,11 @@ def check_valid_token(token, data):
     return u_id
 
 def check_valid_id(u_id, data):
-    if u_id not in data["users"].keys() and u_id != None:
+    if u_id not in data["users"].keys() or u_id == None:
         raise InputError(f"Error: {u_id} does not have a valid ID")
 
 def validate_channel(data, channel_id):
-    if channel_id not in data["channels"].keys and channel_id != None:
+    if channel_id not in data["channels"].keys or channel_id == None:
         raise InputError(f"Error: {channel_id} not valid")
 
 def check_channel_priv(data, channel_id, which_auth):
@@ -33,12 +33,12 @@ def check_channel_user(data, u_id, channel_id):
 
 def auth_user_not_in_channel(data, auth_user_id, channel_id):
     users = data["channels"][channel_id]["all_members"]
-    if auth_user_id not in users.keys() and auth_user_id != None:
+    if auth_user_id not in users.keys() or auth_user_id == None:
         raise AccessError(f"Error: {auth_user_id} not in specific channel")
 
 def user_not_in_channel(data, u_id, channel_id):
     users = data["channels"][channel_id]["all_members"]
-    if u_id not in users.keys() and u_id != None:
+    if u_id not in users.keys() or u_id == None:
         raise InputError(f"Error: {u_id} not in specific channel")
 
 def auth_channel_owner_perm(data, auth_user_id, channel_id):

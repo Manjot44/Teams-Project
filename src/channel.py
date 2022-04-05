@@ -1,6 +1,6 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
-from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel
+from src.error_help import check_valid_token, check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel, auth_user_not_in_channel
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''Invites a user with ID u_id to join a channel with ID channel_id. 
@@ -57,7 +57,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
     }
 
-def channel_details_v1(auth_user_id, channel_id):
+def channel_details_v1(token, channel_id):
     '''Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
 
     Arguments:
@@ -103,20 +103,17 @@ def channel_details_v1(auth_user_id, channel_id):
         'owner_members': [],
         'all_members': [],
     }
-
     saved_data = data_store.get()
-    check_valid_id(auth_user_id, saved_data)
+    u_id = check_valid_token(token, saved_data)
+    check_valid_id(u_id, saved_data)
     validate_channel(saved_data, channel_id)
-
-    # validate user is member of channel
-    user_not_in_channel(saved_data, auth_user_id, channel_id)
+    auth_user_not_in_channel(saved_data, u_id, channel_id)
 
     # configuring 'name' key
     details['name'] = saved_data['channels'][channel_id]['name']
     
     # configuring 'is_public' key
-    public = saved_data['channels'][channel_id]['is_public']
-    details['is_public'] = public
+    details['is_public'] = saved_data['channels'][channel_id]['is_public']
 
     # configuring 'owner_members' key
     details['owner_members'] = saved_data['channels'][channel_id]['owner_members']
