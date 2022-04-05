@@ -111,26 +111,35 @@ def test_normal(user_init):
     auth_response2 = requests.post(
         f"{BASE_URL}/auth/register/v2", json=user2)
     token1 = auth_response1.json()["token"]
+    token2 = auth_response2.json()["token"]
+    u_id1 = auth_response1.json()["auth_user_id"]
     u_id2 = auth_response2.json()["auth_user_id"]
 
     dm_create_input = {
         "token": token1,
         "u_ids": [u_id2]
     }
+    dm_create_input2 = {
+        "token": token2,
+        "u_ids": [u_id1]
+    }
     dm_create_data = requests.post(
         f"{BASE_URL}/dm/create/v1", json=dm_create_input)
     assert dm_create_data.json()["dm_id"] == 0
     dm_create_data1 = requests.post(
-        f"{BASE_URL}/dm/create/v1", json=dm_create_input)
+        f"{BASE_URL}/dm/create/v1", json=dm_create_input2)
     assert dm_create_data1.json()["dm_id"] == 1
-
-    input1 = {
-        "token": token1,
-        "dm_id": 1
-    }
-    response = requests.delete(f"{BASE_URL}/dm/remove/v1", json=input1)
-    assert response.status_code == 200
-    # Testing that the new dm id is the same as the last one, as the dm had been deleted
     dm_create_data2 = requests.post(
         f"{BASE_URL}/dm/create/v1", json=dm_create_input)
-    assert dm_create_data2.json()["dm_id"] == 1
+    assert dm_create_data2.json()["dm_id"] == 2
+    rem_input = {
+        "token": token1,
+        "dm_id": 0
+    }
+    response = requests.delete(f"{BASE_URL}/dm/remove/v1", json=rem_input)
+    assert response.status_code == 200
+    dm_list_response = requests.get(
+        f"{BASE_URL}/dm/list/v1", params={"token": token1})
+    dm_list_data = dm_list_response.json()
+    assert dm_list_data["dms"][0]["dm_id"] == 1
+    assert dm_list_data["dms"][1]["dm_id"] == 2

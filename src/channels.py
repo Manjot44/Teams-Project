@@ -23,16 +23,6 @@ def channels_list_v1(token):
 
     channels_list = []
 
-    # for channel in store["channels"]:
-    #     for member in channel["all_members"]:
-    #         if auth_user_id == member["u_id"]:
-    #             name = channel["name"]
-    #             channel_id = channel["channel_id"]
-    #             channels_list.append({
-    #                 'channel_id': channel_id,
-    #                 'name': name
-    #             })
-
     for channel in store["channels"].items():
         if auth_user_id in channel[1]["all_members"]:
             channels_list.append({

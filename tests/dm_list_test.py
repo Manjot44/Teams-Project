@@ -54,5 +54,5 @@ def test_valid_list(user_init):
     response = requests.get(f"{BASE_URL}/dm/list/v1", params=input1)
     assert response.status_code == 200
     response_data = response.json()
-    assert response_data[0]["dm_id"] == 0
-    assert response_data[0]["name"] == "ashsur, jerrylin"
+    assert response_data["dms"][0]["dm_id"] == 0
+    assert response_data["dms"][0]["name"] == "ashsur, jerrylin"

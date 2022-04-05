@@ -20,69 +20,52 @@ def dm_create_v1(token, u_ids):
             token passed in is not valid
 
     Return Value:
-        Returns {
-            'dm_id': dm_id,
-        }
+        (dict): returns a dictionary with the newly created dm_id 
     '''
-    # Getting Data from data storage file
+
     store = data_store.get()
 
-    # Checking valid token and ids
     check_valid_token(token, store)
     if u_ids == []:
         raise InputError(f"Error: Enter a valid ID")
     for u_id in u_ids:
         check_valid_id(u_id, store)
 
-    # Checking for duplicates
     if(len(set(u_ids)) != len(u_ids)):
         raise InputError(f"Duplicate users in u_ids list")
 
-    # Assigning new dm details
-    if store["dms"][0]["dm_id"] == None:
-        store["dms"] = []
-        dm_id = 0
-    else:
-        dm_id = store["dms"][-1]["dm_id"] + 1
+    store["dm_id"] += 1
+    dm_id = store["dm_id"]
+
+    if None in store["dms"].keys():
+        store["dms"] = {
+            }
+
     user_handles = []
-    user_details_list = []
+    all_members = {}
 
-    # Append the creators handle and save owner info
-    for user in store["users"]:
-        for token_check in user["valid_tokens"]:
-            if(token_check == token):
-                user_handles.append(user["handle_str"])
-                owner_details = user
-                user_details_list.append(user)
+    for user in store["users"].items():
+        if token in user[1]["valid_tokens"]:
+            user_handles.append(user[1]["handle_str"])
+            add_owner = {k: user[1][k] for k in ('email', 'name_first', 'name_last', 'handle_str')}
+            add_owner["is_creator"] = True
+            all_members[user[0]] = add_owner
 
-    # Append all u_id handles and save user info
-    for u_id in u_ids:
-        for user in store["users"]:
-            if(user['u_id'] == u_id):
-                user_handles.append(user["handle_str"])
-                user_details_list.append(user)
+    for user in store["users"].items():
+        if u_id == user[0]:
+            user_handles.append(user[1]["handle_str"])
+            add_member = {k: user[1][k] for k in ('email', 'name_first', 'name_last', 'handle_str')}
+            add_member["is_creator"] = False
+            all_members[user[0]] = add_member
 
-    # Sort and join to create dm name
     alph_handle = sorted(user_handles)
     joined_name = ", ".join([str(item) for item in alph_handle])
 
-    # Creating new dm
-    new_dm = {
-        "dm_id": dm_id,
+    store["dms"][dm_id] = {
         "name": joined_name,
-        "owner_members": [owner_details],
-        "all_members": user_details_list,
-        "messages": [
-            {
-                'message_id': None,
-                'u_id': None,
-                'message': None,
-                'time_sent': None,
-            },
-        ]
+        "all_members": all_members
     }
-    # Saving to datastore
-    store["dms"].append(new_dm)
+
     data_store.set(store)
 
     return {
@@ -90,7 +73,7 @@ def dm_create_v1(token, u_ids):
     }
 
 
-def dm_list_v1(u_id):
+def dm_list_v1(token):
     '''Provide a list of all dms that the authorised user is part of.
 
     Arguments:
@@ -101,35 +84,30 @@ def dm_list_v1(u_id):
             token passed in is not valid
 
     Return Value:
-        Returns {
-            'dm_id': dm_id (int)
-            'namme': name (string)
-        }
+        Returns (dict): returns a dictionary which contains "dms", a list of dictionaries which each contain dm_id(int) and name(string)
     '''
 
-    # Getting Data from data storage file
     store = data_store.get()
-
     dm_list = []
+    u_id = check_valid_token(token, store)
 
-    for dm in store["dms"]:
-        for dm_user in dm["all_members"]:
-            if dm_user["u_id"] == u_id:
-                dm_list.append({
-                    'dm_id': dm['dm_id'],
-                    'name': dm['name']
-                })
+    for dm in store["dms"].items():
+        if u_id in dm[1]["all_members"]:
+            dm_list.append({
+                'dm_id': dm[0],
+                'name': dm[1]['name']
+            })
 
-    return dm_list
+    return {
+        "dms": dm_list
+    }
 
-
-
-def dm_remove_v1(u_id, dm_id):
+def dm_remove_v1(token, dm_id):
     '''Remove an existing DM, so all members are no longer in the DM. 
     This can only be done by the original creator of the DM.
 
     Arguments:
-        u_id (int) - user authentication int
+        token (str) - user authentication 
         dm_id (ints) - dm identification number
 
     Exceptions:
@@ -144,65 +122,36 @@ def dm_remove_v1(u_id, dm_id):
         Returns {}
     '''
 
-    # Getting Data from data storage file
     store = data_store.get()
-
-    valid_dm_id = False
-    for dm in store["dms"]:
-        if dm["dm_id"] == dm_id:
-            valid_dm_id = True
-    if valid_dm_id == False:
+    u_id = check_valid_token(token, store)
+    if dm_id not in store["dms"]:
         raise InputError(f"dm_id is not valid")
 
-    dm_member = False
-    for user in store["dms"][dm_id]["all_members"]:
-        if user["u_id"] == u_id:
-            dm_member = True
-    if dm_member == False:
+    if u_id not in store["dms"][dm_id]["all_members"]:
         raise AccessError(f"You are not part of this dm")
 
-    if u_id != store["dms"][dm_id]["owner_members"][0]["u_id"]:
+    if store["dms"][dm_id]["all_members"][u_id]["is_creator"] == False:
         raise AccessError(f"Only the original creator can remove a dm")
 
     if len(store["dms"]) == 1:
-        store['dms'] = [
-            {
-                'dm_id': None,
-                'name': None,
-                'owner_members': [
-                    {
-                        'u_id': None,
-                        'email': None,
-                        'name_first': None,
-                        'name_last': None,
-                        'handle_str': None,
-                    }
-                ],
-                'all_members': [
-                    {
-                        'u_id': None,
-                        'email': None,
-                        'name_first': None,
-                        'name_last': None,
-                        'handle_str': None,
-                    }
-                ],
-                'messages': [
-                    {
-                        'message_id': None,
-                        'u_id': None,
-                        'message': None,
-                        'time_sent': None,
-                    },
-                ]
-            }
-        ]
+        store['dms'] = {None:
+        {
+            'name': None,
+            'all_members': {None:
+                {
+                    'email': None,
+                    'name_first': None,
+                    'name_last': None,
+                    'handle_str': None,
+                    'is_creator': None,
+                }
+            }, 
+        }
+        },
     else:
-        del store["dms"][dm_id]
+        store["dms"].pop(dm_id)
 
-    # Saving to datastore
     data_store.set(store)
-
     return
 
 def dm_leave_v1(token, dm_id):
@@ -262,12 +211,12 @@ def dm_leave_v1(token, dm_id):
     return {}
 
 
-def dm_details_v1(u_id, dm_id):
+def dm_details_v1(token, dm_id):
     '''Given a DM with ID dm_id that the authorised user is a member of, 
     provide basic details about the DM.
 
     Arguments:
-        u_id (int) - user authentication int
+        token (str) - user authentication 
         dm_id (ints) - dm identification number
 
     Exceptions:
@@ -277,40 +226,26 @@ def dm_details_v1(u_id, dm_id):
             - dm_id is valid and the authorised user is not a member of the DM
 
     Return Value:
-        Returns {
-            'name': name
-            'members': [
-                {
-                    'u_id': None,
-                    'email': None,
-                    'name_first': None,
-                    'name_last': None,
-                    'handle_str': None,
-                }
-            ]
-        }
+        Returns (dict): returns a dictionary which contains name(str) and members() of specified dm       
     '''
 
-    # Getting Data from data storage file
     store = data_store.get()
+    u_id = check_valid_token(token, store)
 
-    valid_dm_id = False
-    for dm in store["dms"]:
-        if dm["dm_id"] == dm_id:
-            valid_dm_id = True
-    if valid_dm_id == False:
+    if dm_id not in store["dms"]:
         raise InputError(f"dm_id is not valid")
 
-    dm_member = False
-    for user in store["dms"][dm_id]["all_members"]:
-        if user["u_id"] == u_id:
-            dm_member = True
-    if dm_member == False:
+    if u_id not in store["dms"][dm_id]["all_members"]:
         raise AccessError(f"You are not part of this dm")
 
+    members = []
+    for member in store["dms"][dm_id]["all_members"].values():
+        members.append(member)
+    
+    #THIS NEEDS TO BE EDITED AFTER USER IS FIXED
     return {
         "name": store["dms"][dm_id]["name"],
-        "members": store["dms"][dm_id]["all_members"]
+        "members": members
     }
 
 
