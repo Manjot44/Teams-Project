@@ -195,11 +195,7 @@ def handle_dm_delete():
 @APP.route("/channels/list/v2", methods=['GET'])
 def handle_channels_list():
     token = str(request.args.get('token'))
-    store = data_store.data_store.get()
-    auth_user_id = store["users"][error_help.check_valid_token(
-        token, store)]["u_id"]
-
-    return dumps(channels.channels_list_v1(auth_user_id))
+    return dumps(channels.channels_list_v1(token))
 
 @APP.route("/channel/messages/v2", methods=['GET'])
 def handle_channel_messages():
