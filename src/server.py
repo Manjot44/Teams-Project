@@ -86,12 +86,9 @@ def handle_channel_leave():
 
 @APP.route("/channels/listall/v2", methods=['GET'])
 def channel_listall():
-    token = str(request.args.get('token')) 
-    data = data_store.data_store.get()
+    token = str(request.args.get('token'))
 
-    u_id = check_valid_token(token, data)
-
-    return dumps(channels.channels_listall_v1(u_id))
+    return dumps(channels.channels_listall_v1(token))
 
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details():

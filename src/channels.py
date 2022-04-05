@@ -1,3 +1,4 @@
+from distutils.command.build_scripts import first_line_re
 from src.error import InputError, AccessError
 from src.data_store import data_store
 from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel, check_valid_token
@@ -72,7 +73,7 @@ def channels_list_v1(auth_user_id):
     }
 
 
-def channels_listall_v1(auth_user_id):
+def channels_listall_v1(token):
     '''Provide a list of all channels, including private channels, (and their associated details)
 
     Arguments:
@@ -115,25 +116,22 @@ def channels_listall_v1(auth_user_id):
             ]
         }
     '''
-
-    # dictionary that is to be returned by function
     listall_return = {
         'channels': []
     }
 
     saved_data = data_store.get()
-
+    u_id = check_valid_token(token, saved_data)
     # validate auth user id
-    check_valid_id(auth_user_id, saved_data)
+    check_valid_id(u_id, saved_data)
 
     # returning channel data to listall_return from saved channel data
-    if saved_data['channels'][0]['channel_id'] == None:
-        listall_return['channels'] = []
-    else:
+    first_entry = list(saved_data['channels'].keys())
+    if first_entry[0] != None:
         for channel in saved_data['channels']:
             appended_channel = {
                 'channel_id': channel['channel_id'],
-                'name': channel['name']
+                'name': channel['name'],
             }
             listall_return['channels'].append(appended_channel)
 
