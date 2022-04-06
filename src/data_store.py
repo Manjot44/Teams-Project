@@ -36,6 +36,7 @@ initial_object = {
             'password': None,
             'perm_id': None,
             'valid_tokens': [],
+            'profile_img_url': None,
         }
     },
     'channels': {None:
@@ -49,6 +50,7 @@ initial_object = {
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
+                    'profile_img_url': None,
                 }
             },
             'all_members': {None:
@@ -58,6 +60,7 @@ initial_object = {
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
+                    'profile_img_url': None,
                 }
             },
             'is_public': None,
@@ -75,6 +78,7 @@ initial_object = {
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
+                    'profile_img_url': None,
                 }
             }, 
         }
@@ -86,6 +90,7 @@ initial_object = {
             'name_first': None,
             'name_last': None,
             'handle_str': None,
+            'profile_img_url': None,
         }
     },
     'channel_messages': {None:
