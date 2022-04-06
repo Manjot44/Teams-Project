@@ -158,7 +158,7 @@ def test_dm_not_from_user(register_three_users):
     assert response.status_code == 200
 
 # test - unauthorised person cant edit dm
-def test_dm_not_from_user(register_three_users):
+def test_dm_unauthorised(register_three_users):
     response = requests.post(f"{url}/dm/create/v1", json = {"token": register_three_users["token"][0], "u_ids": [register_three_users["id"][0], register_three_users["id"][1]]})
     assert response.status_code == 200
     response_data = response.json()
