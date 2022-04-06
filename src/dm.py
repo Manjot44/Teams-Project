@@ -47,22 +47,23 @@ def dm_create_v1(token, u_ids):
     for user in store["users"].items():
         if token in user[1]["valid_tokens"]:
             user_handles.append(user[1]["handle_str"])
-            add_owner = {k: user[1][k] for k in ('email', 'name_first', 'name_last', 'handle_str')}
-            add_owner["is_creator"] = True
+            add_owner = {k: user[1][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')}
+            owner_id = user[0]
             all_members[user[0]] = add_owner
 
     for user in store["users"].items():
         if u_id == user[0]:
             user_handles.append(user[1]["handle_str"])
-            add_member = {k: user[1][k] for k in ('email', 'name_first', 'name_last', 'handle_str')}
-            add_member["is_creator"] = False
+            add_member = {k: user[1][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')}
             all_members[user[0]] = add_member
 
     alph_handle = sorted(user_handles)
     joined_name = ", ".join([str(item) for item in alph_handle])
 
     store["dms"][dm_id] = {
+        "dm_id": dm_id,
         "name": joined_name,
+        "creator_id": owner_id,
         "all_members": all_members
     }
 
@@ -102,6 +103,7 @@ def dm_list_v1(token):
         "dms": dm_list
     }
 
+
 def dm_remove_v1(token, dm_id):
     '''Remove an existing DM, so all members are no longer in the DM. 
     This can only be done by the original creator of the DM.
@@ -130,20 +132,22 @@ def dm_remove_v1(token, dm_id):
     if u_id not in store["dms"][dm_id]["all_members"]:
         raise AccessError(f"You are not part of this dm")
 
-    if store["dms"][dm_id]["all_members"][u_id]["is_creator"] == False:
+    if u_id != store["dms"][dm_id]["creator_id"]:
         raise AccessError(f"Only the original creator can remove a dm")
 
     if len(store["dms"]) == 1:
         store['dms'] = {None:
         {
             'name': None,
+            'creator_id': None,
             'all_members': {None:
                 {
+                    'u_id': None,
                     'email': None,
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
-                    'is_creator': None,
+                    'profile_img_url': None,
                 }
             }, 
         }
@@ -153,6 +157,7 @@ def dm_remove_v1(token, dm_id):
 
     data_store.set(store)
     return
+
 
 def dm_leave_v1(token, dm_id):
     '''User in DM is removed from members list.

@@ -1,20 +1,17 @@
 import requests
 import pytest
-
-BASE_ADDRESS = 'http://127.0.0.1'
-BASE_PORT = 8080
-BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
+import src.config
 
 def test_correct_output():
-    requests.delete(f"{BASE_URL}/clear/v1")
+    requests.delete(f"{src.config.url}/clear/v1")
 
-    response = requests.post(f"{BASE_URL}/auth/register/v2", json = {"email": "jerrylin@gmail.com", "password": "JerrYlin4", "name_first": "Jerry", "name_last": "Lin"})
+    response = requests.post(f"{src.config.url}/auth/register/v2", json = {"email": "jerrylin@gmail.com", "password": "JerrYlin4", "name_first": "Jerry", "name_last": "Lin"})
     user1 = response.json()
     
-    response2 =  requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = {"token": user1["token"], "email": "montajree@gmail.com"})  
+    response2 =  requests.put(f"{src.config.url}/user/profile/setemail/v1", json = {"token": user1["token"], "email": "montajree@gmail.com"})  
     assert response2.status_code == 200
 
-    response3 = requests.get(f"{BASE_URL}/user/profile/v1", params = {"token": user1["token"], "u_id": user1["auth_user_id"]}) 
+    response3 = requests.get(f"{src.config.url}/user/profile/v1", params = {"token": user1["token"], "u_id": user1["auth_user_id"]}) 
 
     return_val = response3.json()
     assert return_val == {'user': {
@@ -26,31 +23,31 @@ def test_correct_output():
     }}
 
 def test_invalid_new_email():
-    requests.delete(f"{BASE_URL}/clear/v1")
+    requests.delete(f"{src.config.url}/clear/v1")
 
-    response = requests.post(f"{BASE_URL}/auth/register/v2", json = {"email": "jerrylin@gmail.com", "password": "JerrYlin4", "name_first": "Jerry", "name_last": "Lin"})
+    response = requests.post(f"{src.config.url}/auth/register/v2", json = {"email": "jerrylin@gmail.com", "password": "JerrYlin4", "name_first": "Jerry", "name_last": "Lin"})
     user1 = response.json()
 
-    response2 = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = {"token": user1["token"], "email": "montajree.com"})
+    response2 = requests.put(f"{src.config.url}/user/profile/setemail/v1", json = {"token": user1["token"], "email": "montajree.com"})
     assert response2.status_code == 400   
 
 def test_email_already_in_use():    
-    requests.delete(f"{BASE_URL}/clear/v1")
+    requests.delete(f"{src.config.url}/clear/v1")
 
-    response = requests.post(f"{BASE_URL}/auth/register/v2", json = {"email": "jerrylin@gmail.com", "password": "JerrYlin4", "name_first": "Jerry", "name_last": "Lin"})
+    response = requests.post(f"{src.config.url}/auth/register/v2", json = {"email": "jerrylin@gmail.com", "password": "JerrYlin4", "name_first": "Jerry", "name_last": "Lin"})
     user1 = response.json()
 
-    response2 = requests.post(f"{BASE_URL}/auth/register/v2", json = {"email": "manjotbhathal@gmail.com", "password": "ManjotBhathal4", "name_first": "Manjot", "name_last": "Bhathal"})
+    response2 = requests.post(f"{src.config.url}/auth/register/v2", json = {"email": "manjotbhathal@gmail.com", "password": "ManjotBhathal4", "name_first": "Manjot", "name_last": "Bhathal"})
     assert response2.status_code == 200 
 
-    response3 = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = {"token": user1["token"], "email": "manjotbhathal@gmail.com"})
+    response3 = requests.put(f"{src.config.url}/user/profile/setemail/v1", json = {"token": user1["token"], "email": "manjotbhathal@gmail.com"})
     assert response3.status_code == 400  
 
 def test_invalid_token():
-    requests.delete(f"{BASE_URL}/clear/v1")
+    requests.delete(f"{src.config.url}/clear/v1")
 
-    response = requests.post(f"{BASE_URL}/auth/register/v2", json = {"email": "jerrylin@gmail.com", "password": "JerrYlin4", "name_first": "Jerry", "name_last": "Lin"})
+    response = requests.post(f"{src.config.url}/auth/register/v2", json = {"email": "jerrylin@gmail.com", "password": "JerrYlin4", "name_first": "Jerry", "name_last": "Lin"})
     assert response.status_code == 200 
 
-    response2 = requests.put(f"{BASE_URL}/user/profile/setemail/v1", json = {"token": "invalid token", "email": "montajree@gmail.com"})
+    response2 = requests.put(f"{src.config.url}/user/profile/setemail/v1", json = {"token": "invalid token", "email": "montajree@gmail.com"})
     assert response2.status_code == 403       
