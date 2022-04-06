@@ -1,8 +1,7 @@
 import requests
 from src.config import url
 
-def test_invalid_token():
-    requests.delete(f"{url}/clear/v1")
+def test_invalid_token(reset):
     input = {
         "token": "invalidtoken",
         "dm_id": 0
@@ -11,10 +10,9 @@ def test_invalid_token():
     assert response.status_code == 403
 
 
-def test_invalid_dm_id(user_init):
+def test_invalid_dm_id(reset, register_user):
     requests.delete(f"{url}/clear/v1")
-    auth_response = requests.post(
-        f"{url}/auth/register/v2", json=user_init)
+    auth_response = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     token = auth_response.json()["token"]
     input = {
         "token": token,
@@ -24,29 +22,10 @@ def test_invalid_dm_id(user_init):
     assert response.status_code == 400
 
 
-def test_user_not_in_dm(user_init):
-    requests.delete(f"{url}/clear/v1")
-    user2 = {
-        "email": "abcd@gmail.com",
-        "password": "thidsIsPass13./",
-        "name_first": "Ash",
-        "name_last": "Sur"
-    }
-    user3 = {
-        "email": "abcde@gmail.com",
-        "password": "thisIsPasss13./",
-        "name_first": "Monta",
-        "name_last": "Singh"
-    }
-    auth_response1 = requests.post(
-        f"{url}/auth/register/v2", json=user_init)
-    auth_response2 = requests.post(
-        f"{url}/auth/register/v2", json=user2)
-    auth_response3 = requests.post(
-        f"{url}/auth/register/v2", json=user3)
-    token1 = auth_response1.json()["token"]
-    u_id2 = auth_response2.json()["auth_user_id"]
-    token3 = auth_response3.json()["token"]
+def test_user_not_in_dm(register_three_users):
+    token1 = register_three_users["token"][0]
+    u_id2 = register_three_users["id"][1]
+    token3 = register_three_users["token"][2]
 
     dm_create_input = {
         "token": token1,
@@ -63,20 +42,11 @@ def test_user_not_in_dm(user_init):
     assert response.status_code == 403
 
 
-def test_normal(user_init):
-    requests.delete(f"{url}/clear/v1")
-    auth_response1 = requests.post(
-        f"{url}/auth/register/v2", json=user_init)
+def test_normal(reset, register_user):
+    auth_response1 = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     token1 = auth_response1.json()["token"]
 
-    user2 = {
-        "email": "abcdef@gmail.com",
-        "password": "thisIsPss13./",
-        "name_first": "Ash",
-        "name_last": "Sur"
-    }
-    auth_response2 = requests.post(
-        f"{url}/auth/register/v2", json=user2)
+    auth_response2 = register_user("jerrylin@gmail.com", "thisIsPass13./", "Ash", "Sur")
     u_id2 = auth_response2.json()["auth_user_id"]
     token2 = auth_response2.json()["token"]
     dm_create_input = {

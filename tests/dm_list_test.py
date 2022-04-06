@@ -2,8 +2,7 @@ import requests
 from src.config import url
 
 
-def test_invalid_token():
-    requests.delete(f"{url}/clear/v1")
+def test_invalid_token(reset):
     input = {
         "token": "invalidtoken"
     }
@@ -11,10 +10,8 @@ def test_invalid_token():
     assert response.status_code == 403
 
 
-def test_valid_token(user_init):
-    requests.delete(f"{url}/clear/v1")
-    auth_response = requests.post(
-        f"{url}/auth/register/v2", json=user_init)
+def test_valid_token(reset, register_user):
+    auth_response = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     token = auth_response.json()["token"]
     input = {
         "token": token
@@ -23,20 +20,11 @@ def test_valid_token(user_init):
     assert response.status_code == 200
 
 
-def test_valid_list(user_init):
-    requests.delete(f"{url}/clear/v1")
-    auth_response1 = requests.post(
-        f"{url}/auth/register/v2", json=user_init)
+def test_valid_list(reset, register_user):
+    auth_response1 = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     token1 = auth_response1.json()["token"]
 
-    user2 = {
-        "email": "abcdef@gmail.com",
-        "password": "thisIsPss13./",
-        "name_first": "Ash",
-        "name_last": "Sur"
-    }
-    auth_response2 = requests.post(
-        f"{url}/auth/register/v2", json=user2)
+    auth_response2 = register_user("jerrylin@gmail.com", "thisIsPass13./", "Ash", "Sur")
     u_id2 = auth_response2.json()["auth_user_id"]
     token2 = auth_response2.json()["token"]
     dm_create_input = {

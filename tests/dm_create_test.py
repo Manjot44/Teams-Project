@@ -1,10 +1,8 @@
 import requests
 from src.config import url
 
-def test_invalid_token(user_init):
-    requests.delete(f"{url}/clear/v1")
-    auth_response = requests.post(
-        f"{url}/auth/register/v2", json=user_init)
+def test_invalid_token(reset, register_user):
+    auth_response = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     u_id = auth_response.json()["auth_user_id"]
     input = {
         "token": "incorrecttoken",
@@ -14,10 +12,8 @@ def test_invalid_token(user_init):
     assert response.status_code == 403
 
 
-def test_invalid_uid(user_init):
-    requests.delete(f"{url}/clear/v1")
-    auth_response = requests.post(
-        f"{url}/auth/register/v2", json=user_init)
+def test_invalid_uid(reset, register_user):
+    auth_response = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     token = auth_response.json()["token"]
     input = {
         "token": token,
@@ -27,10 +23,8 @@ def test_invalid_uid(user_init):
     assert response.status_code == 400
 
 
-def test_duplicate_uid(user_init):
-    requests.delete(f"{url}/clear/v1")
-    auth_response = requests.post(
-        f"{url}/auth/register/v2", json=user_init)
+def test_duplicate_uid(reset, register_user):
+    auth_response = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     token = auth_response.json()["token"]
     u_id = auth_response.json()["auth_user_id"]
     input = {
@@ -41,18 +35,9 @@ def test_duplicate_uid(user_init):
     assert response.status_code == 400
 
 
-def test_dm_normal(user_init):
-    requests.delete(f"{url}/clear/v1")
-    auth_response1 = requests.post(
-        f"{url}/auth/register/v2", json=user_init)
-    new_user = {
-        "email": "abcdewf@gmail.com",
-        "password": "thisI=ljhs13./",
-        "name_first": "zsh",
-        "name_last": "Sur"
-    }
-    auth_response2 = requests.post(
-        f"{url}/auth/register/v2", json=new_user)
+def test_dm_normal(reset, register_user):
+    auth_response1 = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
+    auth_response2 = register_user("jerrylin@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     token1 = auth_response1.json()["token"]
     token2 = auth_response2.json()["token"]
     added_user1 = auth_response1.json()["auth_user_id"]
