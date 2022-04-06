@@ -1,6 +1,7 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.error_help import check_valid_token, check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel, auth_user_not_in_channel
+import src.persistence
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''Invites a user with ID u_id to join a channel with ID channel_id. 
@@ -25,7 +26,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         Returns {}
     '''
     
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     check_valid_id(auth_user_id, store)
     check_valid_id(u_id, store)
@@ -37,8 +38,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
 
     store["channels"][channel_id]["all_members"][u_id] = add_user_info
-    data_store.set(store)
-
+    src.persistence.set_pickle(store)
     return {
     }
 
@@ -81,7 +81,7 @@ def channel_details_v1(token, channel_id):
         }
     '''
     
-    saved_data = data_store.get()
+    saved_data = src.persistence.get_pickle()
     u_id = check_valid_token(token, saved_data)
     validate_channel(saved_data, channel_id)
     auth_user_not_in_channel(saved_data, u_id, channel_id)
@@ -132,7 +132,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         }
     '''
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     check_valid_id(auth_user_id, store)
     validate_channel(store, channel_id)
     auth_user_not_in_channel(store, auth_user_id, channel_id)
@@ -182,7 +182,7 @@ def channel_join_v1(auth_user_id, channel_id):
         Returns {}
     '''
     
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     check_valid_id(auth_user_id, store)
     validate_channel(store, channel_id)
     check_channel_priv(store, channel_id, auth_user_id)
@@ -191,7 +191,7 @@ def channel_join_v1(auth_user_id, channel_id):
     add_user_info = {k: store['users'][auth_user_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str')}
 
     store["channels"][channel_id]["all_members"][auth_user_id] = add_user_info
-    data_store.set(store)
+    src.persistence.set_pickle(store)
 
     return {
     }

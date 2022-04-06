@@ -2,6 +2,7 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel, check_valid_token
 from src.other import clear_v1
+import src.persistence
 
 
 def dm_create_v1(token, u_ids):
@@ -23,9 +24,9 @@ def dm_create_v1(token, u_ids):
         (dict): returns a dictionary with the newly created dm_id 
     '''
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
-    check_valid_token(token, store)
+    owner_id = check_valid_token(token, store)
     if u_ids == []:
         raise InputError(f"Error: Enter a valid ID")
     for u_id in u_ids:
@@ -44,18 +45,11 @@ def dm_create_v1(token, u_ids):
     user_handles = []
     all_members = {}
 
-    for user in store["users"].items():
-        if token in user[1]["valid_tokens"]:
-            user_handles.append(user[1]["handle_str"])
-            add_owner = {k: user[1][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')}
-            owner_id = user[0]
-            all_members[user[0]] = add_owner
-
-    for user in store["users"].items():
-        if u_id == user[0]:
-            user_handles.append(user[1]["handle_str"])
-            add_member = {k: user[1][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')}
-            all_members[user[0]] = add_member
+    u_ids.append(owner_id)
+    for u_id in u_ids:
+        add_member = {k: store["users"][u_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')}
+        all_members[u_id] = add_member
+        user_handles.append(store["users"][u_id]["handle_str"])
 
     alph_handle = sorted(user_handles)
     joined_name = ", ".join([str(item) for item in alph_handle])
@@ -67,7 +61,7 @@ def dm_create_v1(token, u_ids):
         "all_members": all_members
     }
 
-    data_store.set(store)
+    src.persistence.set_pickle(store)
 
     return {
         'dm_id': dm_id,
@@ -88,7 +82,7 @@ def dm_list_v1(token):
         Returns (dict): returns a dictionary which contains "dms", a list of dictionaries which each contain dm_id(int) and name(string)
     '''
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     dm_list = []
     u_id = check_valid_token(token, store)
 
@@ -124,7 +118,7 @@ def dm_remove_v1(token, dm_id):
         Returns {}
     '''
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     u_id = check_valid_token(token, store)
     if dm_id not in store["dms"]:
         raise InputError(f"dm_id is not valid")
@@ -155,7 +149,7 @@ def dm_remove_v1(token, dm_id):
     else:
         store["dms"].pop(dm_id)
 
-    data_store.set(store)
+    src.persistence.set_pickle(store)
     return
 
 
@@ -176,7 +170,7 @@ def dm_leave_v1(token, dm_id):
         Returns {}
 
     '''
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     leaver_id = check_valid_token(token, store)
 
@@ -187,6 +181,8 @@ def dm_leave_v1(token, dm_id):
         raise AccessError(f"User is not member of DM")
     
     store['dms'][dm_id]['all_members'].pop(leaver_id)
+
+    src.persistence.set_pickle(store)
     return {}
 
 
@@ -208,7 +204,7 @@ def dm_details_v1(token, dm_id):
         Returns (dict): returns a dictionary which contains name(str) and members() of specified dm       
     '''
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     u_id = check_valid_token(token, store)
 
     if dm_id not in store["dms"]:
@@ -247,7 +243,7 @@ def dm_messages_v1(token, dm_id, start):
         (dict): returns a dictionary with messages(list of dict), start(int), end(int )
     '''
     
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     u_id = check_valid_token(token, store)
 
     if None in store['dms'].keys() or dm_id not in store['dms'].keys():

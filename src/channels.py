@@ -1,7 +1,7 @@
 from src.error import InputError, AccessError
 from src.data_store import data_store
 from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel, check_valid_token
-
+import src.persistence
 
 def channels_list_v1(token):
     '''Provide a list of all channels (and their associated details) that the authorised user is part of.
@@ -17,7 +17,7 @@ def channels_list_v1(token):
         (dict): returns a dictionary with the list of channels the user is a part of, displayed as channel_id and name 
     '''
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     auth_user_id = check_valid_token(token, store)
 
@@ -79,7 +79,7 @@ def channels_listall_v1(token):
         }
     '''
 
-    saved_data = data_store.get()
+    saved_data = src.persistence.get_pickle()
     check_valid_token(token, saved_data)
 
     listall_return = {
@@ -115,7 +115,7 @@ def channels_create_v1(token, name, is_public):
 
     '''
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     namelen = len(name)
     if namelen < 1 or namelen > 20:
@@ -144,7 +144,7 @@ def channels_create_v1(token, name, is_public):
         "is_public": is_public
     }
 
-    data_store.set(store)
+    src.persistence.set_pickle(store)
 
     return {
         'channel_id': channel_id,
