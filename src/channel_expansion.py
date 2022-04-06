@@ -1,6 +1,7 @@
 from src.data_store import data_store
 import src.error_help
 from src.error import InputError, AccessError
+import src.persistence
 
 MEMBER = 2
 
@@ -21,7 +22,7 @@ def channel_leave_v1(token, channel_id):
     Return Value:
         (dict): returns an empty dictionary
     '''
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.validate_channel(store, channel_id)
@@ -31,7 +32,7 @@ def channel_leave_v1(token, channel_id):
     if auth_user_id in store["channels"][channel_id]["owner_members"].keys():
         store["channels"][channel_id]["owner_members"].pop(auth_user_id)
     
-    data_store.set(store)
+    src.persistence.set_pickle(store)
     return {
     }
 
@@ -56,7 +57,7 @@ def channel_addowner_v1(token, channel_id, u_id):
     Return Value:
         (dict): returns an empty dictionary
     '''
-    store = data_store.get()   
+    store = src.persistence.get_pickle()
     
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.validate_channel(store, channel_id)
@@ -69,7 +70,7 @@ def channel_addowner_v1(token, channel_id, u_id):
     add_user_info = {k: store['users'][auth_user_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str')}
     store["channels"][channel_id]["owner_members"][u_id] = add_user_info
 
-    data_store.set(store)
+    src.persistence.set_pickle(store)
 
     return {
     }
@@ -95,7 +96,7 @@ def channel_removeowner_v1(token, channel_id, u_id):
     Return Value:
         (dict): returns an empty dictionary
     '''
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.validate_channel(store, channel_id)
@@ -108,7 +109,7 @@ def channel_removeowner_v1(token, channel_id, u_id):
     
     store["channels"][channel_id]["owner_members"].pop(u_id)
 
-    data_store.set(store)
+    src.persistence.set_pickle(store)
 
     return {
     }    

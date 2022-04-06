@@ -1,4 +1,5 @@
 from src.data_store import data_store
+import src.persistence
 
 def clear_v1():
     '''Resets the internal data of the application to its initial state
@@ -12,7 +13,8 @@ def clear_v1():
     Return Value:
         Returns {}
     '''
-    store = data_store.get()
+    store = src.persistence.get_pickle()
+
     store['users'] = {None: 
         {
             'email': None,
@@ -89,4 +91,4 @@ def clear_v1():
     store['dm_id'] = -1
     store['message_id'] = -1
 
-    data_store.set(store)
+    src.persistence.set_pickle(store)

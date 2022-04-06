@@ -2,6 +2,7 @@ from src.data_store import data_store
 import src.error_help
 from src.error import InputError, AccessError
 import datetime
+import src.persistence
 
 MEMBER = 2
 OWNER = 1
@@ -30,7 +31,7 @@ def message_send_v1(token, channel_id, message):
                 'message_id': message_id,
             }
     '''
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.validate_channel(store, channel_id)
@@ -57,7 +58,7 @@ def message_send_v1(token, channel_id, message):
         store["channel_messages"] = {}
     store["channel_messages"][id] = new_message
     
-    data_store.set(store)
+    src.persistence.set_pickle(store)
 
     return {
         "message_id": id
@@ -85,7 +86,7 @@ def message_edit_v1(token, message_id, message):
 
             }
     '''
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     auth_user_id = src.error_help.check_valid_token(token, store)
     is_channel_message = src.error_help.check_message_id(store, message_id)
@@ -104,7 +105,7 @@ def message_edit_v1(token, message_id, message):
         else:
             store["dm_messages"][message_id]["message"] = message
 
-    data_store.set(store)
+    src.persistence.set_pickle(store)
     return {
     }
 
@@ -129,7 +130,7 @@ def message_remove_v1(token, message_id):
             }
     '''
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     auth_user_id = src.error_help.check_valid_token(token, store)
     is_channel_message = src.error_help.check_message_id(store, message_id)
@@ -141,7 +142,7 @@ def message_remove_v1(token, message_id):
         src.error_help.check_dmmess_perms(store, auth_user_id, message_id)
         store["dm_messages"].pop(message_id)
 
-    data_store.set(store)
+    src.persistence.set_pickle(store)
     return {
     }
 
@@ -167,7 +168,7 @@ def message_senddm_v1(token, dm_id, message):
             }
     '''
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     auth_user_id = src.error_help.check_valid_token(token, store)
     
     if None in store['dms'].keys() or dm_id not in store['dms'].keys():
@@ -198,7 +199,7 @@ def message_senddm_v1(token, dm_id, message):
     }
 
     store['dm_messages'][id] = new_message
-    data_store.set(store)
+    src.persistence.set_pickle(store)
 
     return {
         "message_id": id

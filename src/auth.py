@@ -4,6 +4,7 @@ import hashlib
 import re
 import jwt
 import src.error_help
+import src.persistence
 
 SECRET = 'jroilin'
 OWNER = 1
@@ -25,8 +26,7 @@ def auth_login_v1(email, password):
         (dict): returns a dictionary with the auth_user_id and the unique token for the current session
     '''
 
-    store = data_store.get()
-    
+    store = src.persistence.get_pickle()
     
     valid_email = False
     u_id = 0
@@ -45,7 +45,7 @@ def auth_login_v1(email, password):
     encoded_jwt = jwt.encode({'handle_str': user["handle_str"], "session_id": session_id}, SECRET, algorithm='HS256')
     user["valid_tokens"].append(encoded_jwt)
     
-    data_store.set(store)
+    src.persistence.set_pickle(store)
 
     return {
         "auth_user_id": u_id,
@@ -68,7 +68,7 @@ def generate_handle(name_first, name_last):
         (str): returns the unique handle
     '''
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     alpha_nfirst = ''.join(filter(str.isalnum, name_first))
     alpha_nlast = ''.join(filter(str.isalnum, name_last))
@@ -111,7 +111,7 @@ def auth_register_v1(email, password, name_first, name_last):
         (dict): returns a dictionary with the auth_user_id and the unique token for the current session 
     '''
     
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     
     regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
     if not (re.search(regex, email)):
@@ -155,7 +155,7 @@ def auth_register_v1(email, password, name_first, name_last):
         store["users"] = {}
     store["users"][id] = new_user
     
-    data_store.set(store)
+    src.persistence.set_pickle(store)
 
     return {
         "auth_user_id": id,
@@ -177,14 +177,14 @@ def auth_logout_v1(token):
     Return Value:
         (dict): returns an empty dictionary
     '''
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     
     auth_user_id = src.error_help.check_valid_token(token, store)
     for tokens in store["users"][auth_user_id]["valid_tokens"]:
         if tokens == token:
             store["users"][auth_user_id]["valid_tokens"].remove(tokens)
 
-    data_store.set(store)
+    src.persistence.set_pickle(store)
 
     return {
     }

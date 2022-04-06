@@ -1,10 +1,8 @@
-from operator import contains
-from src import auth, channel, channels, error, other
 from src.data_store import data_store
-from src.channels import channels_create_v1
 from src.error import InputError, AccessError
-from src.error_help import check_valid_token, check_valid_id
+from src.error_help import check_valid_token
 import re
+import src.persistence
 
 def user_profile_v1(token, u_id):
     # store = data_store.get()
@@ -51,7 +49,7 @@ def user_profile_v1(token, u_id):
     #             user_info_dict['user']['handle_str'] = user['handle_str']
     #             return user_info_dict
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     
     check_valid_token(token, store)
 
@@ -93,7 +91,7 @@ def user_profile_setname_v1(token, name_first, name_last):
     # return {
     # }
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     u_id = check_valid_token(token, store)
 
@@ -105,6 +103,7 @@ def user_profile_setname_v1(token, name_first, name_last):
     store['users'][u_id]['name_first'] = name_first
     store['users'][u_id]['name_last'] = name_last
 
+    src.persistence.set_pickle(store)
     return {
     }
 
@@ -133,7 +132,7 @@ def user_profile_setemail_v1(token, email):
     # return {
     # }    
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     u_id = check_valid_token(token, store)
 
@@ -147,6 +146,7 @@ def user_profile_setemail_v1(token, email):
     
     store['users'][u_id]['email'] = email
 
+    src.persistence.set_pickle(store)
     return {
     }    
 
@@ -172,8 +172,7 @@ def user_profile_sethandle_v1(token, handle_str):
     #         user['handle_str'] = handle_str
     # return {
     # }
-
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     u_id = check_valid_token(token, store)
 
@@ -189,6 +188,7 @@ def user_profile_sethandle_v1(token, handle_str):
 
     store['users'][u_id]['handle_str'] = handle_str
     
+    src.persistence.set_pickle(store)
     return {
     }
 
@@ -207,7 +207,7 @@ def users_all_v1(token):
             'users': [],
         }
     '''
-    store = data_store.get()
+    store = src.persistence.get_pickle()
     
     check_valid_token(token, store)
     

@@ -1,6 +1,7 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.error_help import check_valid_id, check_valid_token, check_global_owner_count, check_global_owner
+import src.persistence
 
 OWNER = 1
 MEMBER = 2
@@ -27,7 +28,7 @@ def admin_userpermission_change(token, u_id, permission_id):
         Return Value:
             Returns {}
     '''
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     auth_user = check_valid_token(token, store)
     check_valid_id(u_id, store)
@@ -44,7 +45,7 @@ def admin_userpermission_change(token, u_id, permission_id):
         check_global_owner_count(store, u_id)
         store['users'][u_id]['perm_id'] = permission_id
 
-    data_store.set(store)
+    src.persistence.set_pickle(store)
     return {
     }
 
@@ -71,7 +72,7 @@ def admin_user_remove(token, u_id):
         Return Value:
             Returns {}
     '''
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     auth_user = check_valid_token(token, store)
     check_valid_id(u_id, store)
@@ -109,6 +110,6 @@ def admin_user_remove(token, u_id):
         if msg["u_id"] == u_id:
             msg["message"] = 'Removed user'
     
-    data_store.set(store)
+    src.persistence.set_pickle(store)
     return {
     }
