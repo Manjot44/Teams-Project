@@ -149,7 +149,27 @@ def message_remove_v1(token, message_id):
     }
 
 def message_senddm_v1(token, dm_id, message):
-    ''' DOCSTRING '''
+    ''' Send a message from the authorised user to the DM specified by dm_id. 
+
+        Arguments:
+            token (str) - user authentication
+            dm_id (int) - DM identification number
+            message (str) - message being sent
+
+        Exceptions:
+            InputError - Occurs when:
+                dm_id does not refer to a valid channel
+                length of message is less than 1 or over 1000 characters
+
+            AccessError - Occurs when:
+                dm_id is valid and the authorised user is not a member of the DM
+        
+        Return Value:
+            Returns {
+                'message_id': message_id,
+            }
+    '''
+
     store = data_store.get()
     auth_user_id = src.error_help.check_valid_token(token, store)
     
