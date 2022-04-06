@@ -129,7 +129,7 @@ def channels_create_v1(token, name, is_public):
     store["channel_id"] += 1
     channel_id = store["channel_id"]
 
-    add_user = {k: store['users'][auth_user_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str')}
+    add_user = {k: store['users'][auth_user_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')}
 
     if None in store["channels"].keys():
         store["channels"] = {

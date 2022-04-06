@@ -148,6 +148,7 @@ def auth_register_v1(email, password, name_first, name_last):
         "handle_str": handle,
         "perm_id": perm_id,
         "valid_tokens": [encoded_jwt],
+        "profile_img_url": None
     }
 
     if None in store["users"].keys():
