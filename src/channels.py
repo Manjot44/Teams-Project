@@ -78,19 +78,16 @@ def channels_listall_v1(token):
             ]
         }
     '''
+
+    saved_data = data_store.get()
+    check_valid_token(token, saved_data)
+
     listall_return = {
         'channels': []
     }
-
-    saved_data = data_store.get()
-    u_id = check_valid_token(token, saved_data)
-    # validate auth user id
-    check_valid_id(u_id, saved_data)
-
-    # returning channel data to listall_return from saved channel data
-    first_entry = list(saved_data['channels'].keys())
-    if first_entry[0] != None:
-        for channel in saved_data['channels']:
+    
+    if None not in saved_data['channels'].keys():
+        for channel in saved_data['channels'].values():
             appended_channel = {
                 'channel_id': channel['channel_id'],
                 'name': channel['name'],

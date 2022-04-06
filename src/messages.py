@@ -3,6 +3,8 @@ import src.error_help
 from src.error import InputError, AccessError
 import datetime
 
+MEMBER = 2
+
 def message_send_v1(token, channel_id, message):
     ''' Send a message from the authorised user to the channel specified by channel_id. 
         Note: Each message should have its own unique ID, 
@@ -33,7 +35,7 @@ def message_send_v1(token, channel_id, message):
     src.error_help.validate_channel(store, channel_id)
     if message == None or len(message) < 1 or len(message) > 1000:
         raise InputError(f"Error: length of message is less than 1 or over 1000 characters")
-    src.error_help.user_not_in_channel(store, auth_user_id, channel_id)
+    src.error_help.auth_user_not_in_channel(store, auth_user_id, channel_id)
 
     store["message_id"] += 1
     id = store["message_id"]
@@ -84,28 +86,26 @@ def message_edit_v1(token, message_id, message):
     '''
     store = data_store.get()
 
-    # Validify token/user_id
     auth_user_id = src.error_help.check_valid_token(token, store)
+    is_channel_message = src.error_help.check_message_id(store, message_id)
+    
+    if is_channel_message == True:
+        src.error_help.check_channelmess_perms(store, auth_user_id, message_id)
+        if len(message) > 1000:
+            raise InputError(f"Error: Message over 1000 characters long")
+        elif len(message) == 0:
+            store["channel_messages"].pop(message_id)
+        else:
+            store["channel_messages"][message_id]["message"] = message
 
-    # Validify message_id
-    valid_messageid = False
-    for messages in store["messages"]:
-        if messages["message_id"] == message_id:
-            valid_messageid = True
-    if valid_messageid == False:
-        raise InputError(f"Error: Message_id not valid")
-
-    # Check if authorised user is allowed to edit message once their token has been validified
-    if store["messages"][message_id]["u_id"] != auth_user_id and store["users"][auth_user_id]["perm_id"] == 2:
-        raise AccessError(f"Error: Forbidden from editing message")
-
-    # Ensure that the length of the edited message is > 0 and <= 1000 characters before its edited. If 0 characters long, message_id will be deleted
-    if len(message) == 0:
-        del store["messages"][message_id]
-    elif len(message) > 1000:
-        raise InputError(f"Error: Message over 1000 characters long")
     else:
-        store["messages"][message_id]["message"] = message
+        src.error_help.check_dmmess_perms(store, auth_user_id, message_id)
+        if len(message) > 1000:
+            raise InputError(f"Error: Message over 1000 characters long")
+        elif len(message) == 0:
+            store["dm_messages"].pop(message_id)
+        else:
+            store["dm_messages"][message_id]["message"] = message
 
     data_store.set(store)
     return {
@@ -134,22 +134,15 @@ def message_remove_v1(token, message_id):
 
     store = data_store.get()
 
-    # Validify token/user_id
     auth_user_id = src.error_help.check_valid_token(token, store)
+    is_channel_message = src.error_help.check_message_id(store, message_id)
 
-    # Validify message_id
-    valid_messageid = False
-    for messages in store["messages"]:
-        if messages["message_id"] == message_id:
-            valid_messageid = True
-    if valid_messageid == False:
-        raise InputError(f"Error: Message_id not valid")
-
-    # Check if authorised user is allowed to delete message once their token has been validified
-    if store["messages"][message_id]["u_id"] != auth_user_id and store["users"][auth_user_id]["perm_id"] == 2:
-        raise AccessError(f"Error: Forbidden from editing message")
-
-    del store["messages"][message_id]
+    if is_channel_message == True:
+        src.error_help.check_channelmess_perms(store, auth_user_id, message_id)
+        store["channel_messages"].pop(message_id)
+    else:
+        src.error_help.check_dmmess_perms(store, auth_user_id, message_id)
+        store["dm_messages"].pop(message_id)
 
     data_store.set(store)
     return {
@@ -157,53 +150,23 @@ def message_remove_v1(token, message_id):
 
 def message_senddm_v1(token, dm_id, message):
     ''' DOCSTRING '''
-    # Checks if token is valid
     store = data_store.get()
     auth_user_id = src.error_help.check_valid_token(token, store)
-    # Checks if dm_id is valid
-    if store['dms'][0]['dm_id'] == None:
-        raise InputError(f"dm_id is not valid because there are no DMs")
-    valid_dm = False
-    dm_index = 0
-    for dm in store['dms']:
-        if dm['dm_id'] == dm_id:
-            valid_dm = True
-            break
-        dm_index += 1
-    if valid_dm == False:
+    
+    if None in store['dms'].keys() or dm_id not in store['dms'].keys():
         raise InputError(f"dm_id = {dm_id} is not valid")
-    # Checks if message is valid
+
     if message == None or len(message) < 1 or len(message) > 1000:
         raise InputError(f"Error: length of message is less than 1 or over 1000 characters")
-    # Checks if user is in dm
-    valid_member = False
-    member_index = 0
-    for members in store['dms'][dm_index]['all_members']:
-        if members['u_id'] == auth_user_id:
-            valid_member = True
-            break
-        member_index += 1
-    if valid_member == False:
+
+    if auth_user_id not in store['dms'][dm_id]['all_members'].keys():
         raise AccessError(f"User is not member of DM")
 
-    if store["dms"][dm_index]["messages"][0]["message_id"] == None:
-        store["dms"][dm_index]["messages"] = []
+    store['message_id'] += 1
+    id = store['message_id']
 
-    # Assigning unique message_id
-    channel_mess_id = store["messages"][-1]["message_id"]
-    if channel_mess_id == None:
-        channel_mess_id = -1
-    
-    dm_message_id = -1
-    for dms in store["dms"]:
-        if (dms["messages"]) and (dms["messages"][-1]["message_id"] > dm_message_id):
-            dm_message_id = dms['messages'][-1]["message_id"]
-    
-    if dm_message_id > channel_mess_id:
-        id = dm_message_id + 1
-    else:
-        id = channel_mess_id + 1
-
+    if None in store['dm_messages'].keys():
+        store['dms'][dm_id]['messages'] = {}
     
     current_time = datetime.datetime.now(datetime.timezone.utc)
     utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
@@ -211,14 +174,13 @@ def message_senddm_v1(token, dm_id, message):
 
     new_message = {
         "message_id": id,
+        "dm_id": dm_id,
         "u_id": auth_user_id,
         "message": message,
         "time_sent": int(unix_timestamp),
     }
-    print(new_message)
-    print(store['dms'])
 
-    store['dms'][dm_index]['messages'].append(new_message)
+    store['dm_messages'][id] = new_message
     data_store.set(store)
 
     return {
