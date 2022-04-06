@@ -105,7 +105,6 @@ def channel_details_v1(token, channel_id):
     }
     saved_data = data_store.get()
     u_id = check_valid_token(token, saved_data)
-    check_valid_id(u_id, saved_data)
     validate_channel(saved_data, channel_id)
     auth_user_not_in_channel(saved_data, u_id, channel_id)
 
@@ -116,10 +115,10 @@ def channel_details_v1(token, channel_id):
     details['is_public'] = saved_data['channels'][channel_id]['is_public']
 
     # configuring 'owner_members' key
-    details['owner_members'] = saved_data['channels'][channel_id]['owner_members']
+    details['owner_members'] = list(saved_data['channels'][channel_id]['owner_members'].values())
 
     # configuring 'all_members' key
-    details['all_members'] = saved_data['channels'][channel_id]['all_members']
+    details['all_members'] = list(saved_data['channels'][channel_id]['all_members'].values())
 
     return details
 

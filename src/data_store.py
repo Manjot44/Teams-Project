@@ -28,6 +28,7 @@ Example usage:
 initial_object = {
     'users': {None: 
         {
+            'u_id': None,
             'email': None,
             'name_first': None,
             'name_last': None,
@@ -39,9 +40,11 @@ initial_object = {
     },
     'channels': {None:
         {
+            'channel_id': None,
             'name': None,
             'owner_members': {None:
                 {
+                    'u_id': None,
                     'email': None,
                     'name_first': None,
                     'name_last': None,
@@ -50,6 +53,7 @@ initial_object = {
             },
             'all_members': {None:
                 {
+                    'u_id': None,
                     'email': None,
                     'name_first': None,
                     'name_last': None,
@@ -61,9 +65,11 @@ initial_object = {
     },
     'dms': {None:
         {
+            'dm_id': None,
             'name': None,
             'all_members': {None:
                 {
+                    'u_id': None,
                     'email': None,
                     'name_first': None,
                     'name_last': None,
@@ -75,6 +81,7 @@ initial_object = {
     },
     'removed_users': {None:
         {
+            'u_id': None,
             'email': None,
             'name_first': None,
             'name_last': None,
@@ -83,6 +90,7 @@ initial_object = {
     },
     'channel_messages': {None:
         {
+            'message_id': None,
             'channel_id': None,
             'u_id': None,
             'message': None,
@@ -91,6 +99,7 @@ initial_object = {
     },
     'dm_messages': {None:
         {
+            'message_id': None,
             'dm_id': None,
             'u_id': None,
             'message': None,
