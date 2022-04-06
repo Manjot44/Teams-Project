@@ -47,16 +47,16 @@ def handle_auth_register():
     request_data = request.get_json()
     email = request_data.get("email", None)
     if email != None:
-        str(email)
+        email = str(email)
     password = request_data.get("password", None)
     if password != None:
-        str(password)
+        password = str(password)
     name_first = request_data.get("name_first", None)
     if name_first != None:
-        str(name_first)
+        name_first = str(name_first)
     name_last = request_data.get("name_last", None)
     if name_last != None:
-        str(name_last)
+        name_last = str(name_last)
 
     return dumps(auth.auth_register_v1(email, password, name_first, name_last))
 
@@ -66,10 +66,10 @@ def handle_auth_login():
     request_data = request.get_json()
     email = request_data.get("email", None)
     if email != None:
-        str(email)
+        email = str(email)
     password = str(request_data.get("password", None))
     if password != None:
-        str(password)
+        password = str(password)
 
     return dumps(auth.auth_login_v1(email, password))
 
@@ -78,7 +78,7 @@ def handle_channel_leave():
     request_data = request.get_json()
     token = str(request_data.get("token", None))
     if token != None:
-        str(token)
+        token = str(token)
     channel_id = request_data.get("channel_id", None)
     channel_id = return_int_helper(channel_id)
 
@@ -103,7 +103,7 @@ def handle_channel_addowner():
     request_data = request.get_json()
     token = request_data.get("token", None)
     if token != None:
-        str(token)
+        token = str(token)
     channel_id = request_data.get("channel_id", None)
     channel_id = return_int_helper(channel_id)
     u_id = request_data.get("u_id", None)
@@ -116,7 +116,7 @@ def handle_channel_removeowner():
     request_data = request.get_json()
     token = request_data.get("token", None)
     if token != None:
-        str(token)
+        token = str(token)
     channel_id = request_data.get("channel_id", None)
     channel_id = return_int_helper(channel_id)
     u_id = request_data.get("u_id", None)
@@ -129,7 +129,7 @@ def handle_auth_logout():
     request_data = request.get_json()
     token = request_data.get("token", None)
     if token != None:
-        str(token)
+        token = str(token)
 
     return dumps(auth.auth_logout_v1(token))
 
@@ -139,12 +139,12 @@ def handle_message_send():
     request_data = request.get_json()
     token = request_data.get("token", None)
     if token != None:
-        str(token)
+        token = str(token)
     channel_id = request_data.get("channel_id", None)
     channel_id = return_int_helper(channel_id)
     message = request_data.get("message", None)
     if message != None:
-        str(message)
+        message = str(message)
 
     return dumps(messages.message_send_v1(token, channel_id, message))
 
@@ -154,12 +154,12 @@ def handle_message_senddm():
     request_data = request.get_json()
     token = request_data.get("token", None)
     if token != None:
-        str(token)
+        token = str(token)
     dm_id = request_data.get("dm_id", None)
     dm_id = return_int_helper(dm_id)
     message = request_data.get("message", None)
     if message != None:
-        str(message)
+        message = str(message)
 
     return dumps(messages.message_senddm_v1(token, dm_id, message))
 
@@ -169,13 +169,13 @@ def handle_channels_create():
     request_data = request.get_json()
     name = request_data.get("name", None)
     if name != None:
-        str(name)
+        name = str(name)
     is_public = request_data.get("is_public")
     if isinstance(is_public, bool) == False:
         is_public = None
     token = request_data.get("token", None)
     if token != None:
-        str(token)
+        token = str(token)
     return dumps(channels.channels_create_v1(token, name, is_public))
 
 
@@ -250,7 +250,7 @@ def handle_userpermission_change():
     request_data = request.get_json()
     token = request_data.get("token", None)
     if token != None:
-        str(token)
+        token = str(token)
 
     u_id = request_data.get("u_id", None)
     u_id = return_int_helper(u_id)

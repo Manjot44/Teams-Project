@@ -1,61 +1,85 @@
 from re import A
+from xmlrpc.client import ResponseError
 import pytest
 import requests
 import src.config
 
 @pytest.fixture
-def register_three_users():
+def reset():
     requests.delete(f"{src.config.url}/clear/v1")
+
+@pytest.fixture
+def register_user():
+    def generate_user(email, password, name_first, name_last):
+        user = {
+            "email": email,
+            "password": password,
+            "name_first": name_first,
+            "name_last": name_last,
+        }
+
+        response = requests.post(f"{src.config.url}/auth/register/v2", json = user)
+
+        return response
+    
+    return generate_user
+
+
+@pytest.fixture
+def register_three_users(reset, register_user):
     user_info = {
         "id": [],
         "token": []
     }
-    
-    user = {
-        "email": "aBc123._%+-@aBc123.-.Co",
-        "password": "123456",
-        "name_first": "A",
-        "name_last": "A"
-    }
 
-    response = requests.post(f"{src.config.url}/auth/register/v2", json = user)
-    assert response.status_code == 200
-    response_data = response.json()
+    new_user = register_user("aBc123._%+-@aBc123.-.Co", "123456", "A", "A")
+    assert new_user.status_code == 200
+    response_data = new_user.json()
     user_info["id"].append(response_data["auth_user_id"])
     user_info["token"].append(response_data["token"])
 
-    
-    user['email'] = ".@..Ml"
-    user['password'] = "a>?:1#"
-    user['name_first'] = "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg"
-    user['name_last'] = "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg"
-
-    response = requests.post(f"{src.config.url}/auth/register/v2", json = user)
-    assert response.status_code == 200
-    response_data = response.json()
+    new_user = register_user(".@..Ml", "a>?:1#", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg", "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg")
+    assert new_user.status_code == 200
+    response_data = new_user.json()
     user_info["id"].append(response_data["auth_user_id"])
     user_info["token"].append(response_data["token"])
 
-
-    user['email'] = "abc@gmail.com"
-    user['password'] = "thisIsPass13./"
-    user['name_first'] = "Jerry"
-    user['name_last'] = "Lin"
-
-    response = requests.post(f"{src.config.url}/auth/register/v2", json = user)
-    assert response.status_code == 200
-    response_data = response.json()
+    new_user = register_user("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")
+    assert new_user.status_code == 200
+    response_data = new_user.json()
     user_info["id"].append(response_data["auth_user_id"])
     user_info["token"].append(response_data["token"])
 
     return user_info
 
 @pytest.fixture
-def user_init():
-    user = {
-        "email": "abc@gmail.com",
-        "password": "thisIsPass13./",
-        "name_first": "Jerry",
-        "name_last": "Lin"
-    }
-    return user
+def create_channel():
+    def make_channel(token, name, is_public):
+        channel_info = {
+            "token": token,
+            "name": name,
+            "is_public": is_public,
+        }
+
+        response = requests.post(f"{src.config.url}/channels/create/v2", json = channel_info)
+        assert response.status_code == 200
+        response_data = response.json()
+
+        return response_data["channel_id"]
+
+    return make_channel
+
+@pytest.fixture
+def invite_to_channel():
+    def inviting(token, channel_id, u_id):
+        info = {
+            "token": token,
+            "channel_id": channel_id,
+            "u_id": u_id,
+        }
+
+        response = requests.post(f"{src.config.url}/channel/invite/v2", json = info)
+
+        return response
+
+    return inviting

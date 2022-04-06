@@ -1,8 +1,7 @@
 import requests
 from src.config import url
 
-def test_invalid_token():
-    requests.delete(f"{url}/clear/v1")
+def test_invalid_token(reset):
     input = {
         "token": "invalidtoken"
     }
@@ -10,10 +9,8 @@ def test_invalid_token():
     assert response.status_code == 403
 
 
-def test_single_channel_list(user_init):
-    requests.delete(f"{url}/clear/v1")
-    auth_response = requests.post(
-        f"{url}/auth/register/v2", json=user_init)
+def test_single_channel_list(reset, register_user):
+    auth_response = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     token = auth_response.json()["token"]
     input1 = {
         "token": token,
@@ -31,10 +28,8 @@ def test_single_channel_list(user_init):
     assert response_data["channels"][0]["name"] == "channel1"
 
 
-def test_multiple_channel_list(user_init):
-    requests.delete(f"{url}/clear/v1")
-    auth_response = requests.post(
-        f"{url}/auth/register/v2", json=user_init)
+def test_multiple_channel_list(reset, register_user):
+    auth_response = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     token = auth_response.json()["token"]
     input1 = {
         "token": token,
