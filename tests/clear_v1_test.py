@@ -1,5 +1,6 @@
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
+from src.config import url
 
 import pytest 
 

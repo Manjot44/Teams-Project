@@ -7,31 +7,28 @@ import src.admin
 import requests
 from tests.conftest import register_three_users
 from src.channels import channels_create_v1
-
-BASE_ADDRESS = 'http://127.0.0.1'
-BASE_PORT = 8080
-BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
+from src.config import url
 
 # Regular Test case where no errors occur - message gets sent to channel and not dm since senddm hasn't been implemented yet 
 def test_valid_remove(register_three_users):
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token": register_three_users["token"][1], "name": "channel_name", "is_public": True})
+    response = requests.post(f"{url}/channels/create/v2", json = {"token": register_three_users["token"][1], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
     channel_id = response_data["channel_id"]
 
-    response = requests.post(f"{BASE_URL}/channel/invite/v2", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "u_id": register_three_users["id"][0]})
-    response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
+    response = requests.post(f"{url}/channel/invite/v2", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "u_id": register_three_users["id"][0]})
+    response = requests.post(f"{url}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
     assert response.status_code == 200
     response_data = response.json()
 
-    response = requests.post(f"{BASE_URL}/admin/userpermission/change/v1", json = {"token" : register_three_users["token"][0], "u_id" : register_three_users["id"][1], "permission_id" : 1})
+    response = requests.post(f"{url}/admin/userpermission/change/v1", json = {"token" : register_three_users["token"][0], "u_id" : register_three_users["id"][1], "permission_id" : 1})
     assert response.status_code == 200
 
-    response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = {"token": register_three_users["token"][0], "u_id": register_three_users["id"][1]})
+    response = requests.delete(f"{url}/admin/user/remove/v1", json = {"token": register_three_users["token"][0], "u_id": register_three_users["id"][1]})
 
     assert response.status_code == 200
 
-    response = requests.get(f"{BASE_URL}/channel/messages/v2?token={register_three_users['token'][0]}&channel_id={channel_id}&start={0}")#, json = {"token": register_three_users["token"][0], "channel_id": channel_id, "start": 0})
+    response = requests.get(f"{url}/channel/messages/v2?token={register_three_users['token'][0]}&channel_id={channel_id}&start={0}")#, json = {"token": register_three_users["token"][0], "channel_id": channel_id, "start": 0})
     assert response.status_code == 200
     response_data = response.json()
     
@@ -41,60 +38,60 @@ def test_valid_remove(register_three_users):
 
 # auth_user who is trying to remove another user has an invalid token
 def test_invalid_id(register_three_users):
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token": register_three_users["token"][1], "name": "channel_name", "is_public": True})
+    response = requests.post(f"{url}/channels/create/v2", json = {"token": register_three_users["token"][1], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
     channel_id = response_data["channel_id"]
 
-    response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
+    response = requests.post(f"{url}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
     assert response.status_code == 200
     response_data = response.json()
 
-    response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = {"token": 'incorrect token', "u_id": register_three_users["id"][1]})
+    response = requests.delete(f"{url}/admin/user/remove/v1", json = {"token": 'incorrect token', "u_id": register_three_users["id"][1]})
 
     assert response.status_code == 403
 
 # uid is invalid
 def test_invalid_uid(register_three_users):
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token": register_three_users["token"][1], "name": "channel_name", "is_public": True})
+    response = requests.post(f"{url}/channels/create/v2", json = {"token": register_three_users["token"][1], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
     channel_id = response_data["channel_id"]
 
-    response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
+    response = requests.post(f"{url}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
     assert response.status_code == 200
     response_data = response.json()
 
-    response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = {"token": register_three_users["token"][0], "u_id": register_three_users["id"][1] + 50})
+    response = requests.delete(f"{url}/admin/user/remove/v1", json = {"token": register_three_users["token"][0], "u_id": register_three_users["id"][1] + 50})
 
     assert response.status_code == 400
 
 # Single global owner tries to remove themselves from Seams
 def test_only_global_owner(register_three_users):
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token": register_three_users["token"][1], "name": "channel_name", "is_public": True})
+    response = requests.post(f"{url}/channels/create/v2", json = {"token": register_three_users["token"][1], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
     channel_id = response_data["channel_id"]
 
-    response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
+    response = requests.post(f"{url}/message/send/v1", json = {"token": register_three_users["token"][1], "channel_id": channel_id, "message": "Hello Sanjam"})
     assert response.status_code == 200
     response_data = response.json()
 
-    response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = {"token": register_three_users["token"][0], "u_id": register_three_users["id"][0]})
+    response = requests.delete(f"{url}/admin/user/remove/v1", json = {"token": register_three_users["token"][0], "u_id": register_three_users["id"][0]})
 
     assert response.status_code == 400
 
 # non global owner tries to remove other user 
 def test_non_global_owner_remove(register_three_users):
-    response = requests.post(f"{BASE_URL}/channels/create/v2", json = {"token": register_three_users["token"][0], "name": "channel_name", "is_public": True})
+    response = requests.post(f"{url}/channels/create/v2", json = {"token": register_three_users["token"][0], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
     channel_id = response_data["channel_id"]
 
-    response = requests.post(f"{BASE_URL}/message/send/v1", json = {"token": register_three_users["token"][0], "channel_id": channel_id, "message": "Hello Sanjam"})
+    response = requests.post(f"{url}/message/send/v1", json = {"token": register_three_users["token"][0], "channel_id": channel_id, "message": "Hello Sanjam"})
     assert response.status_code == 200
     response_data = response.json()
 
-    response = requests.delete(f"{BASE_URL}/admin/user/remove/v1", json = {"token": register_three_users["token"][1], "u_id": register_three_users["id"][0]})
+    response = requests.delete(f"{url}/admin/user/remove/v1", json = {"token": register_three_users["token"][1], "u_id": register_three_users["id"][0]})
 
     assert response.status_code == 403
