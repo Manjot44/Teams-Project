@@ -169,23 +169,17 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     store = data_store.get()
     check_valid_id(auth_user_id, store)
     validate_channel(store, channel_id)
-    user_not_in_channel(store, auth_user_id, channel_id)
+    auth_user_not_in_channel(store, auth_user_id, channel_id)
 
     messagesreturn = {
         'messages': [],
         'start': start, 
         'end': start + 50
     }
-    
-    messages = store['channel_messages']
-    for message in messages:
+   
+    for message in store['channel_messages'].values():
         if message["channel_id"] == channel_id:
-            new_message = {
-                'message_id': message, 
-                "u_id": message["u_id"],
-                "message": message["message"],
-                "time_sent": message["time_sent"],
-            }
+            new_message = {k: message[k] for k in ('message_id', 'u_id', 'message', 'time_sent')}
             messagesreturn['messages'].append(new_message)
 
     messagesreturn['messages'].reverse()

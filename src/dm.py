@@ -176,43 +176,16 @@ def dm_leave_v1(token, dm_id):
 
     '''
     store = data_store.get()
-    # Checks if token is valid
+
     leaver_id = check_valid_token(token, store)
-    # Checks if dm_id is valid
-    if store['dms'][0]['dm_id'] == None:
-        raise InputError(f"dm_id is not valid because there are no DMs")
-    valid_dm = False
-    dm_index = 0
-    for dm in store['dms']:
-        if dm['dm_id'] == dm_id:
-            valid_dm = True
-            break
-        dm_index += 1
-    if valid_dm == False:
+
+    if None in store['dms'].keys() or dm_id not in store['dms'].keys():
         raise InputError(f"dm_id = {dm_id} is not valid")
-    # Checks if user is member of DM
-    valid_member = False
-    member_index = 0
-    for members in store['dms'][dm_index]['all_members']:
-        if members['u_id'] == leaver_id:
-            valid_member = True
-            break
-        member_index += 1
-    if valid_member == False:
+    
+    if leaver_id not in store['dms'][dm_id]['all_members'].keys():
         raise AccessError(f"User is not member of DM")
-    # User is verified member from this point on
-    # Check if member is owner member
-    valid_owner = False
-    owner_index = 0
-    for members in store['dms'][dm_index]['owner_members']:
-        if members['u_id'] == leaver_id:
-            valid_owner = True
-            break
-        owner_index += 1
-    # Removing leaver from member lists
-    if valid_owner == True:
-        store['dms'][dm_index]['owner_members'].remove(store['dms'][dm_index]['owner_members'][owner_index])
-    store['dms'][dm_index]['all_members'].remove(store['dms'][dm_index]['all_members'][member_index])
+    
+    store['dms'][dm_id]['all_members'].pop(leaver_id)
     return {}
 
 
@@ -255,56 +228,38 @@ def dm_details_v1(token, dm_id):
 
 
 def dm_messages_v1(token, dm_id, start):
-    ''' DOC STRING ''' # Throw token, dm_id into help function
+    ''' DOC STRING ''' 
     
     store = data_store.get()
-    # Checks if token is valid
     u_id = check_valid_token(token, store)
-    # Checks if dm_id is valid
-    if store['dms'][0]['dm_id'] == None:
-        raise InputError(f"dm_id is not valid because there are no DMs")
-    valid_dm = False
-    dm_index = 0
-    for dm in store['dms']:
-        if dm['dm_id'] == dm_id:
-            valid_dm = True
-            break
-        dm_index += 1
-    if valid_dm == False:
-        raise InputError(f"dm_id = {dm_id} is not valid")
-    # Checks if user is member of DM
-    valid_member = False
-    member_index = 0
-    for members in store['dms'][dm_index]['all_members']:
-        if members['u_id'] == u_id:
-            valid_member = True
-            break
-        member_index += 1
-    if valid_member == False:
-        raise AccessError(f"User is not member of DM")
-    # Checks if start is greater than number of messages
-    total_message_list = store['dms'][dm_index]['messages']
-    if start == None:
-        raise InputError(f"Invalid value for 'start' variable")
-    if start > len(total_message_list):
-        raise InputError(f"Start greater than number of messages in DM.")
-    if total_message_list[0]['message_id'] == None:
-        if start > 0:
-            raise InputError(f"List is empty, start value higher than 0 not valid")
 
-    # Returning messages
+    if None in store['dms'].keys() or dm_id not in store['dms'].keys():
+        raise InputError(f"dm_id = {dm_id} is not valid")
+
+    if u_id not in store['dms'][dm_id]['all_members'].keys():
+        raise AccessError(f"User is not member of DM")
+
     end = start + 50
     messages = {
         'messages': [],
         'start': start,
         'end': end,
     }
-    last_idx = len(total_message_list)
-    if len(total_message_list[start:last_idx]) <= 50:
+    for message in store['dm_messages'].values():
+        if message["dm_id"] == dm_id:
+            new_message = {k: message[k] for k in ('message_id', 'u_id', 'message', 'time_sent')}
+            messages['messages'].append(new_message)
+
+    messages['messages'].reverse()
+
+    if start == None or start > len(messages['messages']):
+        raise InputError(f"Start greater than number of messages in DM.")
+
+    if len(messages['messages']) <= 50:
         messages['end'] = -1
-        messages['messages'] = total_message_list[start:last_idx]
+        messages['messages'] = messages['messages'][start:]
     else:
-        messages['messages'] = total_message_list[start:start + 50]
+        messages['messages'] = messages['messages'][start:start + 50]
 
     return messages
     

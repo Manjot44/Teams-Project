@@ -46,3 +46,27 @@ def auth_channel_owner_perm(data, auth_user_id, channel_id):
     if auth_user_id not in data["channels"][channel_id]["owner_members"].keys():
         if data["users"][auth_user_id]["perm_id"] == MEMBER:
             raise AccessError(f"Error: {auth_user_id} does not have owner permissions in the channel")
+
+def check_message_id(data, message_id):
+    dm_message = False
+    channel_message = False
+    if message_id in data['channel_messages'].keys() and message_id != None:
+        channel_message = True
+    if message_id in data['dm_messages'].keys() and message_id != None:
+        dm_message = True
+
+    if dm_message == False and channel_message == False:
+        raise InputError(f"Error: Message_id not valid")
+    
+    return channel_message
+
+def check_channelmess_perms(store, auth_user_id, message_id):
+    channel_id = store["channel_messages"][message_id]["channel_id"]
+    if store["channel_messages"][message_id]["u_id"] != auth_user_id:
+        auth_channel_owner_perm(store, auth_user_id, channel_id)
+    
+def check_dmmess_perms(store, auth_user_id, message_id):
+    dm_id = store["dm_messages"][message_id]["dm_id"]
+    if store["dm_messages"][message_id]["u_id"] != auth_user_id:
+        if store["dms"][dm_id]["creator_id"] != auth_user_id and store["users"][auth_user_id]["perm_id"] == MEMBER:
+            raise AccessError(f"Error: Forbidden from editing message")
