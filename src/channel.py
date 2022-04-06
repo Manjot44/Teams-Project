@@ -28,30 +28,17 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     store = data_store.get()
 
     check_valid_id(auth_user_id, store)
-    has_u_id = False
-    for user in store["users"]:
-        if user["u_id"] == u_id and u_id != None:  
-            has_u_id = True
-    if has_u_id == False:
-        raise InputError(f"Error: {u_id} does not have a valid ID")
-
+    check_valid_id(u_id, store)
     validate_channel(store, channel_id)
 
     # Checks if auth_user is in the channel of channel_id
-    user_not_in_channel(store, auth_user_id, channel_id)
+    auth_user_not_in_channel(store, auth_user_id, channel_id)
     check_channel_user(store, u_id, channel_id)
 
     # Once the above functions run and confirm that the auth_user is in channel and that u_id valid, u_id will be added to channel 
-    add_user_info = {
-        'u_id': store['users'][u_id]['u_id'],
-        'email': store['users'][u_id]['email'],
-        'name_first': store['users'][u_id]['name_first'],
-        'name_last': store['users'][u_id]['name_last'],
-        'handle_str': store['users'][u_id]['handle_str'],
-    }
+    add_user_info = {k: store['users'][u_id][k] for k in ('email', 'name_first', 'name_last', 'handle_str')}
 
-    users = store["channels"][channel_id]["all_members"]
-    users.append(add_user_info)
+    store["channels"][channel_id]["all_members"][u_id] = add_user_info
     data_store.set(store)
 
     return {
