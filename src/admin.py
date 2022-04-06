@@ -1,6 +1,6 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
-from src.error_help import check_valid_id, check_valid_token
+from src.error_help import check_valid_id, check_valid_token, check_global_owner_count, check_global_owner
 
 OWNER = 1
 MEMBER = 2
@@ -31,28 +31,18 @@ def admin_userpermission_change(token, u_id, permission_id):
 
     auth_user = check_valid_token(token, store)
     check_valid_id(u_id, store)
+    check_global_owner(store, auth_user)
 
     if permission_id != OWNER and permission_id != MEMBER:
         raise InputError(f"Error: {permission_id} invalid permission id, permission id must either be 1 or 2.")
     if permission_id == store['users'][u_id]['perm_id']:
         raise InputError(f"Error: Perm_id already set to {permission_id}")
-    if store['users'][auth_user]['perm_id'] == MEMBER:
-        raise AccessError(f"Error: {auth_user} is not a global owner")
-    
 
-    if permission_id == OWNER and store['users'][u_id]['perm_id'] == MEMBER:
+    if permission_id == OWNER:
         store['users'][u_id]['perm_id'] = permission_id
-    if permission_id == MEMBER and store['users'][u_id]['perm_id'] == OWNER:
-        
-        global_count = 0
-        for user in store['users'].values():
-            if user['perm_id'] == OWNER:
-                global_count += 1
-        
-        if global_count > 1:
-            store['users'][u_id]['perm_id'] = permission_id
-        else:
-            raise InputError(f"Error: Need to at least have one one global owner")
+    if permission_id == MEMBER:
+        check_global_owner_count(store, u_id)
+        store['users'][u_id]['perm_id'] = permission_id
 
     data_store.set(store)
     return {
@@ -85,16 +75,8 @@ def admin_user_remove(token, u_id):
 
     auth_user = check_valid_token(token, store)
     check_valid_id(u_id, store)
-
-    if store['users'][auth_user]['perm_id'] == MEMBER:
-        raise AccessError(f"Error: {auth_user} is not a global owner")
-
-    global_count = 0
-    for user in store['users'].values():
-        if user['perm_id'] == OWNER:
-            global_count += 1
-    if global_count == 1 and store["users"][u_id]["perm_id"] == OWNER:
-        raise InputError(f"Error: Need to at least have one one global owner")
+    check_global_owner(store, auth_user)
+    check_global_owner_count(store, u_id)
     
     if None in store["removed_users"].keys():
         store['removed_users'] = {}

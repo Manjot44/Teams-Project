@@ -2,6 +2,7 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 
 MEMBER = 2
+OWNER = 1
 
 def check_valid_token(token, data):
     u_id = None
@@ -70,3 +71,15 @@ def check_dmmess_perms(store, auth_user_id, message_id):
     if store["dm_messages"][message_id]["u_id"] != auth_user_id:
         if store["dms"][dm_id]["creator_id"] != auth_user_id and store["users"][auth_user_id]["perm_id"] == MEMBER:
             raise AccessError(f"Error: Forbidden from editing message")
+
+def check_global_owner_count(data, u_id):
+    global_count = 0
+    for user in data['users'].values():
+        if user['perm_id'] == OWNER:
+            global_count += 1
+    if global_count == 1 and data["users"][u_id]["perm_id"] == OWNER:
+        raise InputError(f"Error: Need to at least have one global owner")
+
+def check_global_owner(data, u_id):
+    if data['users'][u_id]['perm_id'] == MEMBER:
+        raise AccessError(f"Error: {u_id} is not a global owner")
