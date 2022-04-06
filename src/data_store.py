@@ -67,6 +67,7 @@ initial_object = {
         {
             'dm_id': None,
             'name': None,
+            'creator_id': None,
             'all_members': {None:
                 {
                     'u_id': None,
@@ -74,7 +75,6 @@ initial_object = {
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
-                    'is_creator': None,
                 }
             }, 
         }
