@@ -75,3 +75,10 @@ def test_invalid_id_http(register_three_users):
 
     response = requests.post(f"{url}/admin/userpermission/change/v1", json = {"token" : token1, "u_id" : id2 + 5, "permission_id" : 1})
     assert response.status_code == 400
+
+# demoting an owner to a member
+def test_demote(register_three_users):
+    response = requests.post(f"{url}/admin/userpermission/change/v1", json = {"token" : register_three_users["token"][0], "u_id" : register_three_users["id"][1], "permission_id" : 1})
+    assert response.status_code == 200
+    response = requests.post(f"{url}/admin/userpermission/change/v1", json = {"token" : register_three_users["token"][1], "u_id" : register_three_users["id"][0], "permission_id" : 2})
+    assert response.status_code == 200
