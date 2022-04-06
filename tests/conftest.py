@@ -83,17 +83,3 @@ def invite_to_channel():
         return response
 
     return inviting
-
-@pytest.fixture
-def join_channel():
-    def joining(token, channel_id):
-        info = {
-            "token": token,
-            "channel_id": channel_id,
-        }
-
-        response = requests.post(f"{src.config.url}/channel/invite/v2", json = info)
-
-        return response
-    
-    return joining
