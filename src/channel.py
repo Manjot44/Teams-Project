@@ -255,17 +255,9 @@ def channel_join_v1(auth_user_id, channel_id):
     check_channel_priv(store, channel_id, auth_user_id)
     check_channel_user(store, auth_user_id, channel_id)
     
-    # Once confirmed that user is not in channel, user will be added
-    add_user_info = {
-        'u_id': store['users'][auth_user_id]['u_id'],
-        'email': store['users'][auth_user_id]['email'],
-        'name_first': store['users'][auth_user_id]['name_first'],
-        'name_last': store['users'][auth_user_id]['name_last'],
-        'handle_str': store['users'][auth_user_id]['handle_str'],
-    }
+    add_user_info = {k: store['users'][auth_user_id][k] for k in ('email', 'name_first', 'name_last', 'handle_str')}
 
-    users = store["channels"][channel_id]["all_members"]
-    users.append(add_user_info)
+    store["channels"][channel_id]["all_members"][auth_user_id] = add_user_info
     data_store.set(store)
 
     return {
