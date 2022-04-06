@@ -81,3 +81,33 @@ def test_not_from_user_owner(register_three_users):
 
     response = requests.delete(f"{url}/message/remove/v1", json = {"token": register_three_users["token"][0], "message_id": message_id})
     assert response.status_code == 200
+
+# test if it removes a dm as it should
+def test_remove_dm_normal(register_three_users):
+    response = requests.post(f"{url}/dm/create/v1", json = {"token": register_three_users["token"][0], "u_ids": [register_three_users["id"][0], register_three_users["id"][1]]})
+    assert response.status_code == 200
+    response_data = response.json()
+    dm_id = response_data["dm_id"]
+
+    response = requests.post(f"{url}/message/senddm/v1", json = {"token": register_three_users["token"][0], "dm_id": dm_id, "message": "Hello Sanjam"})
+    assert response.status_code == 200
+    response_data = response.json()
+    message_id = response_data["message_id"]
+
+    response = requests.delete(f"{url}/message/remove/v1", json = {"token": register_three_users["token"][0], "message_id": message_id})
+    assert response.status_code == 200
+
+# test where unauthorised person tried to remove dm
+def test_remove_unauthrosied(register_three_users):
+    response = requests.post(f"{url}/dm/create/v1", json = {"token": register_three_users["token"][0], "u_ids": [register_three_users["id"][0], register_three_users["id"][1]]})
+    assert response.status_code == 200
+    response_data = response.json()
+    dm_id = response_data["dm_id"]
+
+    response = requests.post(f"{url}/message/senddm/v1", json = {"token": register_three_users["token"][0], "dm_id": dm_id, "message": "Hello Sanjam"})
+    assert response.status_code == 200
+    response_data = response.json()
+    message_id = response_data["message_id"]
+
+    response = requests.delete(f"{url}/message/remove/v1", json = {"token": register_three_users["token"][1], "message_id": message_id})
+    assert response.status_code == 403
