@@ -30,12 +30,9 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     check_valid_id(auth_user_id, store)
     check_valid_id(u_id, store)
     validate_channel(store, channel_id)
-
-    # Checks if auth_user is in the channel of channel_id
     auth_user_not_in_channel(store, auth_user_id, channel_id)
     check_channel_user(store, u_id, channel_id)
 
-    # Once the above functions run and confirm that the auth_user is in channel and that u_id valid, u_id will be added to channel 
     add_user_info = {k: store['users'][u_id][k] for k in ('email', 'name_first', 'name_last', 'handle_str')}
 
     store["channels"][channel_id]["all_members"][u_id] = add_user_info
