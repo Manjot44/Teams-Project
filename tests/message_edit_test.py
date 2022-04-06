@@ -31,7 +31,7 @@ def test_empty_message(register_three_users):
     response_data = response.json()
     message_id = response_data["message_id"]
 
-    response = requests.put(f"{url}/message/edit/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "message": None})
+    response = requests.put(f"{url}/message/edit/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "message": ""})
     assert response.status_code == 200
 
 # Test if message_id is invalid
@@ -139,7 +139,7 @@ def test_empty_dm(register_three_users):
     response_data = response.json()
     message_id = response_data["message_id"]
 
-    response = requests.put(f"{url}/message/edit/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "message": None})
+    response = requests.put(f"{url}/message/edit/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "message": ""})
     assert response.status_code == 200
 
 # Test - User did not send the message, but is an owner member, should go through (for DMs)
