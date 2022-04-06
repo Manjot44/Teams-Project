@@ -162,7 +162,7 @@ def user_profile_setemail_v1(token, email):
     user_info = store['users']
     for user in user_info:
         if user != u_id:
-            if user['email'] == email:
+            if user[0]['email'] == email:
                 raise InputError(f"email address is already being used by another user")
 
     valid_email = True
