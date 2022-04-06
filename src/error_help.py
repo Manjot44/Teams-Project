@@ -1,55 +1,72 @@
 from src.data_store import data_store
 from src.error import InputError, AccessError
 
+MEMBER = 2
+
 def check_valid_token(token, data):
+    u_id = None
     valid_token = False
-    which_auth = 0
-    for idx, user in enumerate(data["users"]):
-        for active_token in user["valid_tokens"]:
-            if active_token == token:
-                valid_token = True
-                which_auth = idx
+    for user in data["users"].items():
+        if token in user[1]["valid_tokens"]:
+            valid_token = True
+            u_id = user[0]
     if valid_token == False:
         raise AccessError(f"Error: User does not have a valid token")
-    return which_auth
+    return u_id
 
-def check_valid_id(auth_user_id, data):
-    has_auth_user = False
-    which_auth = 0
-    for idx, auth_user in enumerate(data["users"]):
-        if auth_user["u_id"] == auth_user_id and auth_user_id != None:
-            has_auth_user = True
-            which_auth = idx
-    if has_auth_user == False:
-        raise AccessError(f"Error: {auth_user_id} does not have a valid ID")
-
-    return which_auth
+def check_valid_id(u_id, data):
+    if u_id not in data["users"].keys() or u_id == None:
+        raise InputError(f"Error: {u_id} does not have a valid ID")
 
 def validate_channel(data, channel_id):
-    valid_channel = False
-    for channel in data['channels']:
-        if channel_id == channel['channel_id']:
-            if channel_id != None:
-                valid_channel = True
-    if valid_channel == False:
-        raise InputError(f"Error: {channel_id} not valid")   
+    if channel_id not in data["channels"].keys() or channel_id == None:
+        raise InputError(f"Error: {channel_id} not valid")
 
 def check_channel_priv(data, channel_id, which_auth):
-    if data["channels"][channel_id]["is_public"] == False and data['users'][which_auth]['perm_id'] == 2: 
+    if data["channels"][channel_id]["is_public"] == False and data['users'][which_auth]['perm_id'] == MEMBER: 
         raise AccessError('Error: Cannot join private channel without being invited')
 
-def check_channel_user(data, auth_user_id, channel_id):
+def check_channel_user(data, u_id, channel_id):
     users = data["channels"][channel_id]["all_members"]
-    for user in users:
-        if user['u_id'] == auth_user_id and auth_user_id != None:
-            raise InputError(f"Error: {auth_user_id} is already member of the channel")
+    if u_id in users.keys() and u_id != None:
+        raise InputError(f"Error: {u_id} is already member of the channel")
 
-def user_not_in_channel(data, auth_user_id, channel_id):
-    in_channel = False
-    check_user = data["channels"][channel_id]["all_members"]
-    for check in check_user:
-        if check['u_id'] == auth_user_id and auth_user_id != None:
-            in_channel = True
-            break
-    if in_channel == False:
+def auth_user_not_in_channel(data, auth_user_id, channel_id):
+    users = data["channels"][channel_id]["all_members"]
+    if auth_user_id not in users.keys() or auth_user_id == None:
         raise AccessError(f"Error: {auth_user_id} not in specific channel")
+
+def user_not_in_channel(data, u_id, channel_id):
+    users = data["channels"][channel_id]["all_members"]
+    if u_id not in users.keys() or u_id == None:
+        raise InputError(f"Error: {u_id} not in specific channel")
+
+def auth_channel_owner_perm(data, auth_user_id, channel_id):
+    auth_user_not_in_channel(data, auth_user_id, channel_id)
+    if auth_user_id not in data["channels"][channel_id]["owner_members"].keys():
+        if data["users"][auth_user_id]["perm_id"] == MEMBER:
+            raise AccessError(f"Error: {auth_user_id} does not have owner permissions in the channel")
+
+def check_message_id(data, message_id):
+    dm_message = False
+    channel_message = False
+    if message_id in data['channel_messages'].keys() and message_id != None:
+        channel_message = True
+    if message_id in data['dm_messages'].keys() and message_id != None:
+        dm_message = True
+
+    if dm_message == False and channel_message == False:
+        raise InputError(f"Error: Message_id not valid")
+    
+    return channel_message
+
+def check_channelmess_perms(store, auth_user_id, message_id):
+    channel_id = store["channel_messages"][message_id]["channel_id"]
+    if store["channel_messages"][message_id]["u_id"] != auth_user_id:
+        auth_channel_owner_perm(store, auth_user_id, channel_id)
+    
+def check_dmmess_perms(store, auth_user_id, message_id):
+    dm_id = store["dm_messages"][message_id]["dm_id"]
+    if store["dm_messages"][message_id]["u_id"] != auth_user_id:
+        if store["dms"][dm_id]["creator_id"] != auth_user_id and store["users"][auth_user_id]["perm_id"] == MEMBER:
+            raise AccessError(f"Error: Forbidden from editing message")

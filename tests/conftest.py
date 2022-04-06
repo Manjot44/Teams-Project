@@ -1,14 +1,11 @@
 from re import A
 import pytest
 import requests
-
-BASE_ADDRESS = 'http://127.0.0.1'
-BASE_PORT = 8080
-BASE_URL = f"{BASE_ADDRESS}:{BASE_PORT}"
+import src.config
 
 @pytest.fixture
 def register_three_users():
-    requests.delete(f"{BASE_URL}/clear/v1")
+    requests.delete(f"{src.config.url}/clear/v1")
     user_info = {
         "id": [],
         "token": []
@@ -21,7 +18,7 @@ def register_three_users():
         "name_last": "A"
     }
 
-    response = requests.post(f"{BASE_URL}/auth/register/v2", json = user)
+    response = requests.post(f"{src.config.url}/auth/register/v2", json = user)
     assert response.status_code == 200
     response_data = response.json()
     user_info["id"].append(response_data["auth_user_id"])
@@ -33,7 +30,7 @@ def register_three_users():
     user['name_first'] = "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg"
     user['name_last'] = "1234567890!@#$%^&*()<>?:|_+PqwertyuiPMhsDFtaVclikg"
 
-    response = requests.post(f"{BASE_URL}/auth/register/v2", json = user)
+    response = requests.post(f"{src.config.url}/auth/register/v2", json = user)
     assert response.status_code == 200
     response_data = response.json()
     user_info["id"].append(response_data["auth_user_id"])
@@ -45,7 +42,7 @@ def register_three_users():
     user['name_first'] = "Jerry"
     user['name_last'] = "Lin"
 
-    response = requests.post(f"{BASE_URL}/auth/register/v2", json = user)
+    response = requests.post(f"{src.config.url}/auth/register/v2", json = user)
     assert response.status_code == 200
     response_data = response.json()
     user_info["id"].append(response_data["auth_user_id"])

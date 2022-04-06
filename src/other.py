@@ -13,9 +13,8 @@ def clear_v1():
         Returns {}
     '''
     store = data_store.get()
-    store['users'] = [
+    store['users'] = {None: 
         {
-            'u_id': None,
             'email': None,
             'name_first': None,
             'name_last': None,
@@ -24,81 +23,70 @@ def clear_v1():
             'perm_id': None,
             'valid_tokens': [],
         }
-    ]
-    store['channels'] = [
+    }
+    store['channels'] = {None:
         {
-            'channel_id': None,
             'name': None,
-            'owner_members': [
+            'owner_members': {None:
                 {
-                    'u_id': None,
                     'email': None,
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
                 }
-            ],
-            'all_members': [
+            },
+            'all_members': {None:
                 {
-                    'u_id': None,
                     'email': None,
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
                 }
-            ],
+            },
             'is_public': None,
         }
-    ]
-    store['dms'] = [
+    }
+    store['dms'] = {None:
         {
-            'dm_id': None,
             'name': None,
-            'owner_members': [
+            'all_members': {None:
                 {
-                    'u_id': None,
                     'email': None,
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
+                    'is_creator': None,
                 }
-            ],
-            'all_members': [
-                {
-                    'u_id': None,
-                    'email': None,
-                    'name_first': None,
-                    'name_last': None,
-                    'handle_str': None,
-                }
-            ],
-            'messages': [
-                {
-                    'message_id': None,
-                    'u_id': None,
-                    'message': None,
-                    'time_sent': None,
-                },
-            ],
+            }, 
         }
-    ]
-    store['removed_users'] = [
+    }
+    store['removed_users'] = {None:
         {
-            'u_id': None,
             'email': None,
             'name_first': None,
             'name_last': None,
             'handle_str': None,
         }
-    ]
-    store['messages'] = [
+    }
+    store['channel_messages'] = {None:
         {
-            'message_id': None,
             'channel_id': None,
             'u_id': None,
             'message': None,
             'time_sent': None,
         },
-    ]
+    }
+    store['dm_messages'] = {None:
+        {
+            'dm_id': None,
+            'u_id': None,
+            'message': None,
+            'time_sent': None,
+        },
+    }
+    store['u_id'] = -1
+    store['channel_id'] = -1
+    store['dm_id'] = -1
+    store['message_id'] = -1
 
     data_store.set(store)

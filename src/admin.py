@@ -2,6 +2,9 @@ from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.error_help import check_valid_id, check_valid_token
 
+OWNER = 1
+MEMBER = 2
+
 def admin_userpermission_change(token, u_id, permission_id):
     ''' Given a user by their user ID, set their permissions to new 
         permissions described by permission_id.
@@ -27,30 +30,23 @@ def admin_userpermission_change(token, u_id, permission_id):
     store = data_store.get()
 
     auth_user = check_valid_token(token, store)
-    has_auth_user = False
-    for user in store["users"]:
-        if user["u_id"] == u_id and u_id != None:
-            has_auth_user = True
-    if has_auth_user == False:
-        raise InputError(f"Error: {u_id} does not have a valid ID")
-    
-    check_valid_id(auth_user, store)
+    check_valid_id(u_id, store)
 
-    if permission_id < 1 or permission_id > 2:
+    if permission_id != OWNER and permission_id != MEMBER:
         raise InputError(f"Error: {permission_id} invalid permission id, permission id must either be 1 or 2.")
     if permission_id == store['users'][u_id]['perm_id']:
         raise InputError(f"Error: Perm_id already set to {permission_id}")
-    if store['users'][auth_user]['perm_id'] == 2:
+    if store['users'][auth_user]['perm_id'] == MEMBER:
         raise AccessError(f"Error: {auth_user} is not a global owner")
     
 
-    if permission_id == 1 and store['users'][u_id]['perm_id'] == 2:
+    if permission_id == OWNER and store['users'][u_id]['perm_id'] == MEMBER:
         store['users'][u_id]['perm_id'] = permission_id
-    if permission_id == 2 and store['users'][u_id]['perm_id'] == 1:
+    if permission_id == MEMBER and store['users'][u_id]['perm_id'] == OWNER:
         
         global_count = 0
-        for user in store['users']:
-            if user['perm_id'] == 1:
+        for user in store['users'].values():
+            if user['perm_id'] == OWNER:
                 global_count += 1
         
         if global_count > 1:
@@ -88,30 +84,20 @@ def admin_user_remove(token, u_id):
     store = data_store.get()
 
     auth_user = check_valid_token(token, store)
-    
-    has_auth_user = False
-    for user in store["users"]:
-        if user["u_id"] == u_id and u_id != None:
-            has_auth_user = True
-    if has_auth_user == False:
-        raise InputError(f"Error: {u_id} does not have a valid ID")
-    
-    check_valid_id(auth_user, store)
+    check_valid_id(u_id, store)
 
-    if store['users'][auth_user]['perm_id'] == 2:
+    if store['users'][auth_user]['perm_id'] == MEMBER:
         raise AccessError(f"Error: {auth_user} is not a global owner")
 
     global_count = 0
-    removing_only_global = False
-    for user in store['users']:
-        if user['perm_id'] == 1:
+    for user in store['users'].values():
+        if user['perm_id'] == OWNER:
             global_count += 1
-            if user["u_id"] == u_id:
-                removing_only_global = True
-    if global_count == 1 and removing_only_global == True:
+    if global_count == 1 and store["users"][u_id]["perm_id"] == OWNER:
         raise InputError(f"Error: Need to at least have one one global owner")
-    if store['removed_users'][0]['u_id'] == None:
-        store['removed_users'] = []
+    
+    if None in store["removed_users"].keys():
+        store['removed_users'] = {}
     add_removed_user = {
         'u_id': u_id,
         'email': None,
@@ -119,36 +105,28 @@ def admin_user_remove(token, u_id):
         'name_last': 'user',
         'handle_str': None,
     }
-    store["removed_users"].append(add_removed_user)
-    for user in store['users']:
-        if user['u_id'] == u_id:
-            del user
+    store["removed_users"][u_id] = add_removed_user
+    
+    store["users"].pop(u_id)
 
-    for channel in store["channels"]:
-        for user in channel["all_members"]:
-            if user["u_id"] == u_id:
-                del user
-
-        for user1 in channel["owner_members"]:
-            if user1["u_id"] == u_id:
-                del user1
+    for channel in store["channels"].values():
+        if u_id in channel["all_members"].keys():
+            channel["all_members"].pop(u_id)
+        if u_id in channel["owner_members"].keys():
+            channel["owner_members"].pop(u_id)
                 
-    for dm in store["dms"]:
-        for user_dm in dm["all_members"]:
-            if user_dm["u_id"] == u_id:
-                del user_dm 
-        
-        for user_dm1 in dm["owner_members"]:
-            if user_dm1["u_id"] == u_id:
-                del user_dm1
+    for dm in store["dms"].values():
+        if u_id in dm["all_members"].keys():
+            dm["all_members"].pop(u_id)
 
-        for dm_message in dm["messages"]:
-            if dm_message["u_id"] == u_id:
-                dm_message["message"] = 'Removed user'
+    for dm_message in store["dm_messages"].values():
+        if dm_message["u_id"] == u_id:
+            dm_message["message"] = 'Removed user'
 
-    for msg in store["messages"]:
+    for msg in store["channel_messages"].values():
         if msg["u_id"] == u_id:
             msg["message"] = 'Removed user'
+    
     data_store.set(store)
     return {
     }

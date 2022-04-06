@@ -26,7 +26,7 @@ Example usage:
 
 # YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'users': [
+    'users': {None: 
         {
             'u_id': None,
             'email': None,
@@ -36,75 +36,64 @@ initial_object = {
             'password': None,
             'perm_id': None,
             'valid_tokens': [],
+            'profile_img_url': None,
         }
-    ],
-    'channels': [
+    },
+    'channels': {None:
         {
             'channel_id': None,
             'name': None,
-            'owner_members': [
+            'owner_members': {None:
                 {
                     'u_id': None,
                     'email': None,
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
+                    'profile_img_url': None,
                 }
-            ],
-            'all_members': [
+            },
+            'all_members': {None:
                 {
                     'u_id': None,
                     'email': None,
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
+                    'profile_img_url': None,
                 }
-            ],
+            },
             'is_public': None,
         }
-    ],
-    'dms': [
+    },
+    'dms': {None:
         {
             'dm_id': None,
             'name': None,
-            'owner_members': [
+            'creator_id': None,
+            'all_members': {None:
                 {
                     'u_id': None,
                     'email': None,
                     'name_first': None,
                     'name_last': None,
                     'handle_str': None,
+                    'profile_img_url': None,
                 }
-            ],
-            'all_members': [
-                {
-                    'u_id': None,
-                    'email': None,
-                    'name_first': None,
-                    'name_last': None,
-                    'handle_str': None,
-                }
-            ],
-            'messages': [
-                {
-                    'message_id': None,
-                    'u_id': None,
-                    'message': None,
-                    'time_sent': None,
-                },
-            ],
+            }, 
         }
-    ],
-    'removed_users': [
+    },
+    'removed_users': {None:
         {
             'u_id': None,
             'email': None,
             'name_first': None,
             'name_last': None,
             'handle_str': None,
+            'profile_img_url': None,
         }
-    ],
-    'messages': [
+    },
+    'channel_messages': {None:
         {
             'message_id': None,
             'channel_id': None,
@@ -112,7 +101,20 @@ initial_object = {
             'message': None,
             'time_sent': None,
         },
-    ],
+    },
+    'dm_messages': {None:
+        {
+            'message_id': None,
+            'dm_id': None,
+            'u_id': None,
+            'message': None,
+            'time_sent': None,
+        },
+    },
+    'u_id': -1,
+    'channel_id': -1,
+    'dm_id': -1,
+    'message_id': -1,
 }
 
 # YOU SHOULD MODIFY THIS OBJECT ABOVE
