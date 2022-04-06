@@ -131,7 +131,8 @@ def user_profile_sethandle_v1(token, handle_str):
     Exceptions:
         InputError - Occurs when:
             - when length of handle_str is not between 3 and 20 characters (incl.)
-            - when handle_str contains characters that are not 
+            - when handle_str contains characters that are not alphanumeric
+            - when handle is already used by another user
         AccessError - Occurs when:
             - token passed in is not valid
 
