@@ -140,6 +140,7 @@ def auth_register_v1(email, password, name_first, name_last):
     encoded_jwt = jwt.encode({'handle_str': handle, 'session_id': 0}, SECRET, algorithm='HS256')
 
     new_user = {
+        "u_id": id,
         "email": email,
         "password": hashlib.sha256(password.encode()).hexdigest(),
         "name_first": name_first,
@@ -149,8 +150,7 @@ def auth_register_v1(email, password, name_first, name_last):
         "valid_tokens": [encoded_jwt],
     }
 
-    user = list(store["users"].keys())
-    if user[0] == None:
+    if None in store["users"].keys():
         store["users"] = {}
     store["users"][id] = new_user
     

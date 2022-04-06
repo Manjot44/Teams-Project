@@ -49,8 +49,7 @@ def message_send_v1(token, channel_id, message):
         "channel_id": channel_id,
     }
 
-    messages = list(store["channel_messages"].keys())
-    if messages[0] == None:
+    if None in store["channel_messages"].keys():
         store["channel_messages"] = {}
     store["channel_messages"][id] = new_message
     

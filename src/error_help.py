@@ -19,7 +19,7 @@ def check_valid_id(u_id, data):
         raise InputError(f"Error: {u_id} does not have a valid ID")
 
 def validate_channel(data, channel_id):
-    if channel_id not in data["channels"].keys or channel_id == None:
+    if channel_id not in data["channels"].keys() or channel_id == None:
         raise InputError(f"Error: {channel_id} not valid")
 
 def check_channel_priv(data, channel_id, which_auth):
