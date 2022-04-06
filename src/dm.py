@@ -167,12 +167,13 @@ def dm_leave_v1(token, dm_id):
         dm_id (int) - dm that is specified
 
     Exceptions:
-        AccessError - Occurs when:
-            token passed in is not valid
         InputError - Occurs when:
-            dm_id passed is not valid
+            - dm_id does not refer to a valid DM
         AccessError - Occurs when:
-            user is not member of DM
+            - dm_id is valid but authorised user is not a member of the DM
+            - when token does not refer to authorised user
+    Return value:
+        Returns {}
 
     '''
     store = data_store.get()
@@ -228,7 +229,23 @@ def dm_details_v1(token, dm_id):
 
 
 def dm_messages_v1(token, dm_id, start):
-    ''' DOC STRING ''' 
+    '''Returns up to 50 messages in DM for given user and dm_id. 
+
+    Arguments:
+        token (str) - user authentication
+        dm_id (int) - dm identification number
+        start (int) - index number of message
+
+    Exceptions:
+        InputError - Occurs when:
+            - when dm_id does not refer to valid DM
+            - start is greater than total messages in DM
+        AccessError - Occurs when:
+            - when dm_id is valid but authorised user is not member of DM
+
+    Return Value:
+        (dict): returns a dictionary with messages(list of dict), start(int), end(int )
+    '''
     
     store = data_store.get()
     u_id = check_valid_token(token, store)
