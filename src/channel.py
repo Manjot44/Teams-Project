@@ -36,7 +36,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     check_channel_user(store, u_id, channel_id)
 
     # Once the above functions run and confirm that the auth_user is in channel and that u_id valid, u_id will be added to channel 
-    add_user_info = {k: store['users'][u_id][k] for k in ('email', 'name_first', 'name_last', 'handle_str')}
+    add_user_info = {k: store['users'][u_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str')}
 
     store["channels"][channel_id]["all_members"][u_id] = add_user_info
     data_store.set(store)
@@ -82,30 +82,18 @@ def channel_details_v1(token, channel_id):
             ],
         }
     '''
-
-    # dictionary that is to be returned with function
-    details = {
-        'name': None,
-        'is_public': None,
-        'owner_members': [],
-        'all_members': [],
-    }
+    
     saved_data = data_store.get()
     u_id = check_valid_token(token, saved_data)
     validate_channel(saved_data, channel_id)
     auth_user_not_in_channel(saved_data, u_id, channel_id)
 
-    # configuring 'name' key
-    details['name'] = saved_data['channels'][channel_id]['name']
-    
-    # configuring 'is_public' key
-    details['is_public'] = saved_data['channels'][channel_id]['is_public']
-
-    # configuring 'owner_members' key
-    details['owner_members'] = list(saved_data['channels'][channel_id]['owner_members'].values())
-
-    # configuring 'all_members' key
-    details['all_members'] = list(saved_data['channels'][channel_id]['all_members'].values())
+    details = {
+        'name': saved_data['channels'][channel_id]['name'],
+        'is_public': saved_data['channels'][channel_id]['is_public'],
+        'owner_members': list(saved_data['channels'][channel_id]['owner_members'].values()),
+        'all_members': list(saved_data['channels'][channel_id]['all_members'].values()),
+    }
 
     return details
 
@@ -242,7 +230,7 @@ def channel_join_v1(auth_user_id, channel_id):
     check_channel_priv(store, channel_id, auth_user_id)
     check_channel_user(store, auth_user_id, channel_id)
     
-    add_user_info = {k: store['users'][auth_user_id][k] for k in ('email', 'name_first', 'name_last', 'handle_str')}
+    add_user_info = {k: store['users'][auth_user_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str')}
 
     store["channels"][channel_id]["all_members"][auth_user_id] = add_user_info
     data_store.set(store)

@@ -136,6 +136,7 @@ def channels_create_v1(token, name, is_public):
             }
 
     store["channels"][channel_id] = {
+        "channel_id": channel_id,
         "name": name,
         "owner_members": {
             auth_user_id: add_user

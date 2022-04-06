@@ -25,7 +25,7 @@ def channel_leave_v1(token, channel_id):
     
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.validate_channel(store, channel_id)
-    src.error_help.user_not_in_channel(store, auth_user_id, channel_id)    
+    src.error_help.auth_user_not_in_channel(store, auth_user_id, channel_id)
     
     store["channels"][channel_id]["all_members"].pop(auth_user_id)
     if auth_user_id in store["channels"][channel_id]["owner_members"].keys():
@@ -66,12 +66,7 @@ def channel_addowner_v1(token, channel_id, u_id):
         raise InputError(f"Error: {u_id} is already an owner of the channel")
     src.error_help.auth_channel_owner_perm(store, auth_user_id, channel_id)
 
-    add_user_info = {
-        'email': store['users'][u_id]['email'],
-        'name_first': store['users'][u_id]['name_first'],
-        'name_last': store['users'][u_id]['name_last'],
-        'handle_str': store['users'][u_id]['handle_str'],
-    }
+    add_user_info = {k: store['users'][auth_user_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str')}
     store["channels"][channel_id]["owner_members"][u_id] = add_user_info
 
     data_store.set(store)

@@ -43,6 +43,7 @@ def message_send_v1(token, channel_id, message):
     unix_timestamp = utc_time.timestamp()
 
     new_message = {
+        "message_id": id,
         "u_id": auth_user_id,
         "message": message,
         "time_sent": int(unix_timestamp),
