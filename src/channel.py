@@ -132,40 +132,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         }
     '''
 
-    # store = data_store.get()
-    # check_valid_id(auth_user_id, store)
-    # validate_channel(store, channel_id)
-    # user_not_in_channel(store, auth_user_id, channel_id)
-
-    # messagesreturn = {
-    #     'messages': [],
-    #     'start': start, 
-    #     'end': start + 50
-    # }
-    
-    # messages = store['messages']
-    # for message in messages:
-    #     if message["channel_id"] == channel_id:
-    #         new_message = {
-    #             'message_id': message["message_id"], 
-    #             "u_id": message["u_id"],
-    #             "message": message["message"],
-    #             "time_sent": message["time_sent"],
-    #         }
-    #         messagesreturn['messages'].append(new_message)
-
-    # if start > len(messagesreturn['messages']):
-    #     raise InputError(f"start must be smaller than total amount of messages")
-
-    # if start + 50 > len(messagesreturn['messages']):
-    #     messagesreturn['end'] = -1
-    #     messagesreturn['messages'] = messagesreturn['messages'][start:]
-        
-    # else:
-    #     messagesreturn['messages'] = messagesreturn['messages'][start:start + 50]
-    #     messagesreturn['end'] = start + 50
-    # return messagesreturn        
-
     store = data_store.get()
     check_valid_id(auth_user_id, store)
     validate_channel(store, channel_id)

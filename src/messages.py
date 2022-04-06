@@ -4,6 +4,7 @@ from src.error import InputError, AccessError
 import datetime
 
 MEMBER = 2
+OWNER = 1
 
 def message_send_v1(token, channel_id, message):
     ''' Send a message from the authorised user to the channel specified by channel_id. 
@@ -88,21 +89,17 @@ def message_edit_v1(token, message_id, message):
 
     auth_user_id = src.error_help.check_valid_token(token, store)
     is_channel_message = src.error_help.check_message_id(store, message_id)
-    
+    if len(message) > 1000: raise InputError(f"Error: Message over 1000 characters long")
+
     if is_channel_message == True:
         src.error_help.check_channelmess_perms(store, auth_user_id, message_id)
-        if len(message) > 1000:
-            raise InputError(f"Error: Message over 1000 characters long")
-        elif len(message) == 0:
+        if len(message) == 0:
             store["channel_messages"].pop(message_id)
         else:
             store["channel_messages"][message_id]["message"] = message
-
     else:
         src.error_help.check_dmmess_perms(store, auth_user_id, message_id)
-        if len(message) > 1000:
-            raise InputError(f"Error: Message over 1000 characters long")
-        elif len(message) == 0:
+        if len(message) == 0:
             store["dm_messages"].pop(message_id)
         else:
             store["dm_messages"][message_id]["message"] = message
