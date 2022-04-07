@@ -37,7 +37,7 @@ def auth_login_v1(email, password):
     if valid_email == False:
         raise InputError(f"Error: email does not belong to a user")
     
-    user =  store["users"][u_id]
+    user = store["users"][u_id]
     if user["password"] != hashlib.sha256(password.encode()).hexdigest():
         raise InputError(f"Error: password is incorrect")
     
@@ -180,9 +180,7 @@ def auth_logout_v1(token):
     store = src.persistence.get_pickle()
     
     auth_user_id = src.error_help.check_valid_token(token, store)
-    for tokens in store["users"][auth_user_id]["valid_tokens"]:
-        if tokens == token:
-            store["users"][auth_user_id]["valid_tokens"].remove(tokens)
+    store["users"][auth_user_id]["valid_tokens"].remove(token)
 
     src.persistence.set_pickle(store)
 
