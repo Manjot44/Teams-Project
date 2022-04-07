@@ -121,3 +121,26 @@ def test_invalid_token():
 
     response3 = requests.get(f"{url}/channel/messages/v2?token={invalid_token}&channel_id={channel_id}&start={0}")
     assert response3.status_code == 403 
+
+def test_send_50_messages():
+    requests.delete(f"{url}/clear/v1")   
+
+    response = requests.post(f"{url}/auth/register/v2", json={"email": "jerrylin@gmail.com", "password": "JerrYlin4", "name_first": "Jerry", "name_last": "Lin"})
+    token1 = response.json()["token"]
+    input = {
+        "token": token1,
+        "name": "foo",
+        "is_public": True
+    }
+
+    response2 = requests.post(f"{url}/channels/create/v2", json=input)
+    channel_id = response2.json()['channel_id']
+
+    i = 0
+    while i < 60:
+        response = requests.post(f"{url}/message/send/v1", json = {"token": token1, "channel_id": channel_id, "message": "lolthony ecsdee"})
+        assert response.status_code == 200
+        i += 1
+
+    response3 = requests.get(f"{url}/channel/messages/v2?token={token1}&channel_id={channel_id}&start={0}")
+    assert response3.status_code == 200
