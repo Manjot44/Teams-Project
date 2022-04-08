@@ -204,9 +204,10 @@ def dm_details_v1(token, dm_id):
     if u_id not in store["dms"][dm_id]["member_ids"]:
         raise AccessError(f"You are not part of this dm")
 
+    user_details = ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')
     members = []
     for member in store["dms"][dm_id]["member_ids"]:
-        add_new = {k:store['users'][member][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')}
+        add_new = {k:store['users'][member][k] for k in user_details}
         members.append(add_new)
     
     return {
@@ -253,7 +254,15 @@ def dm_messages_v1(token, dm_id, start):
         'end': end,
     }
     for message_id in store['dms'][dm_id]['message_ids']:
-        messages['messages'].append(store['messages'][message_id])
+        new_message = store['messages'][message_id]
+        for reaction in new_message['reacts'].values():
+            if u_id in reaction['u_ids']:
+                reaction['is_this_user_reacted'] = True
+            else:
+                reaction['is_this_user_reacted'] = False
+        new_message['reacts'] = list(new_message['reacts'].values())
+        
+        messages['messages'].append(new_message)
     messages['messages'].reverse()
 
     if len(messages['messages']) <= 50:
