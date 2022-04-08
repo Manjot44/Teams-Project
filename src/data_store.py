@@ -26,7 +26,7 @@ Example usage:
 
 # YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'users': {None: 
+    'users': {-1: 
         {
             'u_id': None,
             'email': None,
@@ -39,51 +39,26 @@ initial_object = {
             'profile_img_url': None,
         }
     },
-    'channels': {None:
+    'channels': {-1:
         {
             'channel_id': None,
             'name': None,
-            'owner_members': {None:
-                {
-                    'u_id': None,
-                    'email': None,
-                    'name_first': None,
-                    'name_last': None,
-                    'handle_str': None,
-                    'profile_img_url': None,
-                }
-            },
-            'all_members': {None:
-                {
-                    'u_id': None,
-                    'email': None,
-                    'name_first': None,
-                    'name_last': None,
-                    'handle_str': None,
-                    'profile_img_url': None,
-                }
-            },
+            'owner_ids': [],
+            'member_ids': [],
             'is_public': None,
+            'message_ids': [],
         }
     },
-    'dms': {None:
+    'dms': {-1:
         {
             'dm_id': None,
             'name': None,
             'creator_id': None,
-            'all_members': {None:
-                {
-                    'u_id': None,
-                    'email': None,
-                    'name_first': None,
-                    'name_last': None,
-                    'handle_str': None,
-                    'profile_img_url': None,
-                }
-            }, 
+            'member_ids': [], 
+            'message_ids': [],
         }
     },
-    'removed_users': {None:
+    'removed_users': {-1:
         {
             'u_id': None,
             'email': None,
@@ -93,28 +68,15 @@ initial_object = {
             'profile_img_url': None,
         }
     },
-    'channel_messages': {None:
+    'messages': {-1:
         {
             'message_id': None,
-            'channel_id': None,
             'u_id': None,
             'message': None,
             'time_sent': None,
         },
     },
-    'dm_messages': {None:
-        {
-            'message_id': None,
-            'dm_id': None,
-            'u_id': None,
-            'message': None,
-            'time_sent': None,
-        },
-    },
-    'u_id': -1,
-    'channel_id': -1,
-    'dm_id': -1,
-    'message_id': -1,
+    'id': -1,
 }
 
 # YOU SHOULD MODIFY THIS OBJECT ABOVE
