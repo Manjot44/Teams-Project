@@ -25,8 +25,6 @@ def dm_create_v1(token, u_ids):
     store = src.persistence.get_pickle()
 
     owner_id = check_valid_token(token, store)
-    if u_ids == []:
-        raise InputError(f"Error: Enter a valid ID")
     for u_id in u_ids:
         check_valid_id(u_id, store)
 

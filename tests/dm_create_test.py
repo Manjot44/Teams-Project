@@ -12,17 +12,6 @@ def test_invalid_token(reset, register_user):
     assert response.status_code == 403
 
 
-def test_invalid_uid(reset, register_user):
-    auth_response = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
-    token = auth_response.json()["token"]
-    input = {
-        "token": token,
-        "u_ids": []
-    }
-    response = requests.post(f"{url}/dm/create/v1", json=input)
-    assert response.status_code == 400
-
-
 def test_duplicate_uid(reset, register_user):
     auth_response = register_user("jerry@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     token = auth_response.json()["token"]
