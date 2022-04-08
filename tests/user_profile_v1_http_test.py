@@ -34,7 +34,8 @@ def test_correct_return():
                                     'email': "jerrylin@gmail.com", 
                                     'name_first': 'Jerry', 
                                     'name_last': 'Lin', 
-                                    'handle_str': 'jerrylin'
+                                    'handle_str': 'jerrylin',
+                                    'profile_img_url': None
     }}
 
 def test_correct_return_removed_user(): 
@@ -59,5 +60,6 @@ def test_correct_return_removed_user():
                                     'email': None, 
                                     'name_first': 'Removed', 
                                     'name_last': 'user', 
-                                    'handle_str': None
+                                    'handle_str': None,
+                                    'profile_img_url': None
     }}

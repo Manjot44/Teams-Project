@@ -86,6 +86,7 @@ def admin_user_remove(token, u_id):
         'name_first': 'Removed',
         'name_last': 'user',
         'handle_str': None,
+        'profile_img_url': None,
     }
     store["removed_users"][u_id] = add_removed_user
     
