@@ -1,4 +1,3 @@
-from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.error_help import check_valid_token
 import re
@@ -19,9 +18,7 @@ def user_profile_v1(token, u_id):
             - token passed in is not valid
 
     Return Value:
-        Returns {
-            'user': { u_id, email, name_first, name_last, handle_str, profile_img_url },
-        }
+        (dict): returns a dictionary with key 'user' which contains general user info
     
     '''
 
@@ -30,9 +27,9 @@ def user_profile_v1(token, u_id):
     check_valid_token(token, store)
 
     valid_u_id = "invalid"
-    if u_id in store["users"].keys() and u_id != None:
+    if u_id in store["users"].keys() and u_id != -1:
         valid_u_id = "valid_user"
-    if u_id in store["removed_users"].keys() and u_id != None:
+    if u_id in store["removed_users"].keys() and u_id != -1:
         valid_u_id = "valid_removed_user"
 
     if valid_u_id == "invalid":
@@ -65,7 +62,7 @@ def user_profile_setname_v1(token, name_first, name_last):
             - token passed in is not valid
 
     Return Value:
-        Returns {}
+        (dict): returns an empty dictionary
     
     '''
 
@@ -100,8 +97,7 @@ def user_profile_setemail_v1(token, email):
             - token passed in is not valid
 
     Return Value:
-        Returns {}
-    
+        (dict): returns an empty dictionary
     '''
 
     store = src.persistence.get_pickle()
@@ -139,10 +135,9 @@ def user_profile_sethandle_v1(token, handle_str):
 
     Return Value:
         Returns {}
-    
     '''
 
-    store = data_store.get()
+    store = src.persistence.get_pickle()
 
     u_id = check_valid_token(token, store)
 
@@ -186,7 +181,7 @@ def users_all_v1(token):
     }
 
     for user in store['users'].values():
-        if user['u_id'] != None:
+        if user['u_id'] != -1:
             new_append = {k:user[k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str')}
             users_all['users'].append(new_append)
 

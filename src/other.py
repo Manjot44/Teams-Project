@@ -1,4 +1,3 @@
-from src.data_store import data_store
 import src.persistence
 
 def clear_v1():

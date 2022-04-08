@@ -1,7 +1,3 @@
-import src.auth
-import src.channels
-import src.channel
-import pytest 
 import requests
 import src.config
 

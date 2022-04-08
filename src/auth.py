@@ -1,4 +1,3 @@
-from src.data_store import data_store
 from src.error import InputError
 import hashlib
 import re
@@ -132,8 +131,8 @@ def auth_register_v1(email, password, name_first, name_last):
 
     handle = generate_handle(name_first, name_last)
     
-    store["u_id"] += 1
-    id = store["u_id"]  
+    store["id"] += 1
+    id = store["id"]  
     perm_id = MEMBER
     if id == 0:
         perm_id = OWNER
@@ -151,7 +150,7 @@ def auth_register_v1(email, password, name_first, name_last):
         "profile_img_url": None
     }
 
-    if None in store["users"].keys():
+    if -1 in store["users"].keys():
         store["users"] = {}
     store["users"][id] = new_user
     

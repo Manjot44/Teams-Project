@@ -49,7 +49,7 @@ def test_dm_normal(reset, register_user):
     response1 = requests.post(f"{url}/dm/create/v1", json=input1)
     response_data1 = response1.json()
     assert response1.status_code == 200
-    assert response_data1["dm_id"] == 0
+    assert response_data1["dm_id"] == 2
     input2 = {
         "token": token2,
         "u_ids": [added_user1]
@@ -57,4 +57,4 @@ def test_dm_normal(reset, register_user):
     response2 = requests.post(f"{url}/dm/create/v1", json=input2)
     response_data2 = response2.json()
     assert response2.status_code == 200
-    assert response_data2["dm_id"] == 1
+    assert response_data2["dm_id"] == 3

@@ -1,7 +1,4 @@
-import pytest
 import requests
-from src.messages import message_send_v1
-from tests.conftest import register_three_users
 from src.config import url
 
 # Test if message edit works as it should 

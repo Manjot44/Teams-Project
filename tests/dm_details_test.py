@@ -31,12 +31,13 @@ def test_user_not_in_dm(register_three_users):
         "token": token1,
         "u_ids": [u_id2]
     }
-    requests.post(
-        f"{url}/dm/create/v1", json=dm_create_input)
+    response = requests.post(f"{url}/dm/create/v1", json=dm_create_input)
+    dm_id = response.json()["dm_id"]
+
 
     input1 = {
         "token": token3,
-        "dm_id": 0
+        "dm_id": dm_id
     }
     response = requests.get(f"{url}/dm/details/v1", params=input1)
     assert response.status_code == 403

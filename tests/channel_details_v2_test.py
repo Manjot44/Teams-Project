@@ -1,6 +1,4 @@
-import pytest
 import requests
-from src import auth, channel, channels, error, data_store, other
 from src.config import url
 
 def test_channel_details_valid_user_public_channel(register_three_users):    

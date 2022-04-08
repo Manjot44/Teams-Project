@@ -1,5 +1,4 @@
-from src.data_store import data_store
-from src.error import InputError, AccessError
+from src.error import InputError
 from src.error_help import check_valid_id, check_valid_token, check_global_owner_count, check_global_owner
 import src.persistence
 
@@ -26,7 +25,7 @@ def admin_userpermission_change(token, u_id, permission_id):
                 the authorised user is not a global owner
 
         Return Value:
-            Returns {}
+            (dict): returns an empty dictionary
     '''
     store = src.persistence.get_pickle()
 
@@ -70,7 +69,7 @@ def admin_user_remove(token, u_id):
                 the authorised user is not a global owner
 
         Return Value:
-            Returns {}
+            (dict): returns an empty dictionary
     '''
     store = src.persistence.get_pickle()
 
@@ -79,7 +78,7 @@ def admin_user_remove(token, u_id):
     check_global_owner(store, auth_user)
     check_global_owner_count(store, u_id)
     
-    if None in store["removed_users"].keys():
+    if -1 in store["removed_users"].keys():
         store['removed_users'] = {}
     add_removed_user = {
         'u_id': u_id,
@@ -93,22 +92,20 @@ def admin_user_remove(token, u_id):
     store["users"].pop(u_id)
 
     for channel in store["channels"].values():
-        if u_id in channel["all_members"].keys():
-            channel["all_members"].pop(u_id)
-        if u_id in channel["owner_members"].keys():
-            channel["owner_members"].pop(u_id)
+        if u_id in channel["member_ids"]:
+            channel["member_ids"].remove(u_id)
+        if u_id in channel["owner_ids"]:
+            channel["owner_ids"].remove(u_id)
                 
     for dm in store["dms"].values():
-        if u_id in dm["all_members"].keys():
-            dm["all_members"].pop(u_id)
+        if u_id in dm["member_ids"]:
+            dm["member_ids"].remove(u_id)
+        if u_id == dm["creator_id"]:
+            dm["creator_id"] = None
 
-    for dm_message in store["dm_messages"].values():
-        if dm_message["u_id"] == u_id:
-            dm_message["message"] = 'Removed user'
-
-    for msg in store["channel_messages"].values():
-        if msg["u_id"] == u_id:
-            msg["message"] = 'Removed user'
+    for message in store["messages"].values():
+        if message["u_id"] == u_id:
+            message["message"] = 'Removed user'
     
     src.persistence.set_pickle(store)
     return {

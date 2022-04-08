@@ -1,11 +1,4 @@
-import pytest
-from src.auth import auth_register_v1
-from src.channel import channel_details_v1, channel_join_v1
-from src.channels import channels_create_v1
-from src.error import InputError, AccessError
-from src.other import clear_v1
 from src.config import url
-from tests.conftest import register_three_users
 import requests
 
 ''' 
@@ -21,8 +14,6 @@ def test_user_added(register_three_users):
     response = requests.post(f"{url}/channels/create/v2", json = {"token" : token1, "name" : "channel1", "is_public" : True})
     response_channel = response.json()
     channel1_http = response_channel["channel_id"]
-
-    assert channel1_http == 0
     
     response_channel_join = requests.post(f"{url}/channel/join/v2", json = {"token" : token2, "channel_id" : channel1_http})
     

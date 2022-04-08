@@ -1,5 +1,3 @@
-from re import A
-from xmlrpc.client import ResponseError
 import pytest
 import requests
 import src.config

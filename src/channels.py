@@ -1,6 +1,5 @@
-from src.error import InputError, AccessError
-from src.data_store import data_store
-from src.error_help import check_valid_id, validate_channel, check_channel_priv, check_channel_user, user_not_in_channel, check_valid_token
+from src.error import InputError
+from src.error_help import check_valid_token
 import src.persistence
 
 def channels_list_v1(token):
@@ -23,11 +22,11 @@ def channels_list_v1(token):
 
     channels_list = []
 
-    for channel in store["channels"].items():
-        if auth_user_id in channel[1]["all_members"]:
+    for channel in store["channels"].values():
+        if auth_user_id in channel["member_ids"]:
             channels_list.append({
-                    'channel_id': channel[0],
-                    'name': channel[1]["name"]
+                    'channel_id': channel["channel_id"],
+                    'name': channel["name"]
                 })
 
     return {
@@ -46,37 +45,7 @@ def channels_listall_v1(token):
             auth_user_id passed in is not valid
 
     Return Value:
-        Returns {
-            'channel_id': channel_id (int),
-            'name': channel_name (str),
-            'owner_members': [
-                {
-                    'u_id': id (int),
-                    'email': email (str),
-                    'name_first': name_first (str),
-                    'name_last': name_last (str),
-                    'handle_str': handle (str),
-                }
-            ],
-            'all_members': [
-                {
-                    'u_id': id (int),
-                    'email': email (str),
-                    'name_first': name_first (str),
-                    'name_last': name_last (str),
-                    'handle_str': handle (str),
-                }
-            ],
-            'is_public': public (bool),
-            'messages': [
-                {
-                    'message_id': message_id (int),
-                    'u_id': u_id (int),
-                    'message': message (str),
-                    'time_sent': time (int),
-                },
-            ]
-        }
+        (dict): returns a dictionary with key 'channels' which is a list of dictionaries with 'channel_id' and 'name'
     '''
 
     saved_data = src.persistence.get_pickle()
@@ -86,7 +55,7 @@ def channels_listall_v1(token):
         'channels': []
     }
     
-    if None not in saved_data['channels'].keys():
+    if -1 not in saved_data['channels'].keys():
         for channel in saved_data['channels'].values():
             appended_channel = {
                 'channel_id': channel['channel_id'],
@@ -123,25 +92,19 @@ def channels_create_v1(token, name, is_public):
 
     auth_user_id = check_valid_token(token, store)
 
-    store["channel_id"] += 1
-    channel_id = store["channel_id"]
+    store["id"] += 1
+    channel_id = store["id"]
 
-    add_user = {k: store['users'][auth_user_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')}
-
-    if None in store["channels"].keys():
-        store["channels"] = {
-            }
+    if -1 in store["channels"].keys():
+        store["channels"] = {}
 
     store["channels"][channel_id] = {
         "channel_id": channel_id,
         "name": name,
-        "owner_members": {
-            auth_user_id: add_user
-        },
-        "all_members": {
-            auth_user_id: add_user
-        },
-        "is_public": is_public
+        "owner_ids": [auth_user_id],
+        "member_ids": [auth_user_id],
+        "is_public": is_public,
+        "message_ids": []
     }
 
     src.persistence.set_pickle(store)
