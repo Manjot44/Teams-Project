@@ -99,7 +99,8 @@ def message_edit_v1(token, message_id, message):
             store["messages"].pop(message_id)
             store['dms'][channeldm_id]['message_ids'].remove(message_id)
     
-    store["messages"][message_id]["message"] = message
+    if len(message) != 0:
+        store["messages"][message_id]["message"] = message
 
     src.persistence.set_pickle(store)
     return {
