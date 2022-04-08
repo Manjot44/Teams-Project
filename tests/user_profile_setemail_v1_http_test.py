@@ -18,7 +18,8 @@ def test_correct_output():
                                     'email': "montajree@gmail.com", 
                                     'name_first': 'Jerry', 
                                     'name_last': 'Lin', 
-                                    'handle_str': 'jerrylin'
+                                    'handle_str': 'jerrylin',
+                                    'profile_img_url': None
     }}
 
 def test_invalid_new_email():

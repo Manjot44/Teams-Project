@@ -39,10 +39,11 @@ def user_profile_v1(token, u_id):
         'user': {}
     }
     
+    user_details = ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')
     if valid_u_id == "valid_user":
-        user_info_dict['user'] = {k: store["users"][u_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str')}
+        user_info_dict['user'] = {k: store["users"][u_id][k] for k in user_details}
     elif valid_u_id == "valid_removed_user":
-        user_info_dict['user'] = {k: store["removed_users"][u_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str')}
+        user_info_dict['user'] = {k: store["removed_users"][u_id][k] for k in user_details}
         
     return user_info_dict
                 
@@ -180,9 +181,10 @@ def users_all_v1(token):
         'users': []
     }
 
+    user_details = ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')
     for user in store['users'].values():
         if user['u_id'] != -1:
-            new_append = {k:user[k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str')}
+            new_append = {k:user[k] for k in user_details}
             users_all['users'].append(new_append)
 
     return users_all

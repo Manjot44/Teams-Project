@@ -74,6 +74,14 @@ initial_object = {
             'u_id': None,
             'message': None,
             'time_sent': None,
+            'reacts': {-1:
+                {
+                    'react_id': None,
+                    'u_ids': [],
+                    'is_this_user_reacted': None,
+                }
+            },
+            'is_pinned': None,
         },
     },
     'id': -1,

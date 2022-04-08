@@ -48,6 +48,14 @@ def message_send_v1(token, channel_id, message):
         "u_id": auth_user_id,
         "message": message,
         "time_sent": int(unix_timestamp),
+        "reacts": {1:
+            {
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": None,
+            }
+        },
+        "is_pinned": False,
     }
 
     if -1 in store["messages"].keys():
@@ -190,6 +198,14 @@ def message_senddm_v1(token, dm_id, message):
         "u_id": auth_user_id,
         "message": message,
         "time_sent": int(unix_timestamp),
+        "reacts": {1:
+            {
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": None,
+            }
+        },
+        "is_pinned": False,
     }
     store['messages'][id] = new_message
 

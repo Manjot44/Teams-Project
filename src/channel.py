@@ -70,8 +70,9 @@ def channel_details_v1(token, channel_id):
         'all_members': [],
     }
 
+    user_details = ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')
     for u_id in channel['member_ids']:
-        add_new = {k:saved_data['users'][u_id][k] for k in ('u_id', 'email', 'name_first', 'name_last', 'handle_str', 'profile_img_url')}
+        add_new = {k:saved_data['users'][u_id][k] for k in user_details}
         details['all_members'].append(add_new)
         if u_id in channel['owner_ids']:
             details['owner_members'].append(add_new)
@@ -118,7 +119,15 @@ def channel_messages_v1(token, channel_id, start):
     }
     
     for message_id in store['channels'][channel_id]['message_ids']:
-        messagesreturn['messages'].append(store['messages'][message_id])
+        new_message = store['messages'][message_id]
+        for reaction in new_message['reacts'].values():
+            if auth_user_id in reaction['u_ids']:
+                reaction['is_this_user_reacted'] = True
+            else:
+                reaction['is_this_user_reacted'] = False
+        new_message['reacts'] = list(new_message['reacts'].values())
+
+        messagesreturn['messages'].append(new_message)
     messagesreturn['messages'].reverse()
     
     if start + 50 > len(messagesreturn['messages']):

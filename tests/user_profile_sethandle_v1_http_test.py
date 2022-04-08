@@ -19,7 +19,8 @@ def test_correct_output():
                                     'email': "jerrylin@gmail.com", 
                                     'name_first': 'Jerry', 
                                     'name_last': 'Lin', 
-                                    'handle_str': 'manjotbhathal'
+                                    'handle_str': 'manjotbhathal',
+                                    'profile_img_url': None
     }}
 
 def test_invalid_handle_length1():  

@@ -63,6 +63,14 @@ def clear_v1():
             'u_id': None,
             'message': None,
             'time_sent': None,
+            'reacts': {-1:
+                {
+                    'react_id': None,
+                    'u_ids': [],
+                    'is_this_user_reacted': None,
+                }
+            },
+            'is_pinned': None,
         },
     }
     store['id'] = -1
