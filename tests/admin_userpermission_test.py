@@ -1,9 +1,3 @@
-import pytest
-from src.auth import auth_register_v1
-from src.error import InputError, AccessError
-from src.other import clear_v1
-from src.data_store import data_store
-import src.admin
 import requests
 from src.config import url
 

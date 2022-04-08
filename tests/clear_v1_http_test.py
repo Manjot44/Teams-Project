@@ -1,5 +1,4 @@
 import requests
-import pytest
 from src.config import url
 
 def test_clear_v1_1():

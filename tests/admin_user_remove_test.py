@@ -1,12 +1,4 @@
-import pytest
-from src.auth import auth_register_v1
-from src.error import InputError, AccessError
-from src.other import clear_v1
-from src.data_store import data_store
-import src.admin
 import requests
-from tests.conftest import register_three_users
-from src.channels import channels_create_v1
 from src.config import url
 
 # Regular Test case where no errors occur - message gets sent to channel and not dm since senddm hasn't been implemented yet 

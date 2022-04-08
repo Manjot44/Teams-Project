@@ -1,4 +1,3 @@
-from src.data_store import data_store
 import src.error_help
 from src.error import InputError, AccessError
 import datetime
@@ -27,9 +26,7 @@ def message_send_v1(token, channel_id, message):
                 channel_id is valid and the authorised user is not a member of the channel
         
         Return Value:
-            Returns {
-                'message_id': message_id,
-            }
+            (dict): returns a dictionary with 'message_id'
     '''
     store = src.persistence.get_pickle()
     
@@ -39,8 +36,8 @@ def message_send_v1(token, channel_id, message):
         raise InputError(f"Error: length of message is less than 1 or over 1000 characters")
     src.error_help.auth_user_not_in_channel(store, auth_user_id, channel_id)
 
-    store["message_id"] += 1
-    id = store["message_id"]
+    store["id"] += 1
+    id = store["id"]
 
     current_time = datetime.datetime.now(datetime.timezone.utc)
     utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
@@ -51,13 +48,14 @@ def message_send_v1(token, channel_id, message):
         "u_id": auth_user_id,
         "message": message,
         "time_sent": int(unix_timestamp),
-        "channel_id": channel_id,
     }
 
-    if None in store["channel_messages"].keys():
-        store["channel_messages"] = {}
-    store["channel_messages"][id] = new_message
+    if -1 in store["messages"].keys():
+        store["messages"] = {}
+    store["messages"][id] = new_message
     
+    store["channels"][channel_id]["message_ids"].append(id)
+
     src.persistence.set_pickle(store)
 
     return {
@@ -82,28 +80,27 @@ def message_edit_v1(token, message_id, message):
                  - the authorised user has owner permissions in the channel/DM
 
         Return Value:
-            Returns { 
-
-            }
+            (dict): returns an empty dictionary
     '''
     store = src.persistence.get_pickle()
 
     auth_user_id = src.error_help.check_valid_token(token, store)
-    is_channel_message = src.error_help.check_message_id(store, message_id)
+    channeldm_id = src.error_help.check_message_id(store, message_id)
     if len(message) > 1000: raise InputError(f"Error: Message over 1000 characters long")
 
-    if is_channel_message == True:
-        src.error_help.check_channelmess_perms(store, auth_user_id, message_id)
+    if channeldm_id in store['channels'].keys():
+        src.error_help.check_channelmess_perms(store, auth_user_id, channeldm_id, message_id)
         if len(message) == 0:
-            store["channel_messages"].pop(message_id)
-        else:
-            store["channel_messages"][message_id]["message"] = message
+            store["messages"].pop(message_id)
+            store['channels'][channeldm_id]['message_ids'].remove(message_id)
     else:
-        src.error_help.check_dmmess_perms(store, auth_user_id, message_id)
+        src.error_help.check_dmmess_perms(store, auth_user_id, channeldm_id, message_id)
         if len(message) == 0:
-            store["dm_messages"].pop(message_id)
-        else:
-            store["dm_messages"][message_id]["message"] = message
+            store["messages"].pop(message_id)
+            store['dms'][channeldm_id]['message_ids'].remove(message_id)
+    
+    if len(message) != 0:
+        store["messages"][message_id]["message"] = message
 
     src.persistence.set_pickle(store)
     return {
@@ -125,22 +122,22 @@ def message_remove_v1(token, message_id):
                 - the authorised user has owner permissions in the channel/DM
 
         Return Value:
-            Returns {
-
-            }
+            (dict): returns an empty dictionary
     '''
 
     store = src.persistence.get_pickle()
 
     auth_user_id = src.error_help.check_valid_token(token, store)
-    is_channel_message = src.error_help.check_message_id(store, message_id)
+    channeldm_id = src.error_help.check_message_id(store, message_id)
 
-    if is_channel_message == True:
-        src.error_help.check_channelmess_perms(store, auth_user_id, message_id)
-        store["channel_messages"].pop(message_id)
+    if channeldm_id in store['channels'].keys():
+        src.error_help.check_channelmess_perms(store, auth_user_id, channeldm_id, message_id)
+        store['channels'][channeldm_id]['message_ids'].remove(message_id)
     else:
-        src.error_help.check_dmmess_perms(store, auth_user_id, message_id)
-        store["dm_messages"].pop(message_id)
+        src.error_help.check_dmmess_perms(store, auth_user_id, channeldm_id, message_id)
+        store['dms'][channeldm_id]['message_ids'].remove(message_id)
+    
+    store["messages"].pop(message_id)
 
     src.persistence.set_pickle(store)
     return {
@@ -163,27 +160,25 @@ def message_senddm_v1(token, dm_id, message):
                 dm_id is valid and the authorised user is not a member of the DM
         
         Return Value:
-            Returns {
-                'message_id': message_id,
-            }
+            (dict): returns a dictionary with 'message_id'
     '''
 
     store = src.persistence.get_pickle()
     auth_user_id = src.error_help.check_valid_token(token, store)
     
-    if None in store['dms'].keys() or dm_id not in store['dms'].keys():
+    if dm_id == -1 or dm_id not in store['dms'].keys():
         raise InputError(f"dm_id = {dm_id} is not valid")
 
     if message == None or len(message) < 1 or len(message) > 1000:
         raise InputError(f"Error: length of message is less than 1 or over 1000 characters")
 
-    if auth_user_id not in store['dms'][dm_id]['all_members'].keys():
+    if auth_user_id not in store['dms'][dm_id]['member_ids']:
         raise AccessError(f"User is not member of DM")
 
-    store['message_id'] += 1
-    id = store['message_id']
+    store['id'] += 1
+    id = store['id']
 
-    if None in store['dm_messages'].keys():
+    if -1 in store['messages'].keys():
         store['dms'][dm_id]['messages'] = {}
     
     current_time = datetime.datetime.now(datetime.timezone.utc)
@@ -192,13 +187,14 @@ def message_senddm_v1(token, dm_id, message):
 
     new_message = {
         "message_id": id,
-        "dm_id": dm_id,
         "u_id": auth_user_id,
         "message": message,
         "time_sent": int(unix_timestamp),
     }
+    store['messages'][id] = new_message
 
-    store['dm_messages'][id] = new_message
+    store['dms'][dm_id]['message_ids'].append(id)
+    
     src.persistence.set_pickle(store)
 
     return {

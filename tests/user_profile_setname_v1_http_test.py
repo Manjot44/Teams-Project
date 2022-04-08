@@ -1,5 +1,4 @@
 import requests
-import pytest
 import src.config
 
 def test_correct_output():

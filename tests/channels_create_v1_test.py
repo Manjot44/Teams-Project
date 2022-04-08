@@ -37,7 +37,7 @@ def test_normal_dualchannel(reset, register_user):
     response1 = requests.post(f"{url}/channels/create/v2", json=input1)
     assert response1.status_code == 200
     response_data1 = response1.json()
-    assert response_data1["channel_id"] == 0
+    assert response_data1["channel_id"] == 1
     
     auth_response2 = register_user("jerrylin@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     token2 = auth_response2.json()["token"]
@@ -49,7 +49,7 @@ def test_normal_dualchannel(reset, register_user):
     response2 = requests.post(f"{url}/channels/create/v2", json=input2)
     assert response2.status_code == 200
     response_data2 = response2.json()
-    assert response_data2["channel_id"] == 1
+    assert response_data2["channel_id"] == 3
 
 
 def test_invalid_token(reset):

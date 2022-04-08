@@ -1,5 +1,4 @@
 import requests
-import pytest
 from src.config import url
 
 def test_users_all_token_invalid(register_three_users):

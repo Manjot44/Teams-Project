@@ -1,12 +1,8 @@
-import sys
 import signal
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.error import InputError
-from src.error_help import check_valid_token
-from src import config, auth, other, channel_expansion, messages, channels, error_help, data_store, dm, channel, admin, user
-import src.admin
+from src import config, auth, other, channel_expansion, messages, channels, dm, channel, admin, user
 
 
 def quit_gracefully(*args):
@@ -200,16 +196,13 @@ def handle_channel_messages():
 
     token = str(request.args.get('token'))
 
-    store = data_store.data_store.get()
-    u_id = error_help.check_valid_token(token, store)   
-
     channel_id = request.args.get('channel_id', None)
     channel_id = return_int_helper(channel_id)
 
     start = request.args.get('start', None)
     start = return_int_helper(start)
 
-    return_value = channel.channel_messages_v1(u_id, channel_id, start)
+    return_value = channel.channel_messages_v1(token, channel_id, start)
 
     return dumps(return_value)
 
@@ -257,7 +250,7 @@ def handle_userpermission_change():
     permission_id = request_data.get("permission_id", None)
     permission_id = return_int_helper(permission_id)
 
-    return dumps(src.admin.admin_userpermission_change(token, u_id, permission_id))
+    return dumps(admin.admin_userpermission_change(token, u_id, permission_id))
 
 
 @ APP.route("/dm/create/v1", methods=['POST'])
@@ -289,11 +282,8 @@ def handle_channel_invite():
     channel_id = return_int_helper(channel_id)
     u_id = request_data.get("u_id", None)
     u_id = return_int_helper(u_id)
-    store = data_store.data_store.get()
 
-    auth_user_id = error_help.check_valid_token(token, store)
-
-    return dumps(channel.channel_invite_v1(auth_user_id, channel_id, u_id))
+    return dumps(channel.channel_invite_v1(token, channel_id, u_id))
 
 
 @ APP.route("/channel/join/v2", methods=['POST'])
@@ -302,11 +292,8 @@ def handle_channel_join():
     token = str(request_data.get("token", None))
     channel_id = request_data.get("channel_id", None)
     channel_id = return_int_helper(channel_id)
-    store = data_store.data_store.get()
 
-    auth_user_id = error_help.check_valid_token(token, store)
-
-    return dumps(channel.channel_join_v1(auth_user_id, channel_id))
+    return dumps(channel.channel_join_v1(token, channel_id))
 
 @APP.route("/user/profile/v1", methods=['GET'])
 def handle_user_profile():
@@ -370,7 +357,7 @@ def handle_admin_user_remove():
     token = str(request_data.get("token", None))
     u_id = int(request_data.get("u_id", None))
 
-    return dumps(src.admin.admin_user_remove(token, u_id))
+    return dumps(admin.admin_user_remove(token, u_id))
 
 
 @APP.route("/users/all/v1", methods=['GET'])

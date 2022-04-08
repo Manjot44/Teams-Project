@@ -1,4 +1,3 @@
-from src.data_store import data_store
 import src.persistence
 
 def clear_v1():
@@ -15,8 +14,10 @@ def clear_v1():
     '''
     store = src.persistence.get_pickle()
 
-    store['users'] = {None: 
+    
+    store['users'] = {-1: 
         {
+            'u_id': None,
             'email': None,
             'name_first': None,
             'name_last': None,
@@ -24,71 +25,46 @@ def clear_v1():
             'password': None,
             'perm_id': None,
             'valid_tokens': [],
+            'profile_img_url': None,
         }
     }
-    store['channels'] = {None:
+    store['channels'] = {-1:
         {
+            'channel_id': None,
             'name': None,
-            'owner_members': {None:
-                {
-                    'email': None,
-                    'name_first': None,
-                    'name_last': None,
-                    'handle_str': None,
-                }
-            },
-            'all_members': {None:
-                {
-                    'email': None,
-                    'name_first': None,
-                    'name_last': None,
-                    'handle_str': None,
-                }
-            },
+            'owner_ids': [],
+            'member_ids': [],
             'is_public': None,
+            'message_ids': [],
         }
     }
-    store['dms'] = {None:
+    store['dms'] = {-1:
         {
+            'dm_id': None,
             'name': None,
-            'all_members': {None:
-                {
-                    'email': None,
-                    'name_first': None,
-                    'name_last': None,
-                    'handle_str': None,
-                    'is_creator': None,
-                }
-            }, 
+            'creator_id': None,
+            'member_ids': [], 
+            'message_ids': [],
         }
     }
-    store['removed_users'] = {None:
+    store['removed_users'] = {-1:
         {
+            'u_id': None,
             'email': None,
             'name_first': None,
             'name_last': None,
             'handle_str': None,
+            'profile_img_url': None,
         }
     }
-    store['channel_messages'] = {None:
+    store['messages'] = {-1:
         {
-            'channel_id': None,
+            'message_id': None,
             'u_id': None,
             'message': None,
             'time_sent': None,
         },
     }
-    store['dm_messages'] = {None:
-        {
-            'dm_id': None,
-            'u_id': None,
-            'message': None,
-            'time_sent': None,
-        },
-    }
-    store['u_id'] = -1
-    store['channel_id'] = -1
-    store['dm_id'] = -1
-    store['message_id'] = -1
+    store['id'] = -1
 
     src.persistence.set_pickle(store)

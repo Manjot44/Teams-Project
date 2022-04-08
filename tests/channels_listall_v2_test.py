@@ -1,6 +1,4 @@
-import pytest
 import requests
-from src import auth, channel, channels, error, data_store, other
 from src.config import url
 
 def test_listall_invalid_user():

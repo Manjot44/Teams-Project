@@ -1,11 +1,8 @@
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
-from src.config import url
-
 import pytest 
-
 from src.other import clear_v1
-from src.error import AccessError, InputError
+from src.error import AccessError
 
 def test_clear_v1():
     clear_v1()

@@ -39,5 +39,5 @@ def test_valid_list(reset, register_user):
     response = requests.get(f"{url}/dm/list/v1", params=input1)
     assert response.status_code == 200
     response_data = response.json()
-    assert response_data["dms"][0]["dm_id"] == 0
+    assert response_data["dms"][0]["dm_id"] == 2
     assert response_data["dms"][0]["name"] == "ashsur, jerrylin"
