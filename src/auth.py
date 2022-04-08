@@ -147,7 +147,14 @@ def auth_register_v1(email, password, name_first, name_last):
         "handle_str": handle,
         "perm_id": perm_id,
         "valid_tokens": [encoded_jwt],
-        "profile_img_url": None
+        "profile_img_url": None,
+        "notifications": [
+            {
+            "channel_id": None,
+            "dm_id": None,
+            "notification_message": None,
+            }
+        ],
     }
 
     if -1 in store["users"].keys():

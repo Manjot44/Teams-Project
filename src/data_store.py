@@ -37,6 +37,13 @@ initial_object = {
             'perm_id': None,
             'valid_tokens': [],
             'profile_img_url': None,
+            'notifications': [
+                {
+                'channel_id': None,
+                'dm_id': None,
+                'notification_message': None,
+                }
+            ],
         }
     },
     'channels': {-1:
