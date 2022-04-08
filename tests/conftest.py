@@ -1,3 +1,4 @@
+from urllib import response
 import pytest
 import requests
 import src.config
@@ -81,3 +82,19 @@ def invite_to_channel():
         return response
 
     return inviting
+
+@pytest.fixture
+def create_dm():
+    def make_dm(token, u_ids):
+        dm_info = {
+            'token': token,
+            'u_ids': u_ids
+        }
+        
+        response = requests.post(f"{src.config.url}/dm/create/v1", json = dm_info)
+        assert response.status_code == 200
+        response_data = response.json()
+
+        return response_data['dm_id']
+
+    return make_dm 
