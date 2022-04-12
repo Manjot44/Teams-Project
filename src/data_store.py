@@ -72,6 +72,7 @@ initial_object = {
         {
             'message_id': None,
             'u_id': None,
+            'shared_message_length': None,
             'message': None,
             'time_sent': None,
             'reacts': {-1:
