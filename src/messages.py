@@ -303,7 +303,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
     elif channel_id == -1:
         src.error_help.validate_dm(store, dm_id)
-        src.error_help.check_dmmess_perms(store, auth_user_id, channeldm_id, message_id)
+        src.error_help.check_dmmess_perms(store, auth_user_id, channeldm_id, og_message_id)
 
         store['id'] += 1
         id = store['id']
