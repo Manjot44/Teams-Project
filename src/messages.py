@@ -295,8 +295,8 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
             "is_pinned": False,
         }
 
-        if -1 in store["messages"].keys():
-            store["messages"] = {}
+        # if -1 in store["messages"].keys():
+        #     store["messages"] = {}
         store["messages"][id] = new_message
         
         store["channels"][channel_id]["message_ids"].append(id)
@@ -308,8 +308,8 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         store['id'] += 1
         id = store['id']
 
-        if -1 in store['messages'].keys():
-            store['dms'][dm_id]['messages'] = {}
+        # if -1 in store['messages'].keys():
+        #     store['dms'][dm_id]['messages'] = {}
         
         current_time = datetime.datetime.now(datetime.timezone.utc)
         utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
