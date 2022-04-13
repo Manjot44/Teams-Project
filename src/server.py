@@ -366,6 +366,7 @@ def users_all():
 
     return dumps(user.users_all_v1(token))
 
+
 @APP.route("/notifications/get/v1", methods=['GET'])
 def handle_notifications_get():
     token = request.args.get("token", None)
@@ -373,6 +374,18 @@ def handle_notifications_get():
         token = str(token)
 
     return dumps(notifications.notifications_get(token))
+
+
+@APP.route("/message/share/v1", methods=["POST"])
+def handle_message_share():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    og_message_id = int(request_data.get("og_message_id", None))
+    message = str(request_data.get("message", None))
+    channel_id = int(request_data.get("channel_id", None))
+    dm_id = int(request_data.get("dm_id", None))
+
+    return dumps(messages.message_share_v1(token, og_message_id, message, channel_id, dm_id))
 
 # NO NEED TO MODIFY BELOW THIS POINT
 

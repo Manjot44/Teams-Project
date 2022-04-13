@@ -81,3 +81,7 @@ def check_global_owner_count(data, u_id):
 def check_global_owner(data, u_id):
     if data['users'][u_id]['perm_id'] == MEMBER:
         raise AccessError(f"Error: {u_id} is not a global owner")
+
+def validate_dm(data, dm_id):
+    if dm_id not in data["dms"].keys() or dm_id == -1:
+        raise InputError(f"Error: DM {dm_id} not valid")
