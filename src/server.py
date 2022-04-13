@@ -366,6 +366,21 @@ def users_all():
 
     return dumps(user.users_all_v1(token))
 
+@APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
+def handle_user_profile_uploadphoto_v1():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+
+    img_url = request_data.get("img_url", None)
+    if img_url != None:
+        img_url = str(img_url)
+
+    x_start = return_int_helper('x_start')
+    y_start = return_int_helper('y_start')
+    x_end = return_int_helper('x_end')
+    y_end = return_int_helper('y_end')   
+
+    return dumps(user.user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end))
 
 # NO NEED TO MODIFY BELOW THIS POINT
 

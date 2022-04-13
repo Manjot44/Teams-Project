@@ -37,6 +37,11 @@ initial_object = {
             'perm_id': None,
             'valid_tokens': [],
             'profile_img_url': None,
+            'img_url': None,
+            'x_start': None,
+            'y_start': None, 
+            'x_end': None, 
+            'y_end': None,
         }
     },
     'channels': {-1:

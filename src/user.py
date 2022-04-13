@@ -6,6 +6,7 @@ import requests
 import sys
 from PIL import Image
 import urllib.request
+import validators
 
 def user_profile_v1(token, u_id):
     '''For a valid user, returns information about their user_id, email, first name,
@@ -193,6 +194,8 @@ def users_all_v1(token):
 
     return users_all
 
+
+
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     store = src.persistence.get_pickle()
@@ -203,33 +206,44 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     # checks if url is valid
     response = requests.get(img_url)
     if response.status_code != 200:
-        raise InputError(f"error ocured when retrieving image")
+        raise InputError(f"error occured when retrieving image")
+    # if not validators.url(img_url):
+    #     raise InputError(f"error occured when retrieving image")
 
-    # image is opened
-    urllib.request.urlretrieve(img_url, f'src/static/profile_pic_{u_id}.jpg')
-    imageObject = Image.open(f'src/static/profile_pic_{u_id}.jpg')
 
-    #raises input error if image dimensions are incorrect
-    if x_start < 0 or y_start < 0 or x_end < 0 or y_end < 0:
-        raise InputError(f"the dimensions of the image are invalid")
-    if x_end <= x_start or y_end <= y_start:
-        raise InputError(f"the dimensions of the image are invalid")
-
-    #raises input error if image dimensions are incorrect
-    width, height = imageObject.size
-    if width < x_start or width > x_end:
-        raise InputError(f"the dimensions of the image are invalid")
-
-    if height < y_start or height > y_end:
-        raise InputError(f"the dimensions of the image are invalid")    
-   
     # checks if image is jpg
     if '.jpg' not in img_url:
         raise InputError(f"image is not JPG")
     # if img_url[-3:] != 'jpg':
     #     raise InputError(f"image is not JPG")
 
+    # image is opened
+    urllib.request.urlretrieve(img_url, f'src/static/profile_pic_{u_id}.jpg')
+    imageObject = Image.open(f'src/static/profile_pic_{u_id}.jpg')
+
+    if x_start == None or y_start == None or x_end == None or y_end == None:
+        raise InputError(f"the dimensions are invalid")
+
+    #raises input error if image dimensions are incorrect (x, y values are negative)
+    if x_start < 0 or y_start < 0 or x_end < 0 or y_end < 0:
+        raise InputError(f"the dimensions are invalid")
+    if x_end <= x_start or y_end <= y_start:
+        raise InputError(f"the dimensions  are invalid")
+
+    #raises input error if image dimensions are incorrect (x, y end > x, y start)
+    if x_end > x_start or y_end > y_start:
+        raise InputError(f"the dimensions are invalid")
+
+    #raises input error if image dimensions are incorrect (x, y values are too large)
+    width, height = imageObject.size
+    if x_start > width or x_end > width:
+        raise InputError(f"the dimensions of the image are invalid")
+
+    if y_start > height or y_end > height:
+        raise InputError(f"the dimensions of the image are invalid")    
+   
     cropped = imageObject.crop((x_start, y_start, x_end, y_end))
     cropped.save(f'src/static/profile_pic_{u_id}.jpg')
    
-    return
+    src.persistence.set_pickle(store)
+    
