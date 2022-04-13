@@ -2,6 +2,7 @@ import src.error_help
 from src.error import InputError, AccessError
 import datetime
 import src.persistence
+import src.notifications
 
 MEMBER = 2
 OWNER = 1
@@ -65,6 +66,8 @@ def message_send_v1(token, channel_id, message):
     store["channels"][channel_id]["message_ids"].append(id)
 
     src.persistence.set_pickle(store)
+
+    src.notifications.create_tag_notification(auth_user_id, channel_id, message)
 
     return {
         "message_id": id
@@ -212,6 +215,8 @@ def message_senddm_v1(token, dm_id, message):
     store['dms'][dm_id]['message_ids'].append(id)
     
     src.persistence.set_pickle(store)
+
+    src.notifications.create_tag_notification(auth_user_id, dm_id, message)
 
     return {
         "message_id": id

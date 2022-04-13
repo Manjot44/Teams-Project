@@ -7,7 +7,7 @@ def test_invalid_token(register_three_users):
     response = requests.get(f"{src.config.url}/notifications/get/v1?token=invalidtoken")
     assert response.status_code == 403
 
-def get_channeladd_notification(register_three_users, create_channel, invite_to_channel):
+def test_get_channeladd_notification(register_three_users, create_channel, invite_to_channel):
     channel_id = create_channel(register_three_users["token"][0], "channel_name", True)
     invite_to_channel(register_three_users["token"][0], channel_id, register_three_users["id"][1])
     
@@ -23,7 +23,7 @@ def get_channeladd_notification(register_three_users, create_channel, invite_to_
 
     assert notifications[0] == expected_response
 
-def get_dmadd_notification(register_three_users, create_dm):
+def test_get_dmadd_notification(register_three_users, create_dm):
     dm_id = create_dm(register_three_users["token"][0], [register_three_users["id"][2]])
 
     response = requests.get(f"{src.config.url}/notifications/get/v1?token={register_three_users['token'][2]}")
@@ -38,7 +38,7 @@ def get_dmadd_notification(register_three_users, create_dm):
 
     assert notifications[0] == expected_response
 
-def get_channeltag_notification(register_three_users, create_channel, invite_to_channel):
+def test_get_channeltag_notification(register_three_users, create_channel, invite_to_channel):
     channel_id = create_channel(register_three_users["token"][0], "channel_name", True)
     invite_to_channel(register_three_users["token"][0], channel_id, register_three_users["id"][2])
 
@@ -56,12 +56,12 @@ def get_channeltag_notification(register_three_users, create_channel, invite_to_
     expected_response = {
         'channel_id': channel_id,
         'dm_id': -1,
-        'notification_message': "aa has tagged you in channel_name: @jerrylin hello ther"
+        'notification_message': "aa tagged you in channel_name: @jerrylin hello ther"
     }
 
-    assert notifications[1] == expected_response
+    assert notifications[0] == expected_response
 
-def get_dmtag_notification(register_three_users, create_dm):
+def test_get_dmtag_notification(register_three_users, create_dm):
     dm_id = create_dm(register_three_users["token"][0], [register_three_users["id"][2]])
 
     message_info = {
@@ -78,7 +78,7 @@ def get_dmtag_notification(register_three_users, create_dm):
     expected_response = {
         'channel_id': -1,
         'dm_id': dm_id,
-        'notification_message': "aa has tagged you in aa, jerrylin: @jerrylin hello"
+        'notification_message': "aa tagged you in aa, jerrylin: @jerrylin hello"
     }
 
-    assert notifications[1] == expected_response
+    assert notifications[0] == expected_response
