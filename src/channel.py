@@ -1,6 +1,7 @@
 from src.error import InputError
 from src.error_help import check_valid_token, check_valid_id, validate_channel, check_channel_priv, check_channel_user, auth_user_not_in_channel
 import src.persistence
+import src.notifications
 
 def channel_invite_v1(token, channel_id, u_id):
     '''Invites a user with ID u_id to join a channel with ID channel_id. 
@@ -36,6 +37,9 @@ def channel_invite_v1(token, channel_id, u_id):
     store["channels"][channel_id]["member_ids"].append(u_id)
     
     src.persistence.set_pickle(store)
+
+    src.notifications.create_add_notification(auth_user_id, channel_id, u_id)
+
     return {
     }
 

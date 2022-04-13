@@ -26,6 +26,13 @@ def clear_v1():
             'perm_id': None,
             'valid_tokens': [],
             'profile_img_url': None,
+            'notifications': [
+                {
+                'channel_id': None,
+                'dm_id': None,
+                'notification_message': None,
+                }
+            ],
         }
     }
     store['channels'] = {-1:

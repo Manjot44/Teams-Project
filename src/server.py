@@ -2,7 +2,7 @@ import signal
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src import config, auth, other, channel_expansion, messages, channels, dm, channel, admin, user
+from src import config, auth, other, channel_expansion, messages, channels, dm, channel, admin, user, notifications
 
 
 def quit_gracefully(*args):
@@ -365,6 +365,16 @@ def users_all():
     token = str(request.args.get('token', None))
 
     return dumps(user.users_all_v1(token))
+
+
+@APP.route("/notifications/get/v1", methods=['GET'])
+def handle_notifications_get():
+    token = request.args.get("token", None)
+    if token != None:
+        token = str(token)
+
+    return dumps(notifications.notifications_get(token))
+
 
 @APP.route("/message/share/v1", methods=["POST"])
 def handle_message_share():
