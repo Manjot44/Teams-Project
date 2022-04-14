@@ -2,7 +2,7 @@ import signal
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src import config, auth, other, channel_expansion, messages, channels, dm, channel, admin, user, notifications
+from src import config, auth, other, channel_expansion, messages, channels, dm, channel, admin, user, notifications, standup
 
 
 def quit_gracefully(*args):
@@ -386,6 +386,19 @@ def handle_message_share():
     dm_id = int(request_data.get("dm_id", None))
 
     return dumps(messages.message_share_v1(token, og_message_id, message, channel_id, dm_id))
+
+@APP.route("/standup/start/v1", methods=["POST"])
+def handle_standup_start():
+    request_data = request.get_json()
+    token = request_data.get("token", None)
+    if token != None:
+        token = str(token)
+    channel_id = request_data.get("channel_id", None)
+    channel_id = return_int_helper(channel_id)
+    length = request_data.get("length", None)
+    length = return_int_helper(length)
+    
+    return dumps(standup.standup_start_v1(token, channel_id, length))
 
 # NO NEED TO MODIFY BELOW THIS POINT
 
