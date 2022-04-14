@@ -402,7 +402,7 @@ def handle_standup_start():
     return dumps(standup.standup_start_v1(token, channel_id, length))
 
 
-@APP.route("/standup/start/v1", methods=["POST"])
+@APP.route("/standup/active/v1", methods=["GET"])
 def handle_standup_active():
     request_data = request.get_json()
     token = request_data.get("token", None)
