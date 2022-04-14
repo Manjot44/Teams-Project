@@ -1,4 +1,4 @@
-from src.error_help import check_valid_token, validate_channel, user_not_in_channel
+from src.error_help import check_valid_token, validate_channel, auth_user_not_in_channel
 from src.error import InputError, AccessError
 import src.persistence
 from datetime import datetime
@@ -23,7 +23,7 @@ def standup_start_v1(token, channel_id, length):
     # CHECK CHANNEL_ID VALID
     validate_channel(store, channel_id)
     # CHECK IF USER IS AUTHORISED MEMBER
-    user_not_in_channel(store, u_id, channel_id)
+    auth_user_not_in_channel(store, u_id, channel_id)
     # CHECK LENGTH VALID
     if length < 0 or None:
         raise InputError("Error: Length is a negative number.")
@@ -31,7 +31,7 @@ def standup_start_v1(token, channel_id, length):
     if store['channels'][channel_id]['standup']['is_active'] == True:
         raise InputError("Error: Active standup currently running on this channel.")
     
-    time_finish = round(datetime.datetime.now().timestamp()) + length
+    time_finish = round(datetime.now().timestamp()) + length
     store['channels'][channel_id]['standup']['is_active'] = True
     deactivate = threading.Timer(length, standup_deactivate(token, channel_id))
     deactivate.start()
