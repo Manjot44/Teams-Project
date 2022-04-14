@@ -401,12 +401,8 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     src.error_help.validate_channel(store, channel_id)
     src.error_help.auth_user_not_in_channel(store, auth_user_id, channel_id)
 
-    if len(message) > 1000:
-        raise InputError("Length of message over 1000 characters")
-    if unix_timestamp > time_sent:
-        raise InputError("Timestamp cannot be in the past")
-
-    timepass = time_sent - unix_timestamp
+    src.error_help.check_message_length(message)
+    src.error_help.check_valid_time(unix_timestamp, time_sent)
 
     # Grab a new id
     store["id"] += 1
@@ -417,7 +413,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
 
     src.persistence.set_pickle(store)
 
-    t = threading.Timer(timepass, add_message, args = [auth_user_id, time_sent, channel_id, message, id, CHANNEL_MSG], kwargs = None)
+    t = threading.Timer(time_sent - unix_timestamp, add_message, args = [auth_user_id, time_sent, channel_id, message, id, CHANNEL_MSG], kwargs = None)
     t.start()
 
     return {
@@ -456,12 +452,8 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     src.error_help.validate_dm(store, dm_id)
     src.error_help.auth_user_not_in_dm(store, auth_user_id, dm_id)
 
-    if len(message) > 1000:
-        raise InputError("Length of message over 1000 characters")
-    if unix_timestamp > time_sent:
-        raise InputError("Timestamp cannot be in the past")
-
-    timepass = time_sent - unix_timestamp
+    src.error_help.check_message_length(message)
+    src.error_help.check_valid_time(unix_timestamp, time_sent)
 
     # Grab a new id
     store["id"] += 1
@@ -472,9 +464,9 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
 
     src.persistence.set_pickle(store)
 
-    t = threading.Timer(timepass, add_message, args = [auth_user_id, time_sent, dm_id, message, id, DM_MSG], kwargs = None)
+    t = threading.Timer(time_sent - unix_timestamp, add_message, args = [auth_user_id, time_sent, dm_id, message, id, DM_MSG], kwargs = None)
     t.start()
-    
+
     return {
         "message_id": id
     }
