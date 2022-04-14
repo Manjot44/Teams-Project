@@ -345,7 +345,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         "shared_message_id": id
     }
 
-def add_message(store, auth_user_id, unix_timestamp, channel_id, message, id):    
+def add_message(auth_user_id, unix_timestamp, channel_id, message, id):    
     store = src.persistence.get_pickle()
 
     new_message = {
@@ -418,7 +418,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
 
     src.persistence.set_pickle(store)
 
-    t = threading.Timer(timepass, add_message, args = [store, auth_user_id, time_sent, channel_id, message, id], kwargs = None)
+    t = threading.Timer(timepass, add_message, args = [auth_user_id, time_sent, channel_id, message, id], kwargs = None)
     t.start()
 
     return {
