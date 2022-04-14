@@ -97,3 +97,7 @@ def check_message_length(message):
 def check_valid_time(unix_timestamp, time_sent):
     if unix_timestamp > time_sent:
         raise InputError("Timestamp cannot be in the past")
+
+def check_empty_message(message):
+    if message == None or len(message) < 1 or len(message) > 1000:
+        raise InputError(f"Error: length of message is less than 1 or over 1000 characters")
