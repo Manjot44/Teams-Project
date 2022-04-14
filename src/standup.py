@@ -37,7 +37,7 @@ def standup_start_v1(token, channel_id, length):
     
 
 def standup_active_v1(token, channel_id):
-    ''''doct str''''
+    '''doct str'''
     store = src.persistence.get_pickle()
     u_id = check_valid_token(token, store)
     validate_channel(store, channel_id)
