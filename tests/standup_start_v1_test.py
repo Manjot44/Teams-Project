@@ -1,6 +1,5 @@
 import requests
 from src.config import url
-import datetime
 
 # REGULAR SEASON TESTS
 def test_standup_start_standup_period_0_sec(register_three_users, create_channel):
@@ -14,7 +13,6 @@ def test_standup_start_standup_period_5_sec(register_three_users, create_channel
     token = register_three_users['token'][0]
     channel = create_channel(token, 'CHANNEL_NAME', True)
     response = requests.post(f"{url}standup/start/v1", json={'token': token, 'channel_id': channel, 'length': 5})
-    datetime.datetime.now
     assert response.status_code == 200
     response = response.json()
     response['time_finish']

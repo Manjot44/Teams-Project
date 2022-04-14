@@ -17,6 +17,7 @@ def standup_deactivate(token, channel_id):
     src.persistence.set_pickle(store)
 
 def standup_start_v1(token, channel_id, length):
+    ''' docstring '''
     store = src.persistence.get_pickle()
     # CHECK TOKEN VALID
     u_id = check_valid_token(token, store)
@@ -39,7 +40,6 @@ def standup_start_v1(token, channel_id, length):
     src.persistence.set_pickle(store)
     return {'time_finish': time_finish}
     
-
 
 def standup_active_v1(token, channel_id):
     pass
