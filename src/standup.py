@@ -19,16 +19,11 @@ def standup_deactivate(token, channel_id):
 def standup_start_v1(token, channel_id, length):
     ''' docstring '''
     store = src.persistence.get_pickle()
-    # CHECK TOKEN VALID
     u_id = check_valid_token(token, store)
-    # CHECK CHANNEL_ID VALID
     validate_channel(store, channel_id)
-    # CHECK IF USER IS AUTHORISED MEMBER
     auth_user_not_in_channel(store, u_id, channel_id)
-    # CHECK LENGTH VALID
     if length < 0 or None:
         raise InputError("Error: Length is a negative number.")
-    # CHECK STANDUP ACTIVE
     if store['channels'][channel_id]['standup']['is_active'] == True:
         raise InputError("Error: Active standup currently running on this channel.")
     
@@ -42,7 +37,16 @@ def standup_start_v1(token, channel_id, length):
     
 
 def standup_active_v1(token, channel_id):
-    pass
+    ''''doct str''''
+    store = src.persistence.get_pickle()
+    u_id = check_valid_token(token, store)
+    validate_channel(store, channel_id)
+    auth_user_not_in_channel(store, u_id, channel_id)
+    return {
+        'is_active': store['channels'][channel_id]['standup']['is_active'],
+        'time_finish': store['channels'][channel_id]['standup']['time_finish'],
+    }
+
 
 def standup_send_v1(token, channel_id, message):
     pass
