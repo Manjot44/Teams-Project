@@ -409,6 +409,16 @@ def handle_message_sendlater():
 
     return dumps(messages.message_sendlater_v1(token, channel_id, message, time_sent))
 
+@APP.route("/message/sendlaterdm/v1", methods=["POST"])
+def handle_message_sendlaterdm():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    dm_id = int(request_data.get("dm_id", None))
+    message = str(request_data.get("message", None))
+    time_sent = int(request_data.get("time_sent", None))
+
+    return dumps(messages.message_sendlaterdm_v1(token, dm_id, message, time_sent))
+
 # NO NEED TO MODIFY BELOW THIS POINT
 
 
