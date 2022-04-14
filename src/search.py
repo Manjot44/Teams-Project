@@ -25,11 +25,22 @@ def which_messages(token, store):
     return which_messages
 
 
+def set_react(new_message, auth_user_id):
+    for reaction in new_message['reacts'].values():
+        if auth_user_id in reaction['u_ids']:
+            reaction['is_this_user_reacted'] = True
+        else:
+            reaction['is_this_user_reacted'] = False
+    new_message['reacts'] = list(new_message['reacts'].values())
+    
+    return new_message
+
+
 
 def search_v1(token, query_str):
     store = src.persistence.get_pickle()
 
-    src.error_help.check_valid_token(token, store)
+    auth_user_id = src.error_help.check_valid_token(token, store)
 
     if query_str == None or len(query_str) < 1 or len(query_str) > 1000:
         raise InputError(f"Query string must be in between 1 and 1000 characters inclusive")
@@ -42,8 +53,11 @@ def search_v1(token, query_str):
         store['messages'][id]['message'].lower()
         if query_str in store['messages'][id]['message']:
             new_message = {k:store['messages'][id][k] for k in ('message_id', 'u_id', 'message', 'time_sent', 'reacts', 'is_pinned')}
+            new_message = set_react(new_message, auth_user_id)
             searched_messages.append(new_message)
-        
+
+    print(searched_messages)
+
     return {
         'messages': searched_messages
     }
