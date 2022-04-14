@@ -3,10 +3,13 @@ from src.error import InputError, AccessError
 import datetime
 import src.persistence
 import src.notifications
+import threading
 
 MEMBER = 2
 OWNER = 1
 SHARED_MSG_OFFSET = 9
+CHANNEL_MSG = 3
+DM_MSG = 4
 
 def message_send_v1(token, channel_id, message):
     ''' Send a message from the authorised user to the channel specified by channel_id. 
@@ -300,10 +303,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
             "is_pinned": False,
         }
 
-        # if -1 in store["messages"].keys():
-        #     store["messages"] = {}
         store["messages"][id] = new_message
-        
         store["channels"][channel_id]["message_ids"].append(id)
 
     elif channel_id == -1:
@@ -312,9 +312,6 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
         store['id'] += 1
         id = store['id']
-
-        # if -1 in store['messages'].keys():
-        #     store['dms'][dm_id]['messages'] = {}
         
         current_time = datetime.datetime.now(datetime.timezone.utc)
         utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
@@ -336,10 +333,140 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
             "is_pinned": False,
         }
         store['messages'][id] = new_message
-
         store['dms'][dm_id]['message_ids'].append(id)
         
     src.persistence.set_pickle(store)
     return {
         "shared_message_id": id
+    }
+
+def add_message(auth_user_id, unix_timestamp, channeldm_id, message, id, identifier):    
+    store = src.persistence.get_pickle()
+
+    new_message = {
+        "message_id": id,
+        "u_id": auth_user_id,
+        "shared_message_length": 0,
+        "message": message,
+        "time_sent": int(unix_timestamp),
+        "reacts": {1:
+            {
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": None,
+            }
+        },
+        "is_pinned": False,
+    }
+
+    store["messages"][id] = new_message
+
+    if identifier == CHANNEL_MSG:
+        store["channels"][channeldm_id]["message_ids"].append(id)
+    elif identifier == DM_MSG:
+        store['dms'][channeldm_id]['message_ids'].append(id)
+
+    src.persistence.set_pickle(store)
+
+def message_sendlater_v1(token, channel_id, message, time_sent):
+    ''' Send a message from the authorised user to the channel 
+        specified by channel_id automatically at a specified 
+        time in the future.
+
+        Arguments:
+            token (str) - user authentication number
+            channel_id (int) - identification number for channel being sent to
+            message (str) - message that is being sent
+            time_sent (int: unix timestamp) - time in unix timestamp at which the message will be sent 
+
+        Exceptions:
+            InputError - Occurs when:
+                - channel_id does not refer to a valid channel
+                - length of message is less than 1 or over 1000 characters
+                - time_sent is a time in the past
+
+            AccessError - Occurs when:
+                - channel_id is valid and the authorised user is not a member of the channel they are trying to post to
+
+        Return Value:
+        (dict): returns a dictionary with the message_id
+    '''
+    store = src.persistence.get_pickle()
+
+    current_time = datetime.datetime.now(datetime.timezone.utc)
+    utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
+    unix_timestamp = utc_time.timestamp()
+
+    auth_user_id = src.error_help.check_valid_token(token, store)
+    src.error_help.validate_channel(store, channel_id)
+    src.error_help.auth_user_not_in_channel(store, auth_user_id, channel_id)
+
+    src.error_help.check_message_length(message)
+    src.error_help.check_valid_time(unix_timestamp, time_sent)
+
+    # Grab a new id
+    store["id"] += 1
+    id = store["id"]
+
+    if -1 in store["messages"].keys():
+        store["messages"] = {}
+
+    src.persistence.set_pickle(store)
+
+    t = threading.Timer(time_sent - unix_timestamp, add_message, args = [auth_user_id, time_sent, channel_id, message, id, CHANNEL_MSG], kwargs = None)
+    t.start()
+
+    return {
+        "message_id": id
+    }
+
+def message_sendlaterdm_v1(token, dm_id, message, time_sent):
+    ''' Send a message from the authorised user to the DM specified 
+        by dm_id automatically at a specified time in the future
+    
+        Arguments:
+            token (str) - user authentication number
+            dm_id (int) - identification number for DM being sent to
+            message (str) - message that is being sent
+            time_sent (int: unix timestamp) - time in unix timestamp at which the message will be sent 
+
+        Exceptions:
+            InputError - Occurs when:
+                - dm_id does not refer to a valid DM
+                - length of message is less than 1 or over 1000 characters
+                - time_sent is a time in the past
+
+            AccessError - Occurs when:
+                - dm_id is valid and the authorised user is not a member of the DM they are trying to post to
+
+        Return Value:
+        (dict): returns a dictionary with the message_id
+    '''
+    store = src.persistence.get_pickle()
+
+    current_time = datetime.datetime.now(datetime.timezone.utc)
+    utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
+    unix_timestamp = utc_time.timestamp()
+
+    auth_user_id = src.error_help.check_valid_token(token, store)
+    src.error_help.validate_dm(store, dm_id)
+    src.error_help.auth_user_not_in_dm(store, auth_user_id, dm_id)
+
+    src.error_help.check_message_length(message)
+    src.error_help.check_valid_time(unix_timestamp, time_sent)
+
+    # Grab a new id
+    store["id"] += 1
+    id = store["id"]
+
+    if -1 in store["messages"].keys():
+        store["messages"] = {}
+
+    src.persistence.set_pickle(store)
+
+    t = threading.Timer(time_sent - unix_timestamp, add_message, args = [auth_user_id, time_sent, dm_id, message, id, DM_MSG], kwargs = None)
+    t.start()
+
+    return {
+        "message_id": id
     }
