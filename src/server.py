@@ -387,6 +387,7 @@ def handle_message_share():
 
     return dumps(messages.message_share_v1(token, og_message_id, message, channel_id, dm_id))
 
+
 @APP.route("/standup/start/v1", methods=["POST"])
 def handle_standup_start():
     request_data = request.get_json()
@@ -399,6 +400,19 @@ def handle_standup_start():
     length = return_int_helper(length)
     
     return dumps(standup.standup_start_v1(token, channel_id, length))
+
+
+@APP.route("/standup/start/v1", methods=["POST"])
+def handle_standup_active():
+    request_data = request.get_json()
+    token = request_data.get("token", None)
+    if token != None:
+        token = str(token)
+    channel_id = request_data.get("channel_id", None)
+    channel_id = return_int_helper(channel_id)
+    
+    return dumps(standup.standup_active_v1(token, channel_id))
+
 
 # NO NEED TO MODIFY BELOW THIS POINT
 
