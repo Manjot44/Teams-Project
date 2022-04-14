@@ -3,6 +3,7 @@ from src.error import InputError, AccessError
 import datetime
 import src.persistence
 import src.notifications
+import threading
 
 MEMBER = 2
 OWNER = 1
@@ -342,4 +343,84 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     src.persistence.set_pickle(store)
     return {
         "shared_message_id": id
+    }
+
+def add_message(store, auth_user_id, unix_timestamp, channel_id, message, id):    
+    store = src.persistence.get_pickle()
+
+    new_message = {
+        "message_id": id,
+        "u_id": auth_user_id,
+        "shared_message_length": 0,
+        "message": message,
+        "time_sent": int(unix_timestamp),
+        "reacts": {1:
+            {
+                "react_id": 1,
+                "u_ids": [],
+                "is_this_user_reacted": None,
+            }
+        },
+        "is_pinned": False,
+    }
+
+    store["messages"][id] = new_message
+    
+    store["channels"][channel_id]["message_ids"].append(id)
+    src.persistence.set_pickle(store)
+
+def message_sendlater_v1(token, channel_id, message, time_sent):
+    ''' Send a message from the authorised user to the channel 
+        specified by channel_id automatically at a specified 
+        time in the future.
+
+        Arguments:
+            token (str) - user authentication number
+            channel_id (int) - identification number for channel being sent to
+            message (str) - message that is being sent
+            time_sent (int: unix timestamp) - time in unix timestamp at which the message will be sent 
+
+        Exceptions:
+            InputError - Occurs when:
+                - channel_id does not refer to a valid channel
+                - length of message is less than 1 or over 1000 characters
+                - time_sent is a time in the past
+
+            AccessError - Occurs when:
+                - channel_id is valid and the authorised user is not a member of the channel they are trying to post to
+
+        Return Value:
+        (dict): returns a dictionary with the message_id
+    '''
+    store = src.persistence.get_pickle()
+
+    current_time = datetime.datetime.now(datetime.timezone.utc)
+    utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
+    unix_timestamp = current_time.timestamp()
+
+    auth_user_id = src.error_help.check_valid_token(token, store)
+    src.error_help.validate_channel(store, channel_id)
+    src.error_help.auth_user_not_in_channel(store, auth_user_id, channel_id)
+
+    if len(message) > 1000:
+        raise InputError("Length of message over 1000 characters")
+    if unix_timestamp > time_sent:
+        raise InputError("Timestamp cannot be in the past")
+
+    timepass = time_sent - unix_timestamp
+
+    # Grab a new id
+    store["id"] += 1
+    id = store["id"]
+
+    if -1 in store["messages"].keys():
+        store["messages"] = {}
+
+    src.persistence.set_pickle(store)
+
+    t = threading.Timer(timepass, add_message, args = [store, auth_user_id, time_sent, channel_id, message, id], kwargs = None)
+    t.start()
+
+    return {
+        "message_id": id
     }
