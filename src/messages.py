@@ -396,7 +396,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
 
     current_time = datetime.datetime.now(datetime.timezone.utc)
     utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
-    unix_timestamp = current_time.timestamp()
+    unix_timestamp = utc_time.timestamp()
 
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.validate_channel(store, channel_id)
