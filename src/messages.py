@@ -269,8 +269,9 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     # starts checking the channel/dm message
     if dm_id == -1:
         src.error_help.validate_channel(store, channel_id)
-        src.error_help.check_channelmess_perms(store, auth_user_id, channeldm_id, og_message_id)
-        
+        # src.error_help.check_channelmess_perms(store, auth_user_id, channeldm_id, og_message_id)
+        src.error_help.auth_user_not_in_channel(store, auth_user_id, channel_id)
+
         store["id"] += 1
         id = store["id"]
 
@@ -279,7 +280,8 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
     elif channel_id == -1:
         src.error_help.validate_dm(store, dm_id)
-        src.error_help.check_dmmess_perms(store, auth_user_id, channeldm_id, og_message_id)
+        # src.error_help.check_dmmess_perms(store, auth_user_id, channeldm_id, og_message_id)
+        src.error_help.auth_user_not_in_dm(store, auth_user_id, dm_id)
 
         store['id'] += 1
         id = store['id']
@@ -416,12 +418,14 @@ def message_react_v1(token, message_id, react_id):
     auth_user_id = src.error_help.check_valid_token(token, store)
     channeldm_id = src.error_help.check_message_id(store, message_id)
 
-    if channeldm_id in store["channels"]:
-        if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
-            raise InputError(f"You are not in the channel/DM that contains this message_id")
-    else:
-        if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
-            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    # if channeldm_id in store["channels"]:
+    #     if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
+    #         raise InputError(f"You are not in the channel/DM that contains this message_id")
+    # else:
+    #     if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
+    #         raise InputError(f"You are not in the channel/DM that contains this message_id")
+
+    src.error_help.user_not_in_channeldm(store, auth_user_id, channeldm_id)
 
     if react_id != 1:
         raise InputError(f"Invalid react_id")
@@ -460,12 +464,14 @@ def message_unreact_v1(token, message_id, react_id):
     auth_user_id = src.error_help.check_valid_token(token, store)
     channeldm_id = src.error_help.check_message_id(store, message_id)
 
-    if channeldm_id in store["channels"]:
-        if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
-            raise InputError(f"You are not in the channel/DM that contains this message_id")
-    else:
-        if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
-            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    # if channeldm_id in store["channels"]:
+    #     if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
+    #         raise InputError(f"You are not in the channel/DM that contains this message_id")
+    # else:
+    #     if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
+    #         raise InputError(f"You are not in the channel/DM that contains this message_id")
+
+    src.error_help.user_not_in_channeldm(store, auth_user_id, channeldm_id)
     
     if react_id not in store["messages"][message_id]["reacts"] or react_id == -1:
         raise InputError(f"Invalid react_id")
@@ -498,12 +504,14 @@ def message_pin_v1(token, message_id):
     auth_user_id = src.error_help.check_valid_token(token, store)
     channeldm_id = src.error_help.check_message_id(store, message_id)
 
-    if channeldm_id in store["channels"]:
-        if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
-            raise InputError(f"You are not in the channel/DM that contains this message_id")
-    else:
-        if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
-            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    # if channeldm_id in store["channels"]:
+    #     if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
+    #         raise InputError(f"You are not in the channel/DM that contains this message_id")
+    # else:
+    #     if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
+    #         raise InputError(f"You are not in the channel/DM that contains this message_id")
+
+    src.error_help.user_not_in_channeldm(store, auth_user_id, channeldm_id)
     
     if store["messages"][message_id]["is_pinned"] == True:
         raise InputError(f"This message is already pinned")
@@ -545,12 +553,14 @@ def message_unpin_v1(token, message_id):
     auth_user_id = src.error_help.check_valid_token(token, store)
     channeldm_id = src.error_help.check_message_id(store, message_id)
 
-    if channeldm_id in store["channels"]:
-        if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
-            raise InputError(f"You are not in the channel/DM that contains this message_id")
-    else:
-        if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
-            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    # if channeldm_id in store["channels"]:
+    #     if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
+    #         raise InputError(f"You are not in the channel/DM that contains this message_id")
+    # else:
+    #     if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
+    #         raise InputError(f"You are not in the channel/DM that contains this message_id")
+
+    src.error_help.user_not_in_channeldm(store, auth_user_id, channeldm_id)
     
     if store["messages"][message_id]["is_pinned"] == False:
         raise InputError(f"This message is not pinned")
