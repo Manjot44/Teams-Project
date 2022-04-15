@@ -104,7 +104,12 @@ def channels_create_v1(token, name, is_public):
         "owner_ids": [auth_user_id],
         "member_ids": [auth_user_id],
         "is_public": is_public,
-        "message_ids": []
+        "message_ids": [],
+        'standup': {
+            'is_active': False,
+            'time_finish': None,
+            'queue': [],
+        },
     }
 
     src.persistence.set_pickle(store)

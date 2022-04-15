@@ -2,7 +2,7 @@ import signal
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src import config, auth, other, channel_expansion, messages, channels, dm, channel, admin, user, notifications, search
+from src import config, auth, other, channel_expansion, messages, channels, dm, channel, admin, user, notifications, search, standup
 
 
 def quit_gracefully(*args):
@@ -399,6 +399,47 @@ def handle_message_share():
 
     return dumps(messages.message_share_v1(token, og_message_id, message, channel_id, dm_id))
 
+
+@APP.route("/standup/start/v1", methods=["POST"])
+def handle_standup_start():
+    request_data = request.get_json()
+    token = request_data.get("token", None)
+    if token != None:
+        token = str(token)
+    channel_id = request_data.get("channel_id", None)
+    channel_id = return_int_helper(channel_id)
+    length = request_data.get("length", None)
+    length = return_int_helper(length)
+    
+    return dumps(standup.standup_start_v1(token, channel_id, length))
+
+
+@APP.route("/standup/active/v1", methods=["GET"])
+def handle_standup_active():
+    token = request.args.get("token", None)
+    if token != None:
+        token = str(token)
+    channel_id = request.args.get("channel_id", None)
+    channel_id = return_int_helper(channel_id)
+    
+    return dumps(standup.standup_active_v1(token, channel_id))
+
+
+@APP.route("/standup/send/v1", methods=["POST"])
+def handle_standup_send():
+    request_data = request.get_json()
+    token = request_data.get("token", None)
+    if token != None:
+        token = str(token)
+    channel_id = request_data.get("channel_id", None)
+    channel_id = return_int_helper(channel_id)
+    message = request_data.get("message", None)
+    if message != None:
+        message = str(message)
+    
+    return dumps(standup.standup_send_v1(token, channel_id, message))
+
+
 @APP.route("/message/sendlater/v1", methods=["POST"])
 def handle_message_sendlater():
     request_data = request.get_json()
@@ -409,6 +450,7 @@ def handle_message_sendlater():
 
     return dumps(messages.message_sendlater_v1(token, channel_id, message, time_sent))
 
+
 @APP.route("/message/sendlaterdm/v1", methods=["POST"])
 def handle_message_sendlaterdm():
     request_data = request.get_json()
@@ -418,6 +460,7 @@ def handle_message_sendlaterdm():
     time_sent = int(request_data.get("time_sent", None))
 
     return dumps(messages.message_sendlaterdm_v1(token, dm_id, message, time_sent))
+
 
 # NO NEED TO MODIFY BELOW THIS POINT
 
