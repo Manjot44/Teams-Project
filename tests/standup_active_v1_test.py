@@ -1,11 +1,11 @@
-from ssl import CHANNEL_BINDING_TYPES
 import requests
 from src.config import url
 
 def test_standup_active_channel_standup_inactive(register_three_users, create_channel):
     token = register_three_users['token'][0]
     channel = create_channel(token, 'CHANNEL_NAME', True)
-    response = requests.get(f"{url}standup/active/v1?token={token}&channel_id={channel}")
+    input = {'token': token, 'channel_id': channel}
+    response = requests.get(f"{url}standup/active/v1", params = input)
     assert response.status_code == 200
     data = response.json()
     assert data['is_active'] == False
@@ -36,7 +36,7 @@ def test_standup_active_channelid_valid_user_not_member(register_three_users, cr
     response = requests.get(f"{url}standup/active/v1?token={nonmember}&channel_id={channel}")
     assert response.status_code == 403
 
-def test_standup_active_token_invalid(register_three_users):
+def test_standup_active_token_invalid(register_three_users, create_channel):
     token = register_three_users['token'][0]
     channel = create_channel(token, 'CHANNEL_NAME', True)
     response = requests.get(f"{url}standup/active/v1?token={None}&channel_id={channel}")

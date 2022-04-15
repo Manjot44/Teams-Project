@@ -404,11 +404,10 @@ def handle_standup_start():
 
 @APP.route("/standup/active/v1", methods=["GET"])
 def handle_standup_active():
-    request_data = request.get_json()
-    token = request_data.get("token", None)
+    token = request.args.get("token", None)
     if token != None:
         token = str(token)
-    channel_id = request_data.get("channel_id", None)
+    channel_id = request.args.get("channel_id", None)
     channel_id = return_int_helper(channel_id)
     
     return dumps(standup.standup_active_v1(token, channel_id))

@@ -6,15 +6,15 @@ import threading
 import requests
 from src.config import url
 
-def standup_deactivate(token, channel_id):
-    store = src.persistence.get_pickle()
+def standup_deactivate(token, channel_id, store):
     queued_messages = str(store['channels'][channel_id]['standup']['queue'])        # LINE NEEDS TO BE IMPLEMENTED CORRECTLY;
                                                                                     # QM HAS TO BE ARRANGED INTO STYLE OF STDUP MSG
     requests.post(f"{url}message/send/v1", json={'token': token, 'channel_id': channel_id, 'message': queued_messages})
     store['channels'][channel_id]['standup']['is_active'] = False
     store['channels'][channel_id]['standup']['time_finish'] = None
     store['channels'][channel_id]['standup']['queue'] = []
-    src.persistence.set_pickle(store)
+    # src.persistence.set_pickle(store)
+    return
 
 def standup_start_v1(token, channel_id, length):
     ''' docstring '''
@@ -29,7 +29,8 @@ def standup_start_v1(token, channel_id, length):
     
     time_finish = round(datetime.now().timestamp()) + length
     store['channels'][channel_id]['standup']['is_active'] = True
-    deactivate = threading.Timer(length, standup_deactivate(token, channel_id))
+    store['channels'][channel_id]['standup']['time_finish'] = time_finish
+    deactivate = threading.Timer(length, standup_deactivate, args=(token, channel_id, store,))
     deactivate.start()
 
     src.persistence.set_pickle(store)
