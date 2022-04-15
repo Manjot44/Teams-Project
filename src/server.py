@@ -412,6 +412,20 @@ def handle_standup_active():
     
     return dumps(standup.standup_active_v1(token, channel_id))
 
+@APP.route("/standup/send/v1", methods=["POST"])
+def handle_standup_send():
+    request_data = request.get_json()
+    token = request_data.get("token", None)
+    if token != None:
+        token = str(token)
+    channel_id = request_data.get("channel_id", None)
+    channel_id = return_int_helper(channel_id)
+    message = request_data.get("message", None)
+    if message != None:
+        message = str(token)
+    
+    return dumps(standup.standup_send_v1(token, channel_id, message))
+
 
 # NO NEED TO MODIFY BELOW THIS POINT
 

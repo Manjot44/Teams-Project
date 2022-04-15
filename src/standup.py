@@ -7,9 +7,12 @@ import requests
 from src.config import url
 
 def standup_deactivate(token, channel_id, store):
-    queued_messages = str(store['channels'][channel_id]['standup']['queue'])        # LINE NEEDS TO BE IMPLEMENTED CORRECTLY;
-                                                                                    # QM HAS TO BE ARRANGED INTO STYLE OF STDUP MSG
-    requests.post(f"{url}message/send/v1", json={'token': token, 'channel_id': channel_id, 'message': queued_messages})
+    queued_messages = str(store['channels'][channel_id]['standup']['queue'])
+    formatted_queue = ''
+    for message in queued_messages:
+        formatted_queue += message
+
+    requests.post(f"{url}message/send/v1", json={'token': token, 'channel_id': channel_id, 'message': formatted_queue})
     store['channels'][channel_id]['standup']['is_active'] = False
     store['channels'][channel_id]['standup']['time_finish'] = None
     store['channels'][channel_id]['standup']['queue'] = []
@@ -43,6 +46,7 @@ def standup_active_v1(token, channel_id):
     u_id = check_valid_token(token, store)
     validate_channel(store, channel_id)
     auth_user_not_in_channel(store, u_id, channel_id)
+    
     return {
         'is_active': store['channels'][channel_id]['standup']['is_active'],
         'time_finish': store['channels'][channel_id]['standup']['time_finish'],
@@ -50,4 +54,14 @@ def standup_active_v1(token, channel_id):
 
 
 def standup_send_v1(token, channel_id, message):
-    pass
+    '''doct str'''
+    store = src.persistence.get_pickle()
+    u_id = check_valid_token(token, store)
+    validate_channel(store, channel_id)
+    auth_user_not_in_channel(store, u_id, channel_id)
+
+    user_handle = store['users'][u_id]['handle_str']
+    store['channels'][channel_id]['standup']['queue'].append(f"{user_handle}: {message}")
+    src.persistence.set_pickle(store)
+
+    return {}
