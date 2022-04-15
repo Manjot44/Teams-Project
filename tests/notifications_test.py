@@ -1,5 +1,5 @@
 import requests
-import src
+import src.config
 
 # ADD MESSAGE REACT TESTS IN ONCE THAT IS COMPLETE
 

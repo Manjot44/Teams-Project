@@ -85,3 +85,19 @@ def check_global_owner(data, u_id):
 def validate_dm(data, dm_id):
     if dm_id not in data["dms"].keys() or dm_id == -1:
         raise InputError(f"Error: DM {dm_id} not valid")
+
+def auth_user_not_in_dm(data, auth_user_id, dm_id):
+    if auth_user_id not in data['dms'][dm_id]['member_ids']:
+        raise AccessError(f"User is not member of DM")
+
+def check_message_length(message):
+    if len(message) > 1000:
+        raise InputError("Length of message over 1000 characters")
+
+def check_valid_time(unix_timestamp, time_sent):
+    if unix_timestamp > time_sent:
+        raise InputError("Timestamp cannot be in the past")
+
+def check_empty_message(message):
+    if message == None or len(message) < 1 or len(message) > 1000:
+        raise InputError(f"Error: length of message is less than 1 or over 1000 characters")
