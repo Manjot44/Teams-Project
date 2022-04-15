@@ -214,7 +214,6 @@ def message_senddm_v1(token, dm_id, message):
         "message_id": id
     }
 
-
 def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     ''' og_message_id is the ID of the original message. 
         channel_id is the channel that the message is being shared to, 
@@ -394,3 +393,181 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     return {
         "message_id": id
     }
+
+def message_react_v1(token, message_id, react_id):
+    '''Given a message within a channel or DM the authorised user is part of, add a "react" to that particular message.
+    
+        Arguments:
+            token (str) - user authentication string
+            message_id (int) - message that is being reacted to
+            react_id (int) - type of reaction
+
+        Exceptions:
+            InputError - Occurs when:
+                - message_id is not a valid message within a channel or DM that the authorised user has joined
+                - react_id is not a valid react ID
+                - the message already contains a react with ID react_id from the authorised user
+
+        Return Value:
+        (dict): returns an empty dictionary      
+    '''
+    store = src.persistence.get_pickle()
+
+    auth_user_id = src.error_help.check_valid_token(token, store)
+    channeldm_id = src.error_help.check_message_id(store, message_id)
+
+    if channeldm_id in store["channels"]:
+        if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
+            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    else:
+        if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
+            raise InputError(f"You are not in the channel/DM that contains this message_id")
+
+    if react_id != 1:
+        raise InputError(f"Invalid react_id")
+    if auth_user_id in store["messages"][message_id]["reacts"][react_id]["u_ids"]:
+        raise InputError(f"You have already reacted to this message")
+    
+    if react_id not in store["messages"][message_id]["reacts"]:
+        store["messages"][message_id]["reacts"][react_id] = {
+            'react_id': react_id,
+            'u_ids': [auth_user_id],
+            'is_this_user_reacted': None,
+        }
+    else:
+        store["messages"][message_id]["reacts"][react_id]["u_ids"].append(auth_user_id)
+
+    src.persistence.set_pickle(store)
+
+def message_unreact_v1(token, message_id, react_id):
+    '''Given a message within a channel or DM the authorised user is part of, unreact to that particular message.
+    
+        Arguments:
+            token (str) - user authentication string
+            message_id (int) - message that is being unreacted to
+            react_id (int) - type of reaction
+
+        Exceptions:
+            InputError - Occurs when:
+                - message_id is not a valid message within a channel or DM that the authorised user has joined
+                - react_id is not a valid react ID
+                - the message does not contain a react with ID react_id from the authorised user
+        Return Value:
+        (dict): returns an empty dictionary      
+    '''
+    store = src.persistence.get_pickle()
+
+    auth_user_id = src.error_help.check_valid_token(token, store)
+    channeldm_id = src.error_help.check_message_id(store, message_id)
+
+    if channeldm_id in store["channels"]:
+        if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
+            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    else:
+        if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
+            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    
+    if react_id not in store["messages"][message_id]["reacts"] or react_id == -1:
+        raise InputError(f"Invalid react_id")
+    if auth_user_id not in store["messages"][message_id]["reacts"][react_id]["u_ids"]:
+        raise InputError(f"You have not reacted to this message")
+
+    store["messages"][message_id]["reacts"][react_id]["u_ids"].remove(auth_user_id)
+    src.persistence.set_pickle(store)
+
+def message_pin_v1(token, message_id):
+    '''Given a message within a channel or DM, mark it as "pinned".
+
+        Arguments:
+            token (str) - user authentication string
+            message_id (int) - message that is being pinned 
+
+        Exceptions:
+            InputError - Occurs when:
+                - message_id is not a valid message within a channel or DM that the authorised user has joined
+                - the message is already pinned
+
+            AccessError - Occurs when:
+                - message_id refers to a valid message in a joined channel/DM and the authorised user does not have owner permissions in the channel/DM
+
+        Return Value:
+        (dict): returns an empty dictionary      
+    '''
+    store = src.persistence.get_pickle()
+
+    auth_user_id = src.error_help.check_valid_token(token, store)
+    channeldm_id = src.error_help.check_message_id(store, message_id)
+
+    if channeldm_id in store["channels"]:
+        if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
+            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    else:
+        if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
+            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    
+    if store["messages"][message_id]["is_pinned"] == True:
+        raise InputError(f"This message is already pinned")
+    for channel in store['channels'].values():
+        if message_id in channel['message_ids']:
+            if auth_user_id in channel["owner_ids"]:
+                store["messages"][message_id]["is_pinned"] = True
+                src.persistence.set_pickle(store)
+                return {}
+    for dm in store['dms'].values():
+        if message_id in dm['message_ids']:
+            if auth_user_id == dm["creator_id"]:
+                store["messages"][message_id]["is_pinned"] = True
+                src.persistence.set_pickle(store)
+                return {}
+
+    raise AccessError(f"You are not an owner of the dm/channel")
+
+def message_unpin_v1(token, message_id):
+    '''Given a message within a channel or DM, remove its mark as pinned.
+
+        Arguments:
+            token (str) - user authentication string
+            message_id (int) - message that is being pinned 
+
+        Exceptions:
+            InputError - Occurs when:
+                - message_id is not a valid message within a channel or DM that the authorised user has joined
+                - the message is not already pinned
+
+            AccessError - Occurs when:
+                - message_id refers to a valid message in a joined channel/DM and the authorised user does not have owner permissions in the channel/DM
+
+        Return Value:
+        (dict): returns an empty dictionary      
+    '''
+    store = src.persistence.get_pickle()
+
+    auth_user_id = src.error_help.check_valid_token(token, store)
+    channeldm_id = src.error_help.check_message_id(store, message_id)
+
+    if channeldm_id in store["channels"]:
+        if auth_user_id not in store["channels"][channeldm_id]["member_ids"]:
+            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    else:
+        if auth_user_id not in store["dms"][channeldm_id]["member_ids"]:
+            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    
+    if store["messages"][message_id]["is_pinned"] == False:
+        raise InputError(f"This message is not pinned")
+    for channel in store['channels'].values():
+        if message_id in channel['message_ids']:
+            if auth_user_id in channel["owner_ids"]:
+                store["messages"][message_id]["is_pinned"] = False
+                src.persistence.set_pickle(store)
+                return {}
+    for dm in store['dms'].values():
+        if message_id in dm['message_ids']:
+            if auth_user_id == dm["creator_id"]:
+                store["messages"][message_id]["is_pinned"] = False
+                src.persistence.set_pickle(store)
+                return {}
+
+    raise AccessError(f"You are not an owner of the dm/channel")
+
+        
+        
