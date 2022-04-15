@@ -10,7 +10,9 @@ def test_invalid_message(register_three_users):
     assert response.status_code == 200    
     response_data = response.json()
     message_id = response_data["message_id"]
-    response = requests.post(f"{url}/message/react/v1", json = {"token": register_three_users["token"][0], "message_id": message_id + 1, "react_id": 1})
+    response = requests.post(f"{url}/message/react/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "react_id": 1})
+    assert response.status_code == 200
+    response = requests.post(f"{url}/message/unreact/v1", json = {"token": register_three_users["token"][0], "message_id": message_id + 1, "react_id": 1})
     assert response.status_code == 400
     requests.delete(f"{url}/clear/v1")
 
@@ -23,11 +25,13 @@ def test_valid_message_not_users(register_three_users):
     assert response.status_code == 200    
     response_data = response.json()
     message_id = response_data["message_id"]
-    response = requests.post(f"{url}/message/react/v1", json = {"token": register_three_users["token"][1], "message_id": message_id, "react_id": 1})
+    response = requests.post(f"{url}/message/react/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "react_id": 1})
+    assert response.status_code == 200
+    response = requests.post(f"{url}/message/unreact/v1", json = {"token": register_three_users["token"][1], "message_id": message_id + 1, "react_id": 1})
     assert response.status_code == 400
     requests.delete(f"{url}/clear/v1")
 
-def test_invalid_reacts(register_three_users):
+def test_invalid_unreacts(register_three_users):
     response = requests.post(f"{url}/channels/create/v2", json = {"token": register_three_users["token"][0], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
@@ -36,15 +40,17 @@ def test_invalid_reacts(register_three_users):
     assert response.status_code == 200    
     response_data = response.json()
     message_id = response_data["message_id"]
-    response = requests.post(f"{url}/message/react/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "react_id": 97812356891724365})
-    assert response.status_code == 400
     response = requests.post(f"{url}/message/react/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "react_id": 1})
     assert response.status_code == 200
-    response = requests.post(f"{url}/message/react/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "react_id": 1})
+    response = requests.post(f"{url}/message/unreact/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "react_id": 97812356891724365})
+    assert response.status_code == 400
+    response = requests.post(f"{url}/message/unreact/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "react_id": 1})
+    assert response.status_code == 200
+    response = requests.post(f"{url}/message/unreact/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "react_id": 1})
     assert response.status_code == 400
     requests.delete(f"{url}/clear/v1")
 
-def test_valid_reacts(register_three_users):
+def test_valid_unreacts(register_three_users):
     response = requests.post(f"{url}/channels/create/v2", json = {"token": register_three_users["token"][0], "name": "channel_name", "is_public": True})
     assert response.status_code == 200
     response_data = response.json()
@@ -64,3 +70,11 @@ def test_valid_reacts(register_three_users):
     assert response.status_code == 200
     response_data = response.json()
     assert response_data["messages"][0]["reacts"][0]["u_ids"][0] == register_three_users["id"][0]
+    response = requests.post(f"{url}/message/unreact/v1", json = {"token": register_three_users["token"][0], "message_id": message_id, "react_id": 1})
+    assert response.status_code == 200
+    response = requests.get(f"{url}/channel/messages/v2", params = message_param)
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data["messages"][0]["reacts"][0]["u_ids"] == []
+    requests.delete(f"{url}/clear/v1")
+    

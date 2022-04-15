@@ -56,6 +56,45 @@ def handle_auth_register():
 
     return dumps(auth.auth_register_v1(email, password, name_first, name_last))
 
+@APP.route("/message/react/v1", methods=['POST'])
+def handle_message_react():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = request_data.get("message_id", None)
+    message_id = return_int_helper(message_id)
+    react_id = request_data.get("react_id", None)
+    react_id = return_int_helper(react_id)
+
+    return dumps(messages.message_react_v1(token, message_id, react_id))
+
+@APP.route("/message/unreact/v1", methods=['POST'])
+def handle_message_unreact():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = request_data.get("message_id", None)
+    message_id = return_int_helper(message_id)
+    react_id = request_data.get("react_id", None)
+    react_id = return_int_helper(react_id)
+
+    return dumps(messages.message_unreact_v1(token, message_id, react_id))
+
+@APP.route("/message/pin/v1", methods=['POST'])
+def handle_message_pin():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = request_data.get("message_id", None)
+    message_id = return_int_helper(message_id)
+
+    return dumps(messages.message_pin_v1(token, message_id))
+
+@APP.route("/message/unpin/v1", methods=['POST'])
+def handle_message_unpin():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = request_data.get("message_id", None)
+    message_id = return_int_helper(message_id)
+
+    return dumps(messages.message_unpin_v1(token, message_id))
 
 @APP.route("/auth/login/v2", methods=['POST'])
 def handle_auth_login():
