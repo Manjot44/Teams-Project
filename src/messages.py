@@ -432,6 +432,8 @@ def message_react_v1(token, message_id, react_id):
         store["messages"][message_id]["reacts"][react_id]["u_ids"].append(auth_user_id)
 
     src.persistence.set_pickle(store)
+    src.notifications.create_react_notification(auth_user_id, message_id)
+    return {}
 
 def message_unreact_v1(token, message_id, react_id):
     '''Given a message within a channel or DM the authorised user is part of, unreact to that particular message.
@@ -462,6 +464,8 @@ def message_unreact_v1(token, message_id, react_id):
 
     store["messages"][message_id]["reacts"][react_id]["u_ids"].remove(auth_user_id)
     src.persistence.set_pickle(store)
+    src.notifications.create_react_notification(auth_user_id, message_id)
+    return {}
 
 def message_pin_v1(token, message_id):
     '''Given a message within a channel or DM, mark it as "pinned".
