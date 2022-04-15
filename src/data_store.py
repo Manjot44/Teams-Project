@@ -54,11 +54,6 @@ initial_object = {
             'member_ids': [],
             'is_public': None,
             'message_ids': [],
-            'standup': {
-                'is_active': False,
-                'time_finish': None,
-                'queue': [],
-            },
         }
     },
     'dms': {-1:
