@@ -464,7 +464,7 @@ def message_unreact_v1(token, message_id, react_id):
 
     store["messages"][message_id]["reacts"][react_id]["u_ids"].remove(auth_user_id)
     src.persistence.set_pickle(store)
-    src.notifications.create_react_notification(auth_user_id, message_id)
+
     return {}
 
 def message_pin_v1(token, message_id):
