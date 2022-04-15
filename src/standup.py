@@ -6,10 +6,14 @@ import threading
 import requests
 from src.config import url
 
-def standup_deactivate(token, channel_id, store):
-    queued_messages = str(store['channels'][channel_id]['standup']['queue'])
+def standup_send_queue(token, channel_id):
+    store = src.persistence.get_pickle()
+    # print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>     1:    {store['channels'][channel_id]['standup']}      <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+    queued_messages = store['channels'][channel_id]['standup']['queue']
     formatted_queue = ''
-    for message in queued_messages:
+    for idx, message in enumerate(queued_messages):
+        if idx != 0:
+            formatted_queue += '\n'
         formatted_queue += message
 
     requests.post(f"{url}message/send/v1", json={'token': token, 'channel_id': channel_id, 'message': formatted_queue})
@@ -18,6 +22,13 @@ def standup_deactivate(token, channel_id, store):
     store['channels'][channel_id]['standup']['queue'] = []
     # src.persistence.set_pickle(store)
     return
+
+def standup_deactivate(channel_id):
+    store = src.persistence.get_pickle()
+    store['channels'][channel_id]['standup']['is_active'] = False
+    store['channels'][channel_id]['standup']['time_finish'] = None
+    store['channels'][channel_id]['standup']['queue'] = []
+    src.persistence.set_pickle(store)
 
 def standup_start_v1(token, channel_id, length):
     ''' docstring '''
@@ -33,8 +44,10 @@ def standup_start_v1(token, channel_id, length):
     time_finish = round(datetime.now().timestamp()) + length
     store['channels'][channel_id]['standup']['is_active'] = True
     store['channels'][channel_id]['standup']['time_finish'] = time_finish
-    deactivate = threading.Timer(length, standup_deactivate, args=(token, channel_id, store,))
-    deactivate.start()
+    send_queue = threading.Timer(length, standup_send_queue, args=(token, channel_id,))
+    send_queue.start()
+    deact = threading.Timer(length, standup_deactivate, args=(channel_id,))
+    deact.start()
 
     src.persistence.set_pickle(store)
     return {'time_finish': time_finish}
@@ -59,6 +72,10 @@ def standup_send_v1(token, channel_id, message):
     u_id = check_valid_token(token, store)
     validate_channel(store, channel_id)
     auth_user_not_in_channel(store, u_id, channel_id)
+    if store['channels'][channel_id]['standup']['is_active'] == False:
+        raise InputError("Error: Standup is not currently active in this channel.")
+    if len(message) > 1000:
+        raise InputError("Error: Message is over 1000 characters (standup).")
 
     user_handle = store['users'][u_id]['handle_str']
     store['channels'][channel_id]['standup']['queue'].append(f"{user_handle}: {message}")

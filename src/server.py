@@ -422,7 +422,7 @@ def handle_standup_send():
     channel_id = return_int_helper(channel_id)
     message = request_data.get("message", None)
     if message != None:
-        message = str(token)
+        message = str(message)
     
     return dumps(standup.standup_send_v1(token, channel_id, message))
 

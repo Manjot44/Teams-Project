@@ -15,7 +15,7 @@ def test_standup_send_input_valid_2message_2user(register_three_users, create_ch
     token0 = register_three_users['token'][0]
     token1 = register_three_users['token'][1]
     id1 = register_three_users['id'][1]
-    channel = create_channel(token, 'CHANNEL_NAME', True)
+    channel = create_channel(token0, 'CHANNEL_NAME', True)
     message1 = 'message from og'
     message2 = 'message from 2nd'
     response = requests.post(f"{url}channel/invite/v2", json={'token': token0, 'channel_id': channel, 'u_id': id1})
