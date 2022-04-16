@@ -101,3 +101,11 @@ def check_valid_time(unix_timestamp, time_sent):
 def check_empty_message(message):
     if message == None or len(message) < 1 or len(message) > 1000:
         raise InputError(f"Error: length of message is less than 1 or over 1000 characters")
+
+def user_not_in_channeldm(data, auth_user_id, channeldm_id):
+    if channeldm_id in data["channels"]:
+        if auth_user_id not in data["channels"][channeldm_id]["member_ids"]:
+            raise InputError(f"You are not in the channel/DM that contains this message_id")
+    else:
+        if auth_user_id not in data["dms"][channeldm_id]["member_ids"]:
+            raise InputError(f"You are not in the channel/DM that contains this message_id")
