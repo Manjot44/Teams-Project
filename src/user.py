@@ -231,8 +231,8 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError(f"the dimensions  are invalid")
 
     #raises input error if image dimensions are incorrect (x, y end > x, y start)
-    if x_end > x_start or y_end > y_start:
-        raise InputError(f"the dimensions are invalid")
+    # if x_end > x_start or y_end > y_start:
+    #     raise InputError(f"the dimensions are invalid")
 
     #raises input error if image dimensions are incorrect (x, y values are too large)
     width, height = imageObject.size
@@ -245,5 +245,9 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     cropped = imageObject.crop((x_start, y_start, x_end, y_end))
     cropped.save(f'src/static/profile_pic_{u_id}.jpg')
    
+    for user in store['users'].values():
+        if user['u_id'] == u_id:
+            user['profile_img_url'] = f'src/static/profile_pic_{u_id}.jpg'
+
     src.persistence.set_pickle(store)
     
