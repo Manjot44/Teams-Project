@@ -28,7 +28,6 @@ def test_standup_send_input_valid_2message_2user(register_three_users, create_ch
     assert response.status_code == 200
     response = requests.post(f"{url}standup/start/v1", json={'token': token0, 'channel_id': channel, 'length': 5})
     assert response.status_code == 200
-    time_finish = response.json()
     response = requests.post(f"{url}standup/send/v1", json={'token': token0, 'channel_id': channel, 'message': message1})
     assert response.status_code == 200
     response = requests.post(f"{url}standup/send/v1", json={'token': token1, 'channel_id': channel, 'message': message2})
