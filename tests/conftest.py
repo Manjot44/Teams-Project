@@ -107,3 +107,37 @@ def return_current_time():
     time = utc_time.timestamp
 
     return time
+
+@pytest.fixture
+def send_message():
+    def create_message(token, channel_id, message):
+        message_info = {
+            'token': token,
+            'channel_id': channel_id,
+            'message': message
+        }
+
+        response = requests.post(f"{src.config.url}/message/send/v1", json = message_info)
+        assert response.status_code == 200
+        response_data = response.json()
+        
+        return response_data["message_id"]
+
+    return create_message
+
+@pytest.fixture
+def send_messagedm():
+    def create_messagedm(token, dm_id, message):
+        message_info = {
+            'token': token,
+            'dm_id': dm_id,
+            'message': message
+        }
+
+        response = requests.post(f"{src.config.url}/message/senddm/v1", json = message_info)
+        assert response.status_code == 200
+        response_data = response.json()
+
+        return response_data["message_id"]
+
+    return create_messagedm
