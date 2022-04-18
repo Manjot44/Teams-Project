@@ -22,4 +22,4 @@ def test_users_all_all_fields():
     response = requests.get(f"{url}/users/all/v1?token={user['token']}")
     assert response.status_code == 200
     users_all = response.json()
-    assert users_all['users'][0] == {'email': 'jerrylin@gmail.com', 'handle_str': 'jerrylin', 'name_first': 'Jerry', 'name_last': 'Lin', 'u_id': 0, 'profile_img_url': None}
+    assert users_all['users'][0] == {'email': 'jerrylin@gmail.com', 'handle_str': 'jerrylin', 'name_first': 'Jerry', 'name_last': 'Lin', 'u_id': 0, 'profile_img_url': f'{url}src/static/default.jpg'}

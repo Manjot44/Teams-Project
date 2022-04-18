@@ -1,7 +1,12 @@
-from src.error import InputError, AccessError
+from urllib.error import URLError
+from src.error import InputError
 from src.error_help import check_valid_token
 import re
 import src.persistence
+import requests
+from PIL import Image
+import urllib.request
+import src.config
 
 def user_profile_v1(token, u_id):
     '''For a valid user, returns information about their user_id, email, first name,
@@ -188,3 +193,52 @@ def users_all_v1(token):
             users_all['users'].append(new_append)
 
     return users_all
+
+
+
+def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+
+    store = src.persistence.get_pickle()
+
+    u_id = check_valid_token(token, store)
+
+    req = urllib.request.Request(img_url)
+    try:
+        urllib.request.urlopen(req)
+    except Exception as e:
+        raise InputError(f"error occured when retrieving image") from e
+
+
+    imageObject = Image.open(urllib.request.urlopen(img_url))
+    width, height = imageObject.size
+
+    if x_start == None or y_start == None or x_end == None or y_end == None:
+        raise InputError(f"the dimensions are invalid")
+
+    if x_start < 0 or y_start < 0 or x_end < 0 or y_end < 0:
+        raise InputError(f"the dimensions are invalid")
+    if x_end <= x_start or y_end <= y_start:
+        raise InputError(f"the dimensions are invalid")
+
+    width, height = imageObject.size
+    if x_start > width or x_end > width:
+        raise InputError(f"the dimensions of the image are invalid")
+
+    if y_start > height or y_end > height:
+        raise InputError(f"the dimensions of the image are invalid")    
+
+    if '.jpg' not in img_url:
+        raise InputError(f"image is not JPG")
+    
+    urllib.request.urlretrieve(img_url, f'src/static/profile_pic_{u_id}.jpg')
+    imageObject = Image.open(f'src/static/profile_pic_{u_id}.jpg')
+   
+    cropped = imageObject.crop((x_start, y_start, x_end, y_end))
+    cropped.save(f'src/static/profile_pic_{u_id}.jpg')
+   
+    store['users'][u_id]['profile_img_url'] = f'{src.config.url}src/static/profile_pic_{u_id}.jpg'
+
+    src.persistence.set_pickle(store)
+    
+    return {
+    }

@@ -35,7 +35,7 @@ def test_correct_return():
                                     'name_first': 'Jerry', 
                                     'name_last': 'Lin', 
                                     'handle_str': 'jerrylin',
-                                    'profile_img_url': None
+                                    'profile_img_url': f'{src.config.url}src/static/default.jpg'
     }}
 
 def test_correct_return_removed_user(): 

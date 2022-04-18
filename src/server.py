@@ -529,6 +529,26 @@ def handle_passwordreset_reset():
     
     return dumps(auth.auth_passwordreset_reset(reset_code, new_password))
 
+@APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
+def handle_user_profile_uploadphoto_v1():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+
+    img_url = request_data.get("img_url", None)
+    if img_url != None:
+        img_url = str(img_url)
+
+    x_start = request_data.get('x_start', None)
+    x_start = return_int_helper(x_start)
+    y_start = request_data.get('y_start', None)
+    y_start = return_int_helper(y_start)
+    x_end = request_data.get('x_end', None)
+    x_end = return_int_helper(x_end)
+    y_end = request_data.get('y_end', None)
+    y_end = return_int_helper(y_end)
+    
+    return dumps(user.user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end))
+
 # NO NEED TO MODIFY BELOW THIS POINT
 
 
