@@ -209,7 +209,6 @@ def auth_passwordreset_request(email):
 
     valid_email_uid = src.error_help.check_valid_email(store, email)
     if valid_email_uid == -1:
-       print("this should not be happening")
        return {}
     
     store['users'][valid_email_uid]['reset_id'] += 1
@@ -229,7 +228,6 @@ def auth_passwordreset_request(email):
     )
 
     MAIL.send(msg)
-    print("sending complete")
     
     src.persistence.set_pickle(store)
 
