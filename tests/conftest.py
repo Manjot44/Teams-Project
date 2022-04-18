@@ -2,6 +2,7 @@ from urllib import response
 import pytest
 import requests
 import src.config
+import datetime
 
 @pytest.fixture
 def reset():
@@ -98,3 +99,11 @@ def create_dm():
         return response_data['dm_id']
 
     return make_dm 
+
+@pytest.fixture
+def return_current_time():
+    current_time = datetime.datetime.now(datetime.timezone.utc)
+    utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
+    time = utc_time.timestamp
+
+    return time
