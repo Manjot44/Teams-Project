@@ -19,7 +19,7 @@ def test_email_missing_element(reset, register_user):
 
 def test_email_repeat(reset, register_user):
     register_user("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")
-    response = register_user("abcgmail.com", "thisIsPass13./", "Jerry", "Lin")
+    response = register_user("abc@gmail.com", "thisIsPass13./", "Jerry", "Lin")
     assert response.status_code == 400 
 
 def test_email_invalid_char(reset, register_user):
