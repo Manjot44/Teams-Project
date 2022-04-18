@@ -205,6 +205,19 @@ def auth_logout_v1(token):
 
 
 def auth_passwordreset_request(email):
+    '''Given an email address, if the user is a registered user, sends them an email containing a specific secret code, 
+    that when entered in auth/passwordreset/reset, shows that the user trying to reset the password is the one who got sent this email.
+    When a user requests a password reset, they should be logged out of all current sessions.
+    
+    Arguments:
+        email (str) - inputted email
+
+    Exceptions:
+        N/A
+
+    Return Value:
+        (dict): returns an empty dictionary
+    '''
     store = src.persistence.get_pickle()
 
     valid_email_uid = src.error_help.check_valid_email(store, email)
@@ -216,6 +229,9 @@ def auth_passwordreset_request(email):
 
     encoded_jwt = jwt.encode({'email': email, 'reset_id': reset_id}, SECRET, algorithm='HS256')
     store['users'][valid_email_uid]['reset_codes'].append(encoded_jwt)
+    
+    store["users"][valid_email_uid]["valid_tokens"] = []
+    store["users"][valid_email_uid]["session_id"] = -1
 
     msg = flask_mail.Message('Password Reset Code', recipients = [email])
     
@@ -234,6 +250,20 @@ def auth_passwordreset_request(email):
     return {}
 
 def auth_passwordreset_reset(reset_code, new_password):
+    '''Given a reset code for a user, set that user's new password to the password provided.
+
+    Arguments:
+        reset_code (str) - inputted reset_code,
+        new_password (str) - new password to replace
+
+    Exceptions:
+        InputError - Occurs when:
+            reset_code is not a valid reset code,
+            password entered is less than 6 characters long
+
+    Return Value:
+        (dict): returns an empty dictionary
+    '''
     store = src.persistence.get_pickle()
 
     auth_user_id = src.error_help.check_valid_reset_code(store, reset_code)

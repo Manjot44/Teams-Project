@@ -6,6 +6,18 @@ from src.error import InputError
 
 
 def which_messages(token, store):
+    '''Finds which messages are relevant to the user with inputted token
+
+    Arguments:
+        token (str) - jwt passed in,
+        store (dict) - all stored data
+
+    Exceptions:
+        N/A
+
+    Return Value:
+        (list): returns the list of relevant message ids
+    '''
     channel_ids = []
     which_channels = src.channels.channels_list_v1(token)['channels']
     for channel in which_channels:
@@ -26,6 +38,18 @@ def which_messages(token, store):
 
 
 def set_react(new_message, auth_user_id):
+    '''Sets the 'is_this_user_reacted' field for the auth_user
+
+    Arguments:
+        new_message (dict) - message for which reactions neeed to be set,
+        auth_user_id (int) - user id of the auth_user
+
+    Exceptions:
+        N/A
+
+    Return Value:
+        (dict): returns the message with the set reactions
+    '''
     for reaction in new_message['reacts'].values():
         if auth_user_id in reaction['u_ids']:
             reaction['is_this_user_reacted'] = True
@@ -38,6 +62,22 @@ def set_react(new_message, auth_user_id):
 
 
 def search_v1(token, query_str):
+    '''Given a query string, return a collection of messages in all of the channels/DMs 
+    that the user has joined that contain the query (case-insensitive).
+
+    Arguments:
+        token (str) - jwt passed in,
+        query_str (str) - keyword/s to search for
+
+    Exceptions:
+        InputError - Occurs when:
+            length of query_str is less than 1 or over 1000 characters
+        AccessError - Occurs when:
+            token passed in is not valid
+
+    Return Value:
+        (dict): returns a dictionary with the 'messages' key, which is a list of messages
+    '''
     store = src.persistence.get_pickle()
 
     auth_user_id = src.error_help.check_valid_token(token, store)
