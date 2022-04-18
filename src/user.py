@@ -1,3 +1,4 @@
+from urllib.error import URLError
 from src.error import InputError
 from src.error_help import check_valid_token
 import re
@@ -201,11 +202,12 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     u_id = check_valid_token(token, store)
 
-    if validators.url(img_url) == False:
-        raise InputError(f'error')
-    response = requests.get(img_url)
-    if response.status_code != 200:
-        raise InputError(f"error occured when retrieving image")
+    req = urllib.request.Request(img_url)
+    try:
+        urllib.request.urlopen(req)
+    except Exception as e:
+        raise InputError(f"error occured when retrieving image") from e
+
 
     imageObject = Image.open(urllib.request.urlopen(img_url))
     width, height = imageObject.size

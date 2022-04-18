@@ -34,7 +34,7 @@ def test_invalid_url():
     assert response.status_code == 200 
     user1 = response.json()
 
-    response2 = requests.post(f"{src.config.url}/user/profile/uploadphoto/v1", json = {"token": user1["token"], "img_url": 'http://localhost:8080/', "x_start": 100, "y_start": 100, "x_end": 200, "y_end": 200})
+    response2 = requests.post(f"{src.config.url}/user/profile/uploadphoto/v1", json = {"token": user1["token"], "img_url": 'http://mynameissanjamsingh', "x_start": 100, "y_start": 100, "x_end": 200, "y_end": 200})
     assert response2.status_code == 400
 
 
