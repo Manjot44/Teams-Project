@@ -3,7 +3,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src import config, auth, other, channel_expansion, messages, channels, dm, channel, admin, user, notifications, search, standup
-
+import flask_mail
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -29,6 +29,15 @@ APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
 
 # NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
+
+APP.config['MAIL_SERVER']='smtp.gmail.com'
+APP.config['MAIL_PORT'] = 465
+APP.config['MAIL_USERNAME'] = 'h09aelephant@gmail.com'
+APP.config['MAIL_PASSWORD'] = 'jerrylin'
+APP.config['MAIL_USE_TLS'] = False
+APP.config['MAIL_USE_SSL'] = True
+APP.config['MAIL_DEFAULT_SENDER'] = ('Microsoft Seams', 'h09aelephant@gmail.com')
+MAIL = flask_mail.Mail(APP)
 
 def return_int_helper(num):
     if num != None:
@@ -498,6 +507,27 @@ def handle_standup_send():
     
     return dumps(standup.standup_send_v1(token, channel_id, message))
 
+
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def handle_passwordreset_request():
+    request_data = request.get_json()
+    email = request_data.get("email", None)
+    if email != None:
+        email = str(email)
+    
+    return dumps(auth.auth_passwordreset_request(email))
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def handle_passwordreset_reset():
+    request_data = request.get_json()
+    reset_code = request_data.get("reset_code", None)
+    if reset_code != None:
+        reset_code = str(reset_code)
+    new_password = request_data.get("new_password", None)
+    if new_password != None:
+        new_password = str(new_password)
+    
+    return dumps(auth.auth_passwordreset_reset(reset_code, new_password))
 
 # NO NEED TO MODIFY BELOW THIS POINT
 
