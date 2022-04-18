@@ -81,3 +81,10 @@ def test_react_dm(register_three_users, create_dm, send_messagedm):
     assert response.status_code == 200
     response_data = response.json()
     assert response_data["messages"][0]["reacts"][0]["u_ids"][0] == register_three_users["id"][0]
+
+def test_invalid_react_dm(register_three_users, create_dm, send_messagedm):
+    dm_id = create_dm(register_three_users["token"][0], [register_three_users["id"][1]])
+    message_id = send_messagedm(register_three_users["token"][0], dm_id, "Hello Sanjam")
+
+    response = requests.post(f"{url}/message/react/v1", json = {"token": register_three_users["token"][2], "message_id": message_id, "react_id": 1})
+    assert response.status_code == 400
