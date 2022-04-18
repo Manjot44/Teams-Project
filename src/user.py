@@ -7,6 +7,7 @@ import sys
 from PIL import Image
 import urllib.request
 import validators
+import src.config
 
 def user_profile_v1(token, u_id):
     '''For a valid user, returns information about their user_id, email, first name,
@@ -207,19 +208,10 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     response = requests.get(img_url)
     if response.status_code != 200:
         raise InputError(f"error occured when retrieving image")
-    # if not validators.url(img_url):
-    #     raise InputError(f"error occured when retrieving image")
 
-
-    # checks if image is jpg
-    if '.jpg' not in img_url:
-        raise InputError(f"image is not JPG")
-    # if img_url[-3:] != 'jpg':
-    #     raise InputError(f"image is not JPG")
-
-    # image is opened
-    urllib.request.urlretrieve(img_url, f'src/static/profile_pic_{u_id}.jpg')
-    imageObject = Image.open(f'src/static/profile_pic_{u_id}.jpg')
+    # image is opened and tested for validity
+    imageObject = Image.open(urllib.request.urlopen(img_url))
+    width, height = imageObject.size
 
     if x_start == None or y_start == None or x_end == None or y_end == None:
         raise InputError(f"the dimensions are invalid")
@@ -230,10 +222,6 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     if x_end <= x_start or y_end <= y_start:
         raise InputError(f"the dimensions  are invalid")
 
-    #raises input error if image dimensions are incorrect (x, y end > x, y start)
-    # if x_end > x_start or y_end > y_start:
-    #     raise InputError(f"the dimensions are invalid")
-
     #raises input error if image dimensions are incorrect (x, y values are too large)
     width, height = imageObject.size
     if x_start > width or x_end > width:
@@ -241,13 +229,25 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     if y_start > height or y_end > height:
         raise InputError(f"the dimensions of the image are invalid")    
+
+    # checks if image is jpg
+    if '.jpg' not in img_url:
+        raise InputError(f"image is not JPG")
+    
+    # image is opened and saved this time in local folder
+    urllib.request.urlretrieve(img_url, f'src/static/profile_pic_{u_id}.jpg')
+    imageObject = Image.open(f'src/static/profile_pic_{u_id}.jpg')
    
+    # image is cropped
     cropped = imageObject.crop((x_start, y_start, x_end, y_end))
     cropped.save(f'src/static/profile_pic_{u_id}.jpg')
    
+    # image url is saved in users datastore
     for user in store['users'].values():
         if user['u_id'] == u_id:
-            user['profile_img_url'] = f'src/static/profile_pic_{u_id}.jpg'
+            user['profile_img_url'] = f'{src.config.url}src/static/profile_pic_{u_id}.jpg'
 
     src.persistence.set_pickle(store)
     
+    return {
+    }
