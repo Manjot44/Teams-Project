@@ -65,7 +65,7 @@ def test_dm_channel(register_three_users, create_dm, send_messagedm):
     response = requests.post(f"{url}/admin/userpermission/change/v1", json = {"token" : register_three_users["token"][0], "u_id" : register_three_users["id"][1], "permission_id" : 1})
     assert response.status_code == 200
 
-    response = requests.delete(f"{url}/admin/user/remove/v1", json = {"token": register_three_users["token"][0], "u_id": register_three_users["id"][1]})
+    response = requests.delete(f"{url}/admin/user/remove/v1", json = {"token": register_three_users["token"][1], "u_id": register_three_users["id"][0]})
     assert response.status_code == 200
 
 
