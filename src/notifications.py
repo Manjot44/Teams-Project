@@ -20,6 +20,19 @@ def initialise_notif(channeldm_id, store):
     return [new_notif, name]
 
 
+def check_in_channeldm(store, new_notif, valid_id):
+    if new_notif['channel_id'] == -1:
+        dm_id = new_notif['dm_id']
+        if valid_id not in store['dms'][dm_id]['member_ids']:
+            valid_id = False
+    else:
+        channel_id = new_notif['channel_id']
+        if valid_id not in store['channels'][channel_id]['member_ids']:
+            valid_id = False
+
+    return valid_id
+
+
 def find_valid_handle(message, new_notif, store):
     handle = ""
     for char in message:
@@ -33,14 +46,7 @@ def find_valid_handle(message, new_notif, store):
         if user['handle_str'] == handle:
             valid_id = user['u_id']
 
-    if new_notif['channel_id'] == -1:
-        dm_id = new_notif['dm_id']
-        if valid_id not in store['dms'][dm_id]['member_ids']:
-            valid_id = False
-    else:
-        channel_id = new_notif['channel_id']
-        if valid_id not in store['channels'][channel_id]['member_ids']:
-            valid_id = False
+    valid_id = check_in_channeldm(store, new_notif, valid_id)
 
     return valid_id   
 
@@ -85,13 +91,18 @@ def create_tag_notification(auth_user_id, channeldm_id, message):
     return
 
 
-def create_react_notification(auth_user_id, message_id):
+def create_react_notification(auth_user_id, message_id): #check if the user is still in the channel
     store = src.persistence.get_pickle()
 
     u_id = store['messages'][message_id]['u_id']
     channeldm_id = src.error_help.check_message_id(store, message_id)
 
     new_notif, name = initialise_notif(channeldm_id, store)
+    
+    valid_id = check_in_channeldm(store, new_notif, u_id)
+    if valid_id == False:
+        return
+
     new_notif['notification_message'] = f"{store['users'][auth_user_id]['handle_str']} reacted to your message in {name}"
 
     if store['users'][u_id]['notifications'][0]['channel_id'] == None:

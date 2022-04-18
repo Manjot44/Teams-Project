@@ -47,16 +47,16 @@ def search_v1(token, query_str):
     
     message_ids = which_messages(token, store)
 
-    query_str.lower()
+    print(message_ids)
+
+    query_str = query_str.lower()
     searched_messages = []
     for id in message_ids:
-        store['messages'][id]['message'].lower()
-        if query_str in store['messages'][id]['message']:
+        lower_message = store['messages'][id]['message'].lower()
+        if query_str in lower_message:
             new_message = {k:store['messages'][id][k] for k in ('message_id', 'u_id', 'message', 'time_sent', 'reacts', 'is_pinned')}
             new_message = set_react(new_message, auth_user_id)
             searched_messages.append(new_message)
-
-    print(searched_messages)
 
     return {
         'messages': searched_messages
