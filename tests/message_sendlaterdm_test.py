@@ -2,8 +2,6 @@ import requests
 from src.config import url
 import datetime
 
-def return_time
-
 def test_normal_case(register_three_users, create_dm, return_current_time):
     dm_id = create_dm(register_three_users["token"][0], [register_three_users["id"][0]])
     unix_timestamp = return_current_time()
