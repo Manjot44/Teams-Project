@@ -33,11 +33,6 @@ def test_standup_send_input_valid_2message_2user(register_three_users, create_ch
     assert response.status_code == 200
     response = requests.post(f"{url}standup/send/v1", json={'token': token1, 'channel_id': channel, 'message': message2})
     assert response.status_code == 200
-    # sleep(10)
-    # response = requests.get(f"{url}channel/messages/v2?token={token0}&channel_id={channel}&start=0")
-    # assert response.status_code == 200
-    # data = response.json()
-    # assert data['messages'][0]['time_sent'] == time_finish['time_finish']
 
 def test_standup_send_message_len_1000(register_three_users, create_channel):
     token = register_three_users['token'][0]
