@@ -8,13 +8,14 @@ def test_standup_send_input_valid_1message_og_user(register_three_users, create_
     message = 'message from og'
     response = requests.post(f"{url}standup/start/v1", json={'token': token, 'channel_id': channel, 'length': 2})
     assert response.status_code == 200
+    time_finish = response.json()
     response = requests.post(f"{url}standup/send/v1", json={'token': token, 'channel_id': channel, 'message': message})
     assert response.status_code == 200
-    # sleep(2)
-    # response = requests.get(f"{url}channel/messages/v2?token={token}&channel_id={channel}&start=0")
-    # assert response.status_code == 200
-    # data = response.json()
-    # assert data == 0
+    sleep(5)
+    response = requests.get(f"{url}channel/messages/v2?token={token}&channel_id={channel}&start=0")
+    assert response.status_code == 200
+    data = response.json()
+    assert data['messages'][0]['time_sent'] == time_finish['time_finish']
 
 def test_standup_send_input_valid_2message_2user(register_three_users, create_channel):
     token0 = register_three_users['token'][0]
@@ -31,7 +32,6 @@ def test_standup_send_input_valid_2message_2user(register_three_users, create_ch
     assert response.status_code == 200
     response = requests.post(f"{url}standup/send/v1", json={'token': token1, 'channel_id': channel, 'message': message2})
     assert response.status_code == 200
-    # sleep(5)
 
 def test_standup_send_message_len_1000(register_three_users, create_channel):
     token = register_three_users['token'][0]
@@ -41,7 +41,6 @@ def test_standup_send_message_len_1000(register_three_users, create_channel):
     assert response.status_code == 200
     response = requests.post(f"{url}standup/send/v1", json={'token': token, 'channel_id': channel, 'message': message})
     assert response.status_code == 200
-    # sleep(2)
 
 def test_standup_send_message_len_0(register_three_users, create_channel):
     token = register_three_users['token'][0]
@@ -51,7 +50,6 @@ def test_standup_send_message_len_0(register_three_users, create_channel):
     assert response.status_code == 200
     response = requests.post(f"{url}standup/send/v1", json={'token': token, 'channel_id': channel, 'message': message})
     assert response.status_code == 200
-    # sleep(2)
 
 def test_standup_send_channelid_invalid(register_three_users):
     token = register_three_users['token'][0]
@@ -67,7 +65,6 @@ def test_standup_send_message_len_over1000(register_three_users, create_channel)
     assert response.status_code == 200
     response = requests.post(f"{url}standup/send/v1", json={'token': token, 'channel_id': channel, 'message': message})
     assert response.status_code == 400
-    # sleep(2)
 
 def test_standup_send_standup_inactive(register_three_users, create_channel):
     token = register_three_users['token'][0]
@@ -85,7 +82,6 @@ def test_standup_send_channelid_valid_user_not_member(register_three_users, crea
     assert response.status_code == 200
     response = requests.post(f"{url}standup/send/v1", json={'token': nonmember, 'channel_id': channel, 'message': message})
     assert response.status_code == 403
-    # sleep(2)
 
 def test_standup_send_token_invalid_channelid_valid(register_three_users, create_channel):
     token = register_three_users['token'][0]
@@ -95,7 +91,6 @@ def test_standup_send_token_invalid_channelid_valid(register_three_users, create
     assert response.status_code == 200
     response = requests.post(f"{url}standup/send/v1", json={'token': None, 'channel_id': channel, 'message': message})
     assert response.status_code == 403
-    # sleep(2)
 
 def test_standup_send_token_invalid_channelid_invalid(register_three_users):
     message = 'message from og'
