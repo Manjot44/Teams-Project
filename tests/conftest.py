@@ -1,6 +1,8 @@
+from urllib import response
 import pytest
 import requests
 import src.config
+import datetime
 
 @pytest.fixture
 def reset():
@@ -81,3 +83,61 @@ def invite_to_channel():
         return response
 
     return inviting
+
+@pytest.fixture
+def create_dm():
+    def make_dm(token, u_ids):
+        dm_info = {
+            'token': token,
+            'u_ids': u_ids
+        }
+        
+        response = requests.post(f"{src.config.url}/dm/create/v1", json = dm_info)
+        assert response.status_code == 200
+        response_data = response.json()
+
+        return response_data['dm_id']
+
+    return make_dm 
+
+@pytest.fixture
+def return_current_time():
+    current_time = datetime.datetime.now(datetime.timezone.utc)
+    utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
+    time = utc_time.timestamp
+
+    return time
+
+@pytest.fixture
+def send_message():
+    def create_message(token, channel_id, message):
+        message_info = {
+            'token': token,
+            'channel_id': channel_id,
+            'message': message
+        }
+
+        response = requests.post(f"{src.config.url}/message/send/v1", json = message_info)
+        assert response.status_code == 200
+        response_data = response.json()
+        
+        return response_data["message_id"]
+
+    return create_message
+
+@pytest.fixture
+def send_messagedm():
+    def create_messagedm(token, dm_id, message):
+        message_info = {
+            'token': token,
+            'dm_id': dm_id,
+            'message': message
+        }
+
+        response = requests.post(f"{src.config.url}/message/senddm/v1", json = message_info)
+        assert response.status_code == 200
+        response_data = response.json()
+
+        return response_data["message_id"]
+
+    return create_messagedm

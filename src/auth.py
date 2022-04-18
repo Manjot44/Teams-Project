@@ -4,6 +4,8 @@ import re
 import jwt
 import src.error_help
 import src.persistence
+import flask_mail
+from src.server import MAIL
 import src.config
 
 SECRET = 'jroilin'
@@ -41,7 +43,8 @@ def auth_login_v1(email, password):
     if user["password"] != hashlib.sha256(password.encode()).hexdigest():
         raise InputError(f"Error: password is incorrect")
     
-    session_id = len(user["valid_tokens"])
+    store["users"][u_id]["session_id"] += 1
+    session_id = store["users"][u_id]["session_id"]
     encoded_jwt = jwt.encode({'handle_str': user["handle_str"], "session_id": session_id}, SECRET, algorithm='HS256')
     user["valid_tokens"].append(encoded_jwt)
     
@@ -133,7 +136,7 @@ def auth_register_v1(email, password, name_first, name_last):
     handle = generate_handle(name_first, name_last)
     
     store["id"] += 1
-    id = store["id"]  
+    id = store["id"] 
     perm_id = MEMBER
     if id == 0:
         perm_id = OWNER
@@ -148,7 +151,17 @@ def auth_register_v1(email, password, name_first, name_last):
         "handle_str": handle,
         "perm_id": perm_id,
         "valid_tokens": [encoded_jwt],
-        "profile_img_url": f'{src.config.url}src/static/default.jpg'
+        "profile_img_url": f'{src.config.url}src/static/default.jpg',
+        "notifications": [
+            {
+            "channel_id": None,
+            "dm_id": None,
+            "notification_message": None,
+            }
+        ],
+        "reset_codes": [],
+        "session_id": 0,
+        "reset_id": -1,
     }
 
     if -1 in store["users"].keys():
@@ -181,8 +194,88 @@ def auth_logout_v1(token):
     
     auth_user_id = src.error_help.check_valid_token(token, store)
     store["users"][auth_user_id]["valid_tokens"].remove(token)
+    
+    if store["users"][auth_user_id]["valid_tokens"] == []:
+        store["users"][auth_user_id]["session_id"] = -1
 
     src.persistence.set_pickle(store)
 
     return {
     }
+
+
+
+def auth_passwordreset_request(email):
+    '''Given an email address, if the user is a registered user, sends them an email containing a specific secret code, 
+    that when entered in auth/passwordreset/reset, shows that the user trying to reset the password is the one who got sent this email.
+    When a user requests a password reset, they should be logged out of all current sessions.
+    
+    Arguments:
+        email (str) - inputted email
+
+    Exceptions:
+        N/A
+
+    Return Value:
+        (dict): returns an empty dictionary
+    '''
+    store = src.persistence.get_pickle()
+
+    valid_email_uid = src.error_help.check_valid_email(store, email)
+    if valid_email_uid == -1:
+       return {}
+    
+    store['users'][valid_email_uid]['reset_id'] += 1
+    reset_id = store['users'][valid_email_uid]['reset_id']
+
+    encoded_jwt = jwt.encode({'email': email, 'reset_id': reset_id}, SECRET, algorithm='HS256')
+    store['users'][valid_email_uid]['reset_codes'].append(encoded_jwt)
+    
+    store["users"][valid_email_uid]["valid_tokens"] = []
+    store["users"][valid_email_uid]["session_id"] = -1
+
+    msg = flask_mail.Message('Password Reset Code', recipients = [email])
+    
+    msg.body = (
+        f"Hey {store['users'][valid_email_uid]['handle_str']},\n\n"
+        "This is your password reset code:\n"
+        f"{encoded_jwt}\n\n"
+        "Kind Regards,\n"
+        "Microsoft Seams Team"        
+    )
+
+    MAIL.send(msg)
+    
+    src.persistence.set_pickle(store)
+
+    return {}
+
+def auth_passwordreset_reset(reset_code, new_password):
+    '''Given a reset code for a user, set that user's new password to the password provided.
+
+    Arguments:
+        reset_code (str) - inputted reset_code,
+        new_password (str) - new password to replace
+
+    Exceptions:
+        InputError - Occurs when:
+            reset_code is not a valid reset code,
+            password entered is less than 6 characters long
+
+    Return Value:
+        (dict): returns an empty dictionary
+    '''
+    store = src.persistence.get_pickle()
+
+    auth_user_id = src.error_help.check_valid_reset_code(store, reset_code)
+    if len(new_password) < 6:
+        raise InputError(f"Error: password must be at least 6 characters long")
+
+    store['users'][auth_user_id]['password'] = hashlib.sha256(new_password.encode()).hexdigest()
+    store['users'][auth_user_id]['reset_codes'].remove(reset_code)
+    if store['users'][auth_user_id]['reset_codes'] == []:
+        store['users'][auth_user_id]['reset_id'] = -1
+    
+    src.persistence.set_pickle(store)
+
+    return {}

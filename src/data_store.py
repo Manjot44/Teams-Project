@@ -37,6 +37,16 @@ initial_object = {
             'perm_id': None,
             'valid_tokens': [],
             'profile_img_url': None,
+            'notifications': [
+                {
+                'channel_id': None,
+                'dm_id': None,
+                'notification_message': None,
+                }
+            ],
+            'reset_codes': [],
+            'session_id': None,
+            'reset_id': None,
         }
     },
     'channels': {-1:
@@ -47,6 +57,11 @@ initial_object = {
             'member_ids': [],
             'is_public': None,
             'message_ids': [],
+            'standup': {
+                'is_active': False,
+                'time_finish': None,
+                'queue': [],
+            },
         }
     },
     'dms': {-1:
@@ -72,6 +87,7 @@ initial_object = {
         {
             'message_id': None,
             'u_id': None,
+            'shared_message_length': None,
             'message': None,
             'time_sent': None,
             'reacts': {-1:

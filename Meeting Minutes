@@ -86,7 +86,21 @@ Ashwin: message_react, message_unreact, message_pin, message_unpin
 Iqtidar: standup_start, standup_active, standup_send
 Sanjam: user_profile_uploadphoto, user_stats, users_stats
 
-Our next meeting time will be in a weeks time on 26/03/33. The goals we hope to achieve by this time is for everyone to have finished their new 
-functions.
+Our next meeting time will be in two weeks time on 15/04/22. The goals we hope to achieve by this time is for everyone to have finished their new functions.
 
+\\Meeting 9 Minutes//
+15/04/22 10pm
 
+Attendees: All group members
+
+The purpose of this meeting was to go over everyones new functions and ensure that all our old functions were utilising our new datastore format. Most of us have finished our new functions and they are all working properly for the most part. Our goals for the next meeting will most likely be to improve aspects such as coverage and style, and also taking another look at the iteration 2 autotests and enusring they all pass.
+
+our next meeting will most likely be the day before the assignment just to review everything, and will be on 
+18/04/22.
+
+\\Meeting 10 Minutes//
+18/04/22 10pm
+
+Attendees: All group members
+
+For our final meeting the purpose was to review over everything in iteration 3 and ensure we met the specifications. This started with a review over the requirements and desgin, coverage for the functions and looking over the iteration 2 autotests to ensure our functions would pass those. We then did a review of all the functions to take a look at the style and see if any functions could be moved to the error help file to simplify the code. Finally we fixed some issues with threading which was impacting the standup and senddm later functions. We then set our focus on merging everything into the master branch and deployment.

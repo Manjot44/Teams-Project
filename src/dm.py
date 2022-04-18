@@ -1,6 +1,7 @@
 from src.error import InputError, AccessError
 from src.error_help import check_valid_id, check_valid_token
 import src.persistence
+import src.notifications
 
 
 def dm_create_v1(token, u_ids):
@@ -56,6 +57,10 @@ def dm_create_v1(token, u_ids):
     }
 
     src.persistence.set_pickle(store)
+
+    u_ids.remove(owner_id)
+    for u_id in u_ids:
+        src.notifications.create_add_notification(owner_id, dm_id, u_id)
 
     return {
         'dm_id': dm_id,

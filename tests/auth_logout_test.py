@@ -14,10 +14,15 @@ def test_valid_logout(register_three_users, create_channel):
 
     response = requests.post(f"{src.config.url}/auth/logout/v1", json = {"token": second_token})
     assert response.status_code == 200
-
     response = requests.post(f"{src.config.url}/channels/create/v2", json = {"token": second_token, "name": "channel_name", "is_public": True})
     assert response.status_code == 403
     create_channel(register_three_users["token"][0], "channel_name", True)
+
+    response = requests.post(f"{src.config.url}/auth/logout/v1", json = {"token": register_three_users["token"][0]})
+    assert response.status_code == 200
+    response = requests.post(f"{src.config.url}/channels/create/v2", json = {"token": register_three_users["token"][0], "name": "channel_name", "is_public": True})
+    assert response.status_code == 403
+
 
 def test_invalid_token_registered(register_three_users):
     response = requests.post(f"{src.config.url}/auth/logout/v1", json = {"token": None})

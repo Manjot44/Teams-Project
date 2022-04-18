@@ -1,12 +1,10 @@
-from src.error import InputError, AccessError
+from src.error import InputError
 from src.error_help import check_valid_token
 import re
 import src.persistence
 import requests
-import sys
 from PIL import Image
 import urllib.request
-import validators
 import src.config
 
 def user_profile_v1(token, u_id):

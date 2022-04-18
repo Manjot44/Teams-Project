@@ -2,8 +2,8 @@ import signal
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src import config, auth, other, channel_expansion, messages, channels, dm, channel, admin, user
-
+from src import config, auth, other, channel_expansion, messages, channels, dm, channel, admin, user, notifications, search, standup
+import flask_mail
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -29,6 +29,15 @@ APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
 
 # NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
+
+APP.config['MAIL_SERVER']='smtp.gmail.com'
+APP.config['MAIL_PORT'] = 465
+APP.config['MAIL_USERNAME'] = 'h09aelephant@gmail.com'
+APP.config['MAIL_PASSWORD'] = 'jerrylin'
+APP.config['MAIL_USE_TLS'] = False
+APP.config['MAIL_USE_SSL'] = True
+APP.config['MAIL_DEFAULT_SENDER'] = ('Microsoft Seams', 'h09aelephant@gmail.com')
+MAIL = flask_mail.Mail(APP)
 
 def return_int_helper(num):
     if num != None:
@@ -56,6 +65,45 @@ def handle_auth_register():
 
     return dumps(auth.auth_register_v1(email, password, name_first, name_last))
 
+@APP.route("/message/react/v1", methods=['POST'])
+def handle_message_react():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = request_data.get("message_id", None)
+    message_id = return_int_helper(message_id)
+    react_id = request_data.get("react_id", None)
+    react_id = return_int_helper(react_id)
+
+    return dumps(messages.message_react_v1(token, message_id, react_id))
+
+@APP.route("/message/unreact/v1", methods=['POST'])
+def handle_message_unreact():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = request_data.get("message_id", None)
+    message_id = return_int_helper(message_id)
+    react_id = request_data.get("react_id", None)
+    react_id = return_int_helper(react_id)
+
+    return dumps(messages.message_unreact_v1(token, message_id, react_id))
+
+@APP.route("/message/pin/v1", methods=['POST'])
+def handle_message_pin():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = request_data.get("message_id", None)
+    message_id = return_int_helper(message_id)
+
+    return dumps(messages.message_pin_v1(token, message_id))
+
+@APP.route("/message/unpin/v1", methods=['POST'])
+def handle_message_unpin():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    message_id = request_data.get("message_id", None)
+    message_id = return_int_helper(message_id)
+
+    return dumps(messages.message_unpin_v1(token, message_id))
 
 @APP.route("/auth/login/v2", methods=['POST'])
 def handle_auth_login():
@@ -366,6 +414,121 @@ def users_all():
 
     return dumps(user.users_all_v1(token))
 
+
+@APP.route("/notifications/get/v1", methods=['GET'])
+def handle_notifications_get():
+    token = request.args.get("token", None)
+    if token != None:
+        token = str(token)
+
+    return dumps(notifications.notifications_get(token))
+
+
+@APP.route("/search/v1", methods=['GET'])
+def handle_search():
+    token = request.args.get("token", None)
+    if token != None:
+        token = str(token)
+    query_str = request.args.get("query_str", None)
+    if query_str != None:
+        query_str = str(query_str)
+    
+    return dumps(search.search_v1(token, query_str))
+
+
+@APP.route("/message/share/v1", methods=["POST"])
+def handle_message_share():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    og_message_id = int(request_data.get("og_message_id", None))
+    message = str(request_data.get("message", None))
+    channel_id = int(request_data.get("channel_id", None))
+    dm_id = int(request_data.get("dm_id", None))
+
+    return dumps(messages.message_share_v1(token, og_message_id, message, channel_id, dm_id))
+
+@APP.route("/message/sendlater/v1", methods=["POST"])
+def handle_message_sendlater():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    channel_id = int(request_data.get("channel_id", None))
+    message = str(request_data.get("message", None))
+    time_sent = int(request_data.get("time_sent", None))
+
+    return dumps(messages.message_sendlater_v1(token, channel_id, message, time_sent))
+
+@APP.route("/message/sendlaterdm/v1", methods=["POST"])
+def handle_message_sendlaterdm():
+    request_data = request.get_json()
+    token = str(request_data.get("token", None))
+    dm_id = int(request_data.get("dm_id", None))
+    message = str(request_data.get("message", None))
+    time_sent = int(request_data.get("time_sent", None))
+
+    return dumps(messages.message_sendlaterdm_v1(token, dm_id, message, time_sent))
+
+
+@APP.route("/standup/start/v1", methods=["POST"])
+def handle_standup_start():
+    request_data = request.get_json()
+    token = request_data.get("token", None)
+    if token != None:
+        token = str(token)
+    channel_id = request_data.get("channel_id", None)
+    channel_id = return_int_helper(channel_id)
+    length = request_data.get("length", None)
+    length = return_int_helper(length)
+    
+    return dumps(standup.standup_start_v1(token, channel_id, length))
+
+
+@APP.route("/standup/active/v1", methods=["GET"])
+def handle_standup_active():
+    token = request.args.get("token", None)
+    if token != None:
+        token = str(token)
+    channel_id = request.args.get("channel_id", None)
+    channel_id = return_int_helper(channel_id)
+    
+    return dumps(standup.standup_active_v1(token, channel_id))
+
+
+@APP.route("/standup/send/v1", methods=["POST"])
+def handle_standup_send():
+    request_data = request.get_json()
+    token = request_data.get("token", None)
+    if token != None:
+        token = str(token)
+    channel_id = request_data.get("channel_id", None)
+    channel_id = return_int_helper(channel_id)
+    message = request_data.get("message", None)
+    if message != None:
+        message = str(message)
+    
+    return dumps(standup.standup_send_v1(token, channel_id, message))
+
+
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def handle_passwordreset_request():
+    request_data = request.get_json()
+    email = request_data.get("email", None)
+    if email != None:
+        email = str(email)
+    
+    return dumps(auth.auth_passwordreset_request(email))
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def handle_passwordreset_reset():
+    request_data = request.get_json()
+    reset_code = request_data.get("reset_code", None)
+    if reset_code != None:
+        reset_code = str(reset_code)
+    new_password = request_data.get("new_password", None)
+    if new_password != None:
+        new_password = str(new_password)
+    
+    return dumps(auth.auth_passwordreset_reset(reset_code, new_password))
+
 @APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
 def handle_user_profile_uploadphoto_v1():
     request_data = request.get_json()
@@ -382,8 +545,8 @@ def handle_user_profile_uploadphoto_v1():
     x_end = request_data.get('x_end', None)
     x_end = return_int_helper(x_end)
     y_end = request_data.get('y_end', None)
-    y_end = return_int_helper(y_end)   
-
+    y_end = return_int_helper(y_end)
+    
     return dumps(user.user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end))
 
 # NO NEED TO MODIFY BELOW THIS POINT
