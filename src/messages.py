@@ -38,6 +38,7 @@ def add_message(auth_user_id, unix_timestamp, channeldm_id, message, id, shared_
         store['dms'][channeldm_id]['message_ids'].append(id)
 
     src.persistence.set_pickle(store)
+    src.notifications.create_tag_notification(auth_user_id, channeldm_id, message)
 
 def message_send_v1(token, channel_id, message):
     ''' Send a message from the authorised user to the channel specified by channel_id. 
@@ -80,9 +81,6 @@ def message_send_v1(token, channel_id, message):
 
     src.persistence.set_pickle(store)
     add_message(auth_user_id, unix_timestamp, channel_id, message, id, 0, CHANNEL_MSG)
-
-    src.notifications.create_tag_notification(auth_user_id, channel_id, message)
-
     return {
         "message_id": id
     }
@@ -208,8 +206,6 @@ def message_senddm_v1(token, dm_id, message):
 
     src.persistence.set_pickle(store)
     add_message(auth_user_id, unix_timestamp, dm_id, message, id, 0, DM_MSG)
-
-    src.notifications.create_tag_notification(auth_user_id, dm_id, message)
     return {
         "message_id": id
     }
@@ -245,28 +241,22 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     '''
     store = src.persistence.get_pickle()
 
-    # Authorise user token and message 
     auth_user_id = src.error_help.check_valid_token(token, store)
     src.error_help.check_message_id(store, og_message_id)
 
-    # Checks and validate channel_id and dm_id input
     if dm_id != -1 and channel_id != -1:
         raise InputError("Neither chanel_id or dm_id is -1")
     elif dm_id == -1 and channel_id == -1:
         raise InputError("Both channel_id and dm_id cannot be -1")
     
-    # Check message length
-    src.error_help.check_message_length(message)
-
-    # Setup date and message
     current_time = datetime.datetime.now(datetime.timezone.utc)
     utc_time = current_time.replace(tzinfo=datetime.timezone.utc)
     unix_timestamp = utc_time.timestamp()
 
+    src.error_help.check_message_length(message)
     shared_message_length = len(store['messages'][og_message_id]['message']) + SHARED_MSG_OFFSET
     message = '"""' + "\n" + store['messages'][og_message_id]['message'] + "\n" + '"""' + "\n" + message
 
-    # starts checking the channel/dm message
     if dm_id == -1:
         src.error_help.validate_channel(store, channel_id)
         src.error_help.auth_user_not_in_channel(store, auth_user_id, channel_id)
@@ -327,7 +317,6 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     src.error_help.check_message_length(message)
     src.error_help.check_valid_time(unix_timestamp, time_sent)
 
-    # Grab a new id
     store["id"] += 1
     id = store["id"]
 
@@ -378,7 +367,6 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     src.error_help.check_message_length(message)
     src.error_help.check_valid_time(unix_timestamp, time_sent)
 
-    # Grab a new id
     store["id"] += 1
     id = store["id"]
 
