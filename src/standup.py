@@ -6,7 +6,7 @@ import threading
 import requests
 from src.config import url
 
-def standup_send_queue(token, channel_id):
+def standup_send_queue(token, channel_id, time_finish):
     '''When called sends the messages that were queued in standup
     period as one message from authorised user.
 
@@ -22,21 +22,15 @@ def standup_send_queue(token, channel_id):
             formatted_queue += '\n'
         formatted_queue += message
 
-    requests.post(f"{url}message/send/v1", json={'token': token, 'channel_id': channel_id, 'message': formatted_queue})
-    return
-
-def standup_deactivate(channel_id):
-    '''Resets specified channels standup status.
-
-    Arguments:
-        channel_id (int) - channel identification number
-    '''
+    m_id = requests.post(f"{url}message/send/v1", json={'token': token, 'channel_id': channel_id, 'message': formatted_queue})
     store = src.persistence.get_pickle()
+    store['messages'][m_id.json()['message_id']]['time_sent'] = time_finish
     store['channels'][channel_id]['standup']['is_active'] = False
     store['channels'][channel_id]['standup']['time_finish'] = None
     store['channels'][channel_id]['standup']['queue'] = []
     src.persistence.set_pickle(store)
     return
+
 
 def standup_start_v1(token, channel_id, length):
     '''For given channel, starts the standup period where any calls
@@ -73,10 +67,8 @@ def standup_start_v1(token, channel_id, length):
     time_finish = round(datetime.now().timestamp()) + length
     store['channels'][channel_id]['standup']['is_active'] = True
     store['channels'][channel_id]['standup']['time_finish'] = time_finish
-    send_queue = threading.Timer(length, standup_send_queue, args=(token, channel_id,))
+    send_queue = threading.Timer(length, standup_send_queue, args=(token, channel_id, time_finish,))
     send_queue.start()
-    deact = threading.Timer(length, standup_deactivate, args=(channel_id,))
-    deact.start()
 
     src.persistence.set_pickle(store)
     return {'time_finish': time_finish}
