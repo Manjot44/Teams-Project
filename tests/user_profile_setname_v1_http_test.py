@@ -19,7 +19,7 @@ def test_correct_output():
                                     'name_first': 'Monta', 
                                     'name_last': 'Jree', 
                                     'handle_str': 'jerrylin',
-                                    'profile_img_url': None
+                                    'profile_img_url': f'{src.config.url}src/static/default.jpg'
     }}
 
 def test_invalid_first_name1():

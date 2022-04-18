@@ -20,7 +20,7 @@ def test_correct_output():
                                     'name_first': 'Jerry', 
                                     'name_last': 'Lin', 
                                     'handle_str': 'manjotbhathal',
-                                    'profile_img_url': None
+                                    'profile_img_url': f'{src.config.url}src/static/default.jpg'
     }}
 
 def test_invalid_handle_length1():  

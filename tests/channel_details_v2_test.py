@@ -22,7 +22,7 @@ def test_channel_details_valid_user_public_channel(register_three_users):
             'name_first': 'A',
             'name_last': 'A',
             'handle_str': 'aa',
-            'profile_img_url': None,
+            'profile_img_url': f'{url}src/static/default.jpg',
         }
     ]
     assert details['all_members'] == [
@@ -32,7 +32,7 @@ def test_channel_details_valid_user_public_channel(register_three_users):
             'name_first': 'A',
             'name_last': 'A',
             'handle_str': 'aa',
-            'profile_img_url': None,
+            'profile_img_url': f'{url}src/static/default.jpg',
         }
     ]
 

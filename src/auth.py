@@ -4,6 +4,7 @@ import re
 import jwt
 import src.error_help
 import src.persistence
+import src.config
 
 SECRET = 'jroilin'
 OWNER = 1
@@ -147,7 +148,7 @@ def auth_register_v1(email, password, name_first, name_last):
         "handle_str": handle,
         "perm_id": perm_id,
         "valid_tokens": [encoded_jwt],
-        "profile_img_url": None
+        "profile_img_url": f'{src.config.url}src/static/default.jpg'
     }
 
     if -1 in store["users"].keys():

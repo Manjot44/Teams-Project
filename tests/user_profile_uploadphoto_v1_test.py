@@ -10,8 +10,11 @@ def test_correct_output():
     user1 = response.json()
 
     response2 = requests.post(f"{src.config.url}/user/profile/uploadphoto/v1", json = {"token": user1["token"], "img_url": "http://cdn.mos.cms.futurecdn.net/iC7HBvohbJqExqvbKcV3pP.jpg", "x_start": 100, "y_start": 100, "x_end": 200, "y_end": 200})
-    # assert response2.status_code == 200
-    # assert user1['profile_img_url'] == f'src/static/profile_pic_0.jpg'
+    assert response2.status_code == 200
+    
+    response = requests.get(f"{src.config.url}/user/profile/v1?token={user1['token']}&u_id={0}")
+    user = response.json()["user"]
+    assert user['profile_img_url'] == f'{src.config.url}src/static/profile_pic_0.jpg'
     assert os.path.isfile("src/static/profile_pic_0.jpg") is True
 
 def test_invalid_token():
@@ -31,7 +34,7 @@ def test_invalid_url():
     assert response.status_code == 200 
     user1 = response.json()
 
-    response2 = requests.post(f"{src.config.url}/user/profile/uploadphoto/v1", json = {"token": user1["token"], "img_url": 'http://www.sredtrfjgkyjhkgkyftjdrsher.jpg/', "x_start": 100, "y_start": 100, "x_end": 200, "y_end": 200})
+    response2 = requests.post(f"{src.config.url}/user/profile/uploadphoto/v1", json = {"token": user1["token"], "img_url": 'http://localhost:8080/', "x_start": 100, "y_start": 100, "x_end": 200, "y_end": 200})
     assert response2.status_code == 400
 
 
