@@ -44,6 +44,9 @@ initial_object = {
                 'notification_message': None,
                 }
             ],
+            'reset_codes': [],
+            'session_id': None,
+            'reset_id': None,
         }
     },
     'channels': {-1:

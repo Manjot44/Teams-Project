@@ -34,6 +34,9 @@ def clear_v1():
                     'notification_message': None,
                     }
                 ],
+                'reset_codes': [],
+                'session_id': None,
+                'reset_id': None,
             }
         },
         'channels': {-1:

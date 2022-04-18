@@ -109,3 +109,23 @@ def user_not_in_channeldm(data, auth_user_id, channeldm_id):
     else:
         if auth_user_id not in data["dms"][channeldm_id]["member_ids"]:
             raise InputError(f"You are not in the channel/DM that contains this message_id")
+
+def check_valid_email(data, email):
+    valid_email_uid = -1
+    for id, user in data["users"].items():
+        if email == user["email"] and email != None:
+            valid_email_uid = id
+            print(valid_email_uid)
+    
+    return valid_email_uid
+
+def check_valid_reset_code(data, reset_code):
+    valid_code_uid = -1
+    for id, user in data["users"].items():
+        if reset_code in user["reset_codes"] and reset_code != None:
+            valid_code_uid = id
+
+    if valid_code_uid == -1:
+        raise InputError(f"Reset code is not a valid reset code")
+    
+    return valid_code_uid
