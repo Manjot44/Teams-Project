@@ -103,3 +103,24 @@ def test_dm_messages_valid_input(register_three_users):
     response = requests.get(f"{url}/dm/messages/v1?token={token}&dm_id={dm_id['dm_id']}&start={start}")
     assert response.status_code == 200
     
+def test_over_50_messages(register_three_users, create_dm, send_messagedm):
+    token = register_three_users['token'][0]
+    member_id = register_three_users['id'][1]
+    response = requests.post(f"{url}/dm/create/v1", json={'token': token, 'u_ids': [member_id]})
+    assert response.status_code == 200
+    dm_id = response.json()
+    
+    i = 0
+    while i < 60:
+        response = requests.post(f"{url}/message/senddm/v1", json={
+            'token': token,
+            'dm_id': dm_id['dm_id'],
+            'message': "Your"
+        })
+        assert response.status_code == 200
+        i += 1
+
+    assert response.status_code == 200
+    start = 0
+    response = requests.get(f"{url}/dm/messages/v1?token={token}&dm_id={dm_id['dm_id']}&start={start}")
+    assert response.status_code == 200
