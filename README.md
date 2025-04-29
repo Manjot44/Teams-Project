@@ -108,7 +108,7 @@ cd Teams-Project
 
 ### 2. Install dependencies
 ```bash
-pip install flask flask-cors pytest coverage
+pip install -r requirements.txt
 ```
 
 ---
