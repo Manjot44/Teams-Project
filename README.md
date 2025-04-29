@@ -8,6 +8,7 @@ The backend is implemented using **Python (Flask)**, and interacts with a fronte
 ---
 
 ## 🔗 Related Repositories
+Please refer to the following repo if you wish to run this backend with the appropriate frontend. 
 - [Teams-Frontend](https://github.com/Manjot44/Teams-Frontend) — Frontend React application for UNSW Seams
 
 ---
